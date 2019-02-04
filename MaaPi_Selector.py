@@ -23,7 +23,6 @@ class MaapiSelector():
 
     def __init__(self):
         # objects
-        
         self.queue              = Queue.queue()
         self.config             = Config.MaapiVars()
         self.sendstr            = SocketClient.socketClient()
@@ -55,19 +54,29 @@ class MaapiSelector():
     def scanTcpIncommingQuerys(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
-                for que in queue[self.objectname][self.selectorHost][self.selectorPort]:
+                pass
+        except:
+            pass
+        else:
+            if queue[self.objectname][self.selectorHost][self.selectorPort]:
+                queue_ = queue
+                for que in queue_[self.objectname][self.selectorHost][self.selectorPort]:
                     data     = (queue[self.objectname][self.selectorHost][self.selectorPort][que][0].decode("utf-8"))
                     recvHost = (queue[self.objectname][self.selectorHost][self.selectorPort][que][1])
                     recvPort = (queue[self.objectname][self.selectorHost][self.selectorPort][que][2])
                     dtime    = (queue[self.objectname][self.selectorHost][self.selectorPort][que][3])
-                    
+                    print ("|{0}|".format(data))
+                    print ("|{0}|".format(recvHost))
+                    print ("|{0}|".format(recvPort))
                     if data == "is ok?":
-                        print (dtime + " resonce sended")
+                        print ("|{0}|".format(data))
+                        print ("|{0}|".format(recvHost))
+                        print ("|{0}|".format(recvPort)) 
+#                        print (dtime + " resonce sended")
                         self.SendDataToServer(recvHost,recvPort,"ok")
-                    
+                  
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
-        except:
-            pass
+ 
 
     def DeviceList(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled=True).get()
@@ -87,7 +96,7 @@ class MaapiSelector():
                 "dev_machine_location_id",
                 ).order_by('dev_id').filters_eq(
                 dev_status=True, dev_machine_location_id=self.board_id).get()
-        print(data)
+ #       print(data)
  
 
     def SendDataToServer(self,host,port,data):

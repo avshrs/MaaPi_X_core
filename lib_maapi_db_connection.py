@@ -23,7 +23,7 @@ class MaaPiDBConnection():
         Maapi_dbUser            =self.config.maapiDbUser
         Maapi_dbHost            =self.config.maapiDbHost
         Maapi_dbPasswd          =self.config.maapiDbpass
-        print ("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
+#        print ("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
         
         try:    
             self.conn = psycopg2.connect("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
@@ -218,7 +218,7 @@ class MaaPiDBConnection():
         try:
             x = self.conn.cursor()
             try:
-                print(query)
+#                print(query)
                 x.execute(query)
             except Exception as e:
                 print (e)

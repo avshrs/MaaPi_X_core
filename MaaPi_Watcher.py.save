@@ -9,7 +9,7 @@
 
 
 
-import lib_maapi_socketServer               as SocketServer
+import lib_maapi_watcherSocketServer        as WatcherSocketServer 
 import lib_maapi_queue                      as Queue
 import lib_maapi_db_connection              as Db_connection
 import lib_maapi_socketClient               as SocketClient
@@ -29,9 +29,8 @@ class MaapiWatcher():
         self.queue              = Queue.queue()
         self.config             = Config.MaapiVars()
         self.socketClient       = SocketClient.socketClient()
-        self.socketServer       = SocketServer.SocketServer()       
+        self.socketServer       = WatcherSocketServer.WatcherSocketServer()
         self.maapiDB            = Db_connection.MaaPiDBConnection()
-
         # vars
         self.objectname         ="watcher"
         self.selectorHost       = self.config.selectorHost
@@ -56,12 +55,7 @@ class MaapiWatcher():
 
     def runTcpServer(self):
         print ("run server")
-        self.thread.append(Thread(target=self.socketServer.startServer, 
-                                  args=(self.objectname,
-                                        self.selectorHost, 
-                                        self.selectorPort, 
-                                        self.queue, 
-                                        1)))
+        self.thread.append(Thread(target=self.socketServer.startServer, args=(self.watcherHost, self.watcherPort, self.queue, 0)))
         print ("start server")
         self.thread[0].start()
     
@@ -75,41 +69,31 @@ class MaapiWatcher():
             self.selectorPid = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
             print (self.selectorPid.pid)
     
-    def scanTcpIncommingQuerys(self,queue):
-        try:
-            if queue[self.objectname][self.selectorHost][self.selectorPort]:    
-                pass
-        except:
-            pass
-        else:
-            if queue[self.objectname][self.selectorHost][self.selectorPort]:
-                queue_ = queue
-                for que in queue_[self.objectname][self.selectorHost][self.selectorPort]:
-                    data     = (queue[self.objectname][self.selectorHost][self.selectorPort][que][0].decode("utf-8"))
-                    recvHost = (queue[self.objectname][self.selectorHost][self.selectorPort][que][1])
-                    recvPort = (queue[self.objectname][self.selectorHost][self.selectorPort][que][2])
-                    dtime    = (queue[self.objectname][self.selectorHost][self.selectorPort][que][3])
-                    if data == "ok":                  
-                    del queue[self.objectname][self.selectorHost][self.selectorPort][que]
+ 
     
-   
-    def checkSelector(self):
+    def checkSelector2(self):
         try:
             if (dt.now() - self.lastResponce).seconds >5:
-                responce = self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, "is ok?")
+                responce = self.socketClient.sendStr(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost, self.watcherPort) )
+		
+        except Exception as e:
+            print (e)
+
+    def checkSelector2(self):
+        try:
+            if (dt.now() - self.lastResponce).seconds >5:
+                responce = self.socketClient.sendStr(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost, self.watcherPort) )
                 if responce.decode("utf-8") == "ok": 
                      print ("ok") 
                      self.lastResponce = dt.now() 
                 else: 
                      print ("restart selector") 
-                     self.startSelector()                              
         except:
-             pass
+             self.startSelector()                              
 
     def loop(self):
-
-        while True:
-            time.sleep(5)
+        except Exception as e: while True:
+            print (e)            time.sleep(5)
             
             print ("{0} - pause - Watcher".format(dt.now()))
             self.checkSelector()
