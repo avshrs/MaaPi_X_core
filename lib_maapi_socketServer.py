@@ -13,9 +13,9 @@ class SocketServer():
     def startServer(self,owner, host, port, queue, object_id):
         queue_=queue
         
-        self._debug(1,"ss start")
+        
         try:
-            self._debug(1,"ss starttry ")
+            
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.bind((host, int(port)))
