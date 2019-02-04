@@ -44,8 +44,8 @@ class MaapiWatcher():
         
         self.lastResponce       = dt.now() - timedelta(hours=1)
         self.selectorPid        = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
-
-        self._debug(1,self.selectorPid.pid)
+        self.debug = 1
+        
         
     
     
