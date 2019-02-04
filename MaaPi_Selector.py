@@ -67,10 +67,10 @@ class MaapiSelector():
             pass
         else:
             for que in queue__:
-                data     = (que[0])
-                recvHost = (que[1])
-                recvPort = (que[2])
-                dtime    = (que[3])
+                data     = (queue__[que][0])
+                recvHost = (queue__[que][1])
+                recvPort = (queue__[que][2])
+                dtime    = (queue__[que][3])
                 
                 if data == "is ok?":
                     self.SendDataToServer(recvHost,recvPort,"ok")
