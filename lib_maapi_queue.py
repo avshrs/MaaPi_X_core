@@ -26,10 +26,10 @@ class queue():
             port_[onPort]=id_
             host_[fomHost]=port_
             self.socketReadings[owner]=host_
-            print ("empty",self.socketReadings)
+            #print ("empty",self.socketReadings)
         else:
             self.socketReadings[owner][fomHost][onPort][self.seqSRnr]=[data,reciveToHost,reciveToPort,dt_]
-            print ("adding",self.socketReadings)
+            #print ("adding",self.socketReadings)
         self.seqSRnr +=1
 
     def getSocketRadings(self):

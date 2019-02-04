@@ -35,8 +35,8 @@ class SocketServer():
                         #response = data # ack ok
                         #client.send(response)
         except Exception as e :
-             self._debug(1,"Except detect:\n---------------------------------------------------\n{0}".format(e))
-             self._debug(1,"---------------------------------------------------")
+             self._debug(1,"\nExcept detect:\n---------------------------------------------------\n{0}".format(e))
+             self._debug(1,"\n---------------------------------------------------\n")
              sock.close()
 
         finally:
