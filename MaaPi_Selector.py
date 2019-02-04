@@ -62,7 +62,7 @@ class MaapiSelector():
     def scanQueueForIncommingQuerys(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
-                queue__=queue[self.objectname][self.selectorHost][self.selectorPort]
+                queue__= queue[self.objectname][self.selectorHost][self.selectorPort]
         except:
             pass
         else:
