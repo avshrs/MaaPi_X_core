@@ -62,22 +62,20 @@ class MaapiSelector():
     def scanQueueForIncommingQuerys(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
-                pass
+                queue__=queue[self.objectname][self.selectorHost][self.selectorPort]
         except:
             pass
         else:
-            if queue[self.objectname][self.selectorHost][self.selectorPort]:
-                queue_ = queue
-                for que in queue_[self.objectname][self.selectorHost][self.selectorPort]:
-                    data     = (queue[self.objectname][self.selectorHost][self.selectorPort][que][0])
-                    recvHost = (queue[self.objectname][self.selectorHost][self.selectorPort][que][1])
-                    recvPort = (queue[self.objectname][self.selectorHost][self.selectorPort][que][2])
-                    dtime    = (queue[self.objectname][self.selectorHost][self.selectorPort][que][3])
-                    
-                    if data == "is ok?":
-                        self.SendDataToServer(recvHost,recvPort,"ok")
-                        del queue[self.objectname][self.selectorHost][self.selectorPort][que]
- 
+            for que in queue__:
+                data     = (que[0])
+                recvHost = (que[1])
+                recvPort = (que[2])
+                dtime    = (que[3])
+                
+                if data == "is ok?":
+                    self.SendDataToServer(recvHost,recvPort,"ok")
+                    del queue[self.objectname][self.selectorHost][self.selectorPort][que]
+
 
     def DeviceList(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled=True).get()
