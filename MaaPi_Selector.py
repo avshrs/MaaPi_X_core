@@ -73,8 +73,7 @@ class MaapiSelector():
                     recvHost = (queue[self.objectname][self.selectorHost][self.selectorPort][que][1])
                     recvPort = (queue[self.objectname][self.selectorHost][self.selectorPort][que][2])
                     dtime    = (queue[self.objectname][self.selectorHost][self.selectorPort][que][3])
-                    self._debug(1,data)
-                    data_,ip_,port_= data.split(",")
+                    
                     if data == "is ok?":
                         self.SendDataToServer(recvHost,recvPort,"ok")
                         del queue[self.objectname][self.selectorHost][self.selectorPort][que]
