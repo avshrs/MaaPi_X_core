@@ -110,7 +110,6 @@ class MaapiSelector():
         
         while True:
             if (dt.now() - self.timer1).seconds >1:
-                print (1)
                 self.DeviceList()
                 self.timer1 = dt.now()
             time.sleep(0.01)

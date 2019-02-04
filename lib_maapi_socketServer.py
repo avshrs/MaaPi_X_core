@@ -21,6 +21,7 @@ class SocketServer():
                     while True:
                         data = client.recv(20000)
                         if not data: break
+                        data, ip_, port_ = data.decode("utf-8").split(",")
                         queue_.addSocketRadings(owner, host, port, data, ip_, port_)         
                         #response = data # ack ok
                         #client.send(response)
