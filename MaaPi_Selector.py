@@ -52,7 +52,7 @@ class MaapiSelector():
         return readings
 
     
-    def scanTcpIncommingQuerys(self,queue):
+    def scanQueueForIncommingQuerys(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
                 for que in queue[self.objectname][self.selectorHost][self.selectorPort]:
@@ -105,10 +105,7 @@ class MaapiSelector():
                 self.DeviceList()
                 self.timer1 = dt.now()
             time.sleep(0.01)
-            
-          #  print ("{0} - pause - Selector".format(dt.now()))
-            #self.scanTcpIncommingQuerys(self.queue.get_tcp_radings())
-            self.scanTcpIncommingQuerys(self.queue.getSocketRadings())
+            self.scanQueueForIncommingQuerys(self.queue.getSocketRadings())
     
 if __name__ == "__main__":
     MaapiSel =  MaapiSelector()
