@@ -13,6 +13,11 @@ import MaaPi_Config as Config
 class MaaPiDBConnection():
       
     def __init__(self):
+        self.filters_ = {}
+        self.orders_ = {}
+        self.columns_ = {}
+        self.columns_var = {}
+        self.table_ = {}
         self.config             = Config.MaapiVars()
         Maapi_dbName            =self.config.maapiDbName
         Maapi_dbUser            =self.config.maapiDbUser
@@ -147,14 +152,7 @@ class MaaPiDBConnection():
         return self
 
     def get(self):
-        try:
-            if self.columns_:
-                  pass
-        except:
-            columns = "*"
-            self.columns_var = "*"
-        
-        else:
+        if self.columns_:
             c_len = len(self.columns_)
             c_i = 1
             columns = " "
@@ -166,53 +164,56 @@ class MaaPiDBConnection():
                     c_i += 1
                 else:
                     columns += "{0}".format(c)
-
+        else:
+            columns = "*"
+            self.columns_var = "*"
+        
         query = "SELECT {0} FROM {1} ".format(columns, self.table_)
         
-        try:           
-              if self.filters_:
-                  f_len = len(self.filters_)
-                  f_i = 1
-                  query += "WHERE "
-                  for i in self.filters_:
-                      if f_i == 1:
-                          if self.if_number(self.filters_[i]):
-                              query += " {0} = {1}".format(i, self.filters_[i])
-                          else:
-                              query += " {0} = '{1}'".format(i, self.filters_[i])
-                      else:
-                          query += " and "
-                          if self.if_number(self.filters_[i]):
-                              query += " {0} = {1}".format(i, self.filters_[i])
-                          else:
-                              query += " {0} = '{1}'".format(i, self.filters_[i])
-                      f_i += 1
-        except:
-            pass
-        try:                  
-              if self.orders_:
-                  try:
-                      self.orders_[1]
-                  except:
-                      query += " ORDER BY {0}".format(self.orders_[0])
-                  else:
-                      if self.orders_[1] == "asc" or self.orders_[1] == "ASC" or self.orders_[1] == "desc" or self.orders_[1] == "DESC":
-                          query += " ORDER BY {0} {1}".format(self.orders_[0],
-                                                              self.orders_[1])
-                      else:
-                          raise ValueError(
-                              "order_by Second Value should be empty or ASC or DESC but get: '{0}'".
-                              format(self.orders_[1]))
-        except:
-            pass
+        if self.filters_:
+            f_len = len(self.filters_)
+            f_i = 1
+            query += "WHERE "
+            for i in self.filters_:
+                if f_i == 1:
+                    if self.if_number(self.filters_[i]):
+                        query += " {0} = {1}".format(i, self.filters_[i])
+                    else:
+                        query += " {0} = '{1}'".format(i, self.filters_[i])
+                else:
+                    query += " and "
+                    if self.if_number(self.filters_[i]):
+                        query += " {0} = {1}".format(i, self.filters_[i])
+                    else:
+                        query += " {0} = '{1}'".format(i, self.filters_[i])
+                f_i += 1
+        if self.orders_:
+            try:
+                self.orders_[1]
+            except:
+                query += " ORDER BY {0}".format(self.orders_[0])
+            else:
+                if self.orders_[1] == "asc" or self.orders_[1] == "ASC" or self.orders_[1] == "desc" or self.orders_[1] == "DESC":
+                    query += " ORDER BY {0} {1}".format(self.orders_[0],
+                                                        self.orders_[1])
+                else:
+                    raise ValueError(
+                        "order_by Second Value should be empty or ASC or DESC but get: '{0}'".
+                        format(self.orders_[1]))
+        
 
         query += ";"
-
+        
         data = self.exec_query_select(query, self.table_)
-
+        self.filters_ = {}
+        self.orders_ = {}
+        self.columns_ = {}
+        self.columns_var = {}
+        self.table_ = {}    
         return data 
 
     def exec_query_select(self, query, name):
+      
         table_data_dict = {}
         try:
             x = self.conn.cursor()
