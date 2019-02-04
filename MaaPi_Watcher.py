@@ -90,6 +90,7 @@ class MaapiWatcher():
                     recvPort = (queue[self.objectname][self.selectorHost][self.selectorPort][que][2])
                     dtime    = (queue[self.objectname][self.selectorHost][self.selectorPort][que][3])
                     if data == "ok":                  
+                        print("ok")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
     
    
