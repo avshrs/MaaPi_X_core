@@ -45,19 +45,19 @@ class MaapiWatcher():
         self.lastResponce       = dt.now() - timedelta(hours=1)
         self.selectorPid        = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
 
-        print (self.selectorPid.pid)
+        self._debug(1,self.selectorPid.pid)
         
     
     
     def _debug(self, level, msg):
         if self.debug >= level:
-            print("DEBUG MaaPi Connection DB Main {0} {1}, {2}".format(level, dt.now(), msg))
+            print("DEBUG MaaPi Watcher\t\t\t{0} {1}, {2}".format(level, dt.now(), msg))
 
 
     def runTcpServer(self):
-        print ("run server")
+        self._debug(1,"run server")
         self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.watcherHost, self.watcherPort, self.queue, 1)))
-        print ("start server")
+        self._debug(1,"start server")
         self.thread[0].start()
     
 
@@ -65,10 +65,10 @@ class MaapiWatcher():
         try:
             self.selectorPid.kill
         except Exception as e:
-            print(e)
+            self._debug(1,e)
         else:
             self.selectorPid = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
-            print (self.selectorPid.pid)
+            self._debug(1,self.selectorPid.pid)
     
     def scanQueueForSelectorAck(self,queue):
         try:
@@ -93,13 +93,13 @@ class MaapiWatcher():
     def checkSelector(self):
         try:
             if (dt.now() - self.lastResponce).seconds >5:
-                self.socketClient.sendStr(self.selectorHost, self.selectorPort, "is ok?")
+                self.socketClient.sendStr(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost,port=self.watcherPort))
                 responce = self.scanQueueForSelectorAck(self.queue)
                 if responce == "ok": 
-                     print ("ok") 
+                     self._debug(1,"ack from selector = ok") 
                      self.lastResponce = dt.now() 
                 else: 
-                     print ("restart selector") 
+                     self._debug(1,"restart selector") 
                      self.startSelector()                              
         except:
              pass
@@ -109,7 +109,7 @@ class MaapiWatcher():
         while True:
             time.sleep(5)
             
-            print ("{0} - pause - Watcher".format(dt.now()))
+            self._debug(1,"{0} - pause - Watcher".format(dt.now()))
             self.checkSelector()
     
 if __name__ == "__main__":
