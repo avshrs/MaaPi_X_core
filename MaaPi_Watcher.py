@@ -46,7 +46,7 @@ class MaapiWatcher():
         self.selectorPid        = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
 
         print (self.selectorPid.pid)
-        print(self.queue)
+        
     
     
     def _debug(self, level, msg):
@@ -70,7 +70,7 @@ class MaapiWatcher():
             self.selectorPid = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
             print (self.selectorPid.pid)
     
-    def scanTcpIncommingQuerys(self,queue):
+    def scanQueueForSelectorAck(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
                 pass
@@ -85,15 +85,17 @@ class MaapiWatcher():
                     recvPort = (queue[self.objectname][self.selectorHost][self.selectorPort][que][2])
                     dtime    = (queue[self.objectname][self.selectorHost][self.selectorPort][que][3])
                     if data == "ok":                  
-                        print("ok")
-                    del queue[self.objectname][self.selectorHost][self.selectorPort][que]
-    
+                        return "ok"          
+                        del queue[self.objectname][self.selectorHost][self.selectorPort][que]
+                return "nn"
+        
    
     def checkSelector(self):
         try:
             if (dt.now() - self.lastResponce).seconds >5:
-                responce = self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, "is ok?")
-                if responce.decode("utf-8") == "ok": 
+                self.socketClient.sendStr(self.selectorHost, self.selectorPort, "is ok?")
+                responce = self.scanQueueForSelectorAck(self.queue)
+                if responce == "ok": 
                      print ("ok") 
                      self.lastResponce = dt.now() 
                 else: 
