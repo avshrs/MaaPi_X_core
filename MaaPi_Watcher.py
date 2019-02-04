@@ -56,12 +56,7 @@ class MaapiWatcher():
 
     def runTcpServer(self):
         print ("run server")
-        self.thread.append(Thread(target=self.socketServer.startServer, 
-                                  args=(self.objectname,
-                                        self.selectorHost, 
-                                        self.selectorPort, 
-                                        self.queue, 
-                                        1)))
+        self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.watcherHost, self.watcherPort, self.queue, 1)))
         print ("start server")
         self.thread[0].start()
     
