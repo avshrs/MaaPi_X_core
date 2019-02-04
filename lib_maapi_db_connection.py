@@ -148,25 +148,27 @@ class MaaPiDBConnection():
 
     def get(self):
         try:
-              if self.columns_:
-                  c_len = len(self.columns_)
-                  c_i = 1
-                  columns = " "
-                  for c in self.columns_:
-                      if c_len > 1:
-                          columns += "{0}".format(c)
-                          if c_i < c_len:
-                              columns += ", "
-                          c_i += 1
-                      else:
-                          columns += "{0}".format(c)
-              else:
-                  columns = "*"
-                  self.columns_var = "*"
-
-              query = "SELECT {0} FROM {1} ".format(columns, self.table_)
+            if self.columns_:
+                  pass
         except:
-            pass
+            columns = "*"
+            self.columns_var = "*"
+        
+        else:
+            c_len = len(self.columns_)
+            c_i = 1
+            columns = " "
+            for c in self.columns_:
+                if c_len > 1:
+                    columns += "{0}".format(c)
+                    if c_i < c_len:
+                        columns += ", "
+                    c_i += 1
+                else:
+                    columns += "{0}".format(c)
+
+        query = "SELECT {0} FROM {1} ".format(columns, self.table_)
+        
         try:           
               if self.filters_:
                   f_len = len(self.filters_)
