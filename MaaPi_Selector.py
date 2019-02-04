@@ -37,12 +37,20 @@ class MaapiSelector():
         self.selectorHost       = self.config.selectorHost
         self.thread             = []
         self.timer1             = dt.now()
+        self.debug = 1
+        
+        
+    
+    
+    def _debug(self, level, msg):
+        if self.debug >= level:
+            print("DEBUG MaaPi Selector\t\t\t{0} {1}, {2}".format(level, dt.now(), msg))
 
     
     def runTcpServer(self):
-        print ("run server")
+        self._debug(1,"run server")
         self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.selectorHost, self.selectorPort, self.queue, 1)))
-        print ("start server")
+        self._debug(1,"start server")
         self.thread[0].start()
     
 
@@ -65,17 +73,9 @@ class MaapiSelector():
                     recvHost = (queue[self.objectname][self.selectorHost][self.selectorPort][que][1])
                     recvPort = (queue[self.objectname][self.selectorHost][self.selectorPort][que][2])
                     dtime    = (queue[self.objectname][self.selectorHost][self.selectorPort][que][3])
-                    print ("|{0}|".format(data))
-                    print ("|{0}|".format(recvHost))
-                    print ("|{0}|".format(recvPort))
                     if data == "is ok?":
-                        print ("|{0}|".format(data))
-                        print ("|{0}|".format(recvHost))
-                        print ("|{0}|".format(recvPort)) 
-#                        print (dtime + " resonce sended")
                         self.SendDataToServer(recvHost,recvPort,"ok")
-                  
-                    del queue[self.objectname][self.selectorHost][self.selectorPort][que]
+                        del queue[self.objectname][self.selectorHost][self.selectorPort][que]
  
 
     def DeviceList(self):
@@ -96,14 +96,14 @@ class MaapiSelector():
                 "dev_machine_location_id",
                 ).order_by('dev_id').filters_eq(
                 dev_status=True, dev_machine_location_id=self.board_id).get()
- #       print(data)
+
  
 
     def SendDataToServer(self,host,port,data):
         try:
             self.sendstr.sendStr(host, port, data)
         except Exception as e:
-            print (e)
+            self._debug(1,e)
 
 
     def loop(self):

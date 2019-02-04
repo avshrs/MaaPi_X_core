@@ -23,19 +23,23 @@ class MaaPiDBConnection():
         Maapi_dbUser            =self.config.maapiDbUser
         Maapi_dbHost            =self.config.maapiDbHost
         Maapi_dbPasswd          =self.config.maapiDbpass
-#        print ("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
-        
+        self.debug = 1
+
         try:    
             self.conn = psycopg2.connect("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
         except (Exception, psycopg2.DatabaseError) as error:
-            print (error)
+            self._debug(1,error)
     def __del__(self):
         try:
             self.conn.close()
-            print ("con closed and init end")
+
         except:
-            print ("init end")
-    
+            psss
+       
+    def _debug(self, level, msg):
+        if self.debug >= level:
+            print("DEBUG MaaPi Watcher\t\t\t{0} {1}, {2}".format(level, dt.now(), msg))
+
 
 
     def queue(self,dev_id,status,board_id):
@@ -61,7 +65,7 @@ class MaaPiDBConnection():
 
     def insertRaw(self, where, what):
         string_ = "INSERT INTO {where} ({what})".format(where=where, what=",".join(what))
-        print (string_)
+        self._debug(1,string_)
         return string_
 
 
