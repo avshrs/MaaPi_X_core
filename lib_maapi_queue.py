@@ -44,6 +44,7 @@ class queue():
    
 
     def addSocketRadings(self,owner,fomHost,onPort, data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
+            print (self.socketReadings)
             self.socketReadings[str(owner)][str(fomHost)][int(onPort)][int(self.seqSRnr)]=[str(data),str(reciveToHost),int(reciveToPort),dt_]
             self._debug(1,"insert update data: {d}".format(d=self.socketReadings))
            
