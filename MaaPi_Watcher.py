@@ -99,8 +99,8 @@ class MaapiWatcher():
                 responce = self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost,port=self.watcherPort))
 
                 
-                self._debug(1,"self.checkSelector() responce = |{responce}| ".format(responce=responce))
-                if responce == "ok": 
+                self._debug(1,"self.checkSelector() responce = |{responce}| ".format(responce=responce.data.decode("utf-8")))
+                if responce.data.decode("utf-8") == "ok": 
                      self._debug(1,"ack from selector = ok") 
                      self.lastResponce = dt.now() 
                 else: 
