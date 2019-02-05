@@ -81,7 +81,7 @@ class MaapiSelector():
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
         
-        self.devices = self.maapiDB.table("devices").columns(
+        data = self.maapiDB.table("devices").columns(
                 "dev_id",
                 "dev_type_id",
                 "dev_rom_id",
@@ -93,7 +93,7 @@ class MaapiSelector():
                 "dev_machine_location_id",
                 ).order_by('dev_id').filters_eq(
                 dev_status=True, dev_machine_location_id=self.board_id).get()
-        print (self.devices["dev_id"])
+
  
 
     def SendDataToServer(self,host,port,data):
@@ -109,7 +109,7 @@ class MaapiSelector():
             if (dt.now() - self.timer1).seconds >1:
                 self.DeviceList()
                 self.timer1 = dt.now()
-            
+            time.sleep(0.01)
             self.scanQueueForIncommingQuerys(self.queue.getSocketRadings())
     
 if __name__ == "__main__":
