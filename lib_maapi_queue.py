@@ -16,7 +16,7 @@ class queue():
     def __init__(self):
         self.seqSRnr = 0
         self.queue_tcp_radings = {}
-        self.socketReadings =  defaultdict( lambda: defaultdict(lambda: defaultdict( list() )))
+        self.socketReadings =  defaultdict( lambda: defaultdict(lambda: defaultdict( lambda: defaultdict(list() ))))
         
         self.debug = 1
     
