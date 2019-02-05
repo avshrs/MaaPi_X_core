@@ -40,7 +40,10 @@ class MaapiSelector():
         self.debug = 1
         self._debug(1,"Initialising Selector Module ")
         
-    
+       
+    def __del__(self):
+        self.thread[0].join()
+     
     
     def _debug(self, level, msg):
         if self.debug >= level:
@@ -48,9 +51,12 @@ class MaapiSelector():
 
     
     def runTcpServer(self):
-        self._debug(2,"Selector run tcp Server")
-        self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.selectorHost, self.selectorPort, self.queue, 1)))
-        self.thread[0].start()
+        try:    
+            self._debug(2,"Selector run tcp Server")
+            self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.selectorHost, self.selectorPort, self.queue, 1)))
+            self.thread[0].start()
+        finally:
+            self.thread[0].join()
     
 
     def checkDbForOldreadings(self):
