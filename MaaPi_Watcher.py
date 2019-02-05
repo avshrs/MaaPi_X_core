@@ -97,17 +97,17 @@ class MaapiWatcher():
     def checkSelector(self):
         try:
             if (dt.now() - self.lastResponce).seconds >5:
-                self._debug(1,"self.checkSelector() sending ack ")
+                self._debug(1,"Sending query to Selector: is ok?")
                 responce = self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost,port=self.watcherPort))
-
-                
                 self._debug(1,"self.checkSelector() responce = |{responce}| ".format(responce=responce.data.decode("utf-8")))
+                
                 if responce.data.decode("utf-8") == "ok": 
-                     self._debug(1,"ack from selector = ok") 
-                     self.lastResponce = dt.now() 
+                    self._debug(1,"Ack from Selector = ok") 
+                    self.lastResponce = dt.now() 
                 else: 
-                     self._debug(1,"restart selector") 
-                     self.startSelector()                              
+                    self._debug(1,"Restart selector") 
+                    self.startSelector()        
+                    self.lastResponce = dt.now()                       
         except:
              pass
 

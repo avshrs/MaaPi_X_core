@@ -26,8 +26,11 @@ class SocketServer():
                     while True:
                         data = client.recv(20000)
                         if not data: break
+                        self._debug(1,"Data recived from {address}".format(address=address))
                         data_ , ip_, port_ = data.decode("utf-8").split(",")
+                       
                         queue.addSocketRadings(owner, host, port, data, ip_, port_)   
+                        
                         if data_ =="is ok?":
                             response = bytes("{payload}".format(payload="ok"),"utf-8")
                             client.send(response)
