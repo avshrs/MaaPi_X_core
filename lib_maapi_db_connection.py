@@ -7,7 +7,7 @@
 #
 ##############################################################
 import psycopg2
-from datetime import datetime, timedelta
+from datetime import datetime as dt, timedelta
 import MaaPi_Config as Config
 
 class MaaPiDBConnection():
@@ -29,12 +29,11 @@ class MaaPiDBConnection():
             self.conn = psycopg2.connect("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
         except (Exception, psycopg2.DatabaseError) as error:
             self._debug(1,error)
-    def __del__(self):
-        try:
-            self.conn.close()
 
-        except:
-            psss
+    def __del__(self):
+        self.conn.close()
+
+    
        
     def _debug(self, level, msg):
         if self.debug >= level:

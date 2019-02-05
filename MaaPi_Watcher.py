@@ -80,7 +80,6 @@ class MaapiWatcher():
         except:
             pass
         else:
-            
             for que in queue__:
                 data     = queue__[que][0]
                 recvHost = queue__[que][1]

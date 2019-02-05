@@ -64,9 +64,6 @@ class MaapiSelector():
     def scanQueueForIncommingQuerys(self,queue):
         try:
             queue__= copy.deepcopy(queue[self.objectname][self.selectorHost][self.selectorPort])
-        except:
-            pass
-        else:
             for que in queue__:
                 data     = queue__[que][0]
                 recvHost = queue__[que][1]
@@ -75,6 +72,8 @@ class MaapiSelector():
                 if data == "is ok?":
                     self._debug(1,"del inserted data ")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
+        except Exception as e:
+            self._debug(1,e)
 
     def DeviceList(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled=True).get()
@@ -82,7 +81,7 @@ class MaapiSelector():
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
         
-        data = self.maapiDB.table("devices").columns(
+        self.devices = self.maapiDB.table("devices").columns(
                 "dev_id",
                 "dev_type_id",
                 "dev_rom_id",
@@ -94,7 +93,7 @@ class MaapiSelector():
                 "dev_machine_location_id",
                 ).order_by('dev_id').filters_eq(
                 dev_status=True, dev_machine_location_id=self.board_id).get()
-
+        print (self.devices["dev_id"])
  
 
     def SendDataToServer(self,host,port,data):
@@ -108,7 +107,7 @@ class MaapiSelector():
         
         while True:
             if (dt.now() - self.timer1).seconds >1:
-                #self.DeviceList()
+                self.DeviceList()
                 self.timer1 = dt.now()
             
             self.scanQueueForIncommingQuerys(self.queue.getSocketRadings())
