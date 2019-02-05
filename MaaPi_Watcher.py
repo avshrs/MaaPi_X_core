@@ -15,6 +15,7 @@ import lib_maapi_db_connection              as Db_connection
 import lib_maapi_socketClient               as SocketClient
 import MaaPi_Config                         as Config
 
+from threading import RLock
 from datetime import datetime as dt, timedelta
 from threading import Lock, Thread
 import subprocess
@@ -41,7 +42,7 @@ class MaapiWatcher():
         self.selecorName        = self.config.selectorName
         self.thread             = []
 
-        
+        self.lock               = RLock()
         self.lastResponce       = dt.now() - timedelta(hours=1)
         self.selectorPid        = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
         self.debug = 1
@@ -77,8 +78,10 @@ class MaapiWatcher():
         except:
             pass
         else:
+
             if queue[self.objectname][self.selectorHost][self.selectorPort]:
-                queue_ = queue
+                queue_ = dict(queue)
+                
                 for que in queue_[self.objectname][self.selectorHost][self.selectorPort]:
                     data     = (queue[self.objectname][self.selectorHost][self.selectorPort][que][0].decode("utf-8"))
                     recvHost = (queue[self.objectname][self.selectorHost][self.selectorPort][que][1])
@@ -88,7 +91,7 @@ class MaapiWatcher():
                         return "ok"          
                         del queue[self.objectname][self.selectorHost][self.selectorPort][que]
                 return "nn"
-        
+ 
    
     def checkSelector(self):
         try:
