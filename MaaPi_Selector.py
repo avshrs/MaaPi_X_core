@@ -73,6 +73,7 @@ class MaapiSelector():
                 recvHost = queue__[que][1]
                 recvPort = queue__[que][2]
                 dtime    = queue__[que][3]
+                self._debug(1,queue__[que])
                 if data == "is ok?":
                     self._debug(1,"del inserted data ")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
