@@ -48,7 +48,7 @@ class MaapiSelector():
 
     
     def runTcpServer(self):
-        self._debug(1,"Selector run tcp Server")
+        self._debug(2,"Selector run tcp Server")
         self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.selectorHost, self.selectorPort, self.queue, 1)))
         self.thread[0].start()
     

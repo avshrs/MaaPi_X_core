@@ -54,9 +54,9 @@ class MaapiWatcher():
 
 
     def runTcpServerAsThreat(self):
-        self._debug(1,"run server")
+        self._debug(2,"Selector run tcp Server")
         self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.watcherHost, self.watcherPort, self.queue, 1)))
-        self._debug(1,"start server")
+        
         self.thread[0].start()
     
 
