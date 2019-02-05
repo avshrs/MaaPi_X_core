@@ -72,6 +72,7 @@ class MaapiSelector():
                 dtime    = queue__[que][3]
                 
                 if data == "is ok?":
+                    self._debug(1,"del inserted data ")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
 
     def DeviceList(self):
