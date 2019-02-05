@@ -38,7 +38,7 @@ class MaaPiDBConnection():
        
     def _debug(self, level, msg):
         if self.debug >= level:
-            print("DEBUG MaaPi Watcher\t\t\t{0} {1}, {2}".format(level, dt.now(), msg))
+            print("DEBUG MaaPi Watcher\t\t{0} {1}, {2}".format(level, dt.now(), msg))
 
 
 

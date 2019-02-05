@@ -44,13 +44,12 @@ class MaapiSelector():
     
     def _debug(self, level, msg):
         if self.debug >= level:
-            print("DEBUG MaaPi Selector\t{0} {1}, {2}".format(level, dt.now(), msg))
+            print("DEBUG MaaPi Selector\t\t{0} {1}, {2}".format(level, dt.now(), msg))
 
     
     def runTcpServer(self):
-        self._debug(1,"run server")
+        self._debug(1,"Selector run tcp Server")
         self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.selectorHost, self.selectorPort, self.queue, 1)))
-        self._debug(1,"start server")
         self.thread[0].start()
     
 
@@ -70,7 +69,6 @@ class MaapiSelector():
                 recvHost = queue__[que][1]
                 recvPort = queue__[que][2]
                 dtime    = queue__[que][3]
-                
                 if data == "is ok?":
                     self._debug(1,"del inserted data ")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
@@ -107,9 +105,9 @@ class MaapiSelector():
         
         while True:
             if (dt.now() - self.timer1).seconds >1:
-                self.DeviceList()
+                #self.DeviceList()
                 self.timer1 = dt.now()
-            time.sleep(0.01)
+            
             self.scanQueueForIncommingQuerys(self.queue.getSocketRadings())
     
 if __name__ == "__main__":
