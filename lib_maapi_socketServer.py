@@ -30,7 +30,7 @@ class SocketServer():
                     while True:
                         data = client.recv(20000)
                         if not data: break
-                        data_ , ip_, port_ = data.decode("utf-8")
+                        data_ , ip_, port_ = data.decode("utf-8").split(",")
                         if data =="is ok?":
                             response = bytes("{payload}".format(payload="ok"),"utf-8")
                             client.send(response)
