@@ -72,8 +72,10 @@ class MaapiSelector():
                 dtime    = queue__[que][3]
                 
                 if data == "is ok?":
+                    self._debug(1, "incomming is ok?")
                     self.SendDataToServer(recvHost,recvPort,"ok")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
+                    self._debug(1, "outgoing is ok")
 
 
     def DeviceList(self):
