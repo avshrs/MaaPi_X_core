@@ -42,6 +42,7 @@ class MaapiSelector():
         
        
     def __del__(self):
+        self._debug(1,"Joining tcp server thread ")
         self.thread[0].join()
      
     
