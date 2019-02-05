@@ -84,7 +84,7 @@ class MaapiWatcher():
                 recvHost = queue__[que][1]
                 recvPort = queue__[que][2]
                 dtime    = queue__[que][3]
-
+                self._debug(1,data)
                 if data == "ok":                  
                     self._debug(1,"get ok from selector")
                     return "ok"          
