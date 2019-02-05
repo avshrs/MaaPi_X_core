@@ -29,7 +29,7 @@ class SocketServer():
                     while True:
                         data = client.recv(20000)
                         if not data: break
-                        self._debug(1,"Data recived from {address} - data {data}".format(address=address,data=data))
+                        self._debug(1,"owner {owner} - Data recived from {address} - data {data} ".format(owner=owner,address=address,data=data))
                         data_ , ip_, port_ = data.decode("utf-8").split(",")
                        
                         queue.addSocketRadings(owner, host, port, data, ip_, port_)   
@@ -37,7 +37,7 @@ class SocketServer():
                         if data_ =="is ok?":
                             response = bytes("{payload}".format(payload="ok"),"utf-8")
                             client.send(response)
-                            self._debug(1,"Responce sended to {address} - data {response}".format(address=address, response=response) ) 
+                            self._debug(1,"owner {owner} - Responce sended to {address} - data {response}".format(owner=owner,address=address, response=response) ) 
 
         except Exception as e :
             self._debug(1,"Except detect:")
