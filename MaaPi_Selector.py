@@ -61,16 +61,15 @@ class MaapiSelector():
     
     def scanQueueForIncommingQuerys(self,queue):
         try:
-            
             queue__= copy.deepcopy(queue[self.objectname][self.selectorHost][self.selectorPort])
         except:
             pass
         else:
             for que in queue__:
-                data     = (queue__[que][0])
-                recvHost = (queue__[que][1])
-                recvPort = (queue__[que][2])
-                dtime    = (queue__[que][3])
+                data     = queue__[que][0]
+                recvHost = queue__[que][1]
+                recvPort = queue__[que][2]
+                dtime    = queue__[que][3]
                 
                 if data == "is ok?":
                     self.SendDataToServer(recvHost,recvPort,"ok")
