@@ -98,7 +98,7 @@ class MaapiWatcher():
                 self._debug(1,"self.checkSelector() to old ")
                 self.socketClient.sendStr(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost,port=self.watcherPort))
                 responce = self.scanQueueForSelectorAck(self.queue)
-                self._debug(1,"self.checkSelector() responce = {responce} ")
+                self._debug(1,"self.checkSelector() responce = |{responce}| ".format(responce=responce))
                 if responce == "ok": 
                      self._debug(1,"ack from selector = ok") 
                      self.lastResponce = dt.now() 
