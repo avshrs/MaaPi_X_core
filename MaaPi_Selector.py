@@ -65,8 +65,8 @@ class MaapiSelector():
     def scanQueueForIncommingQuerys(self,queue):
         try:
             queue__= copy.deepcopy(queue[self.objectname][self.selectorHost][self.selectorPort])
-        except Exception as e:
-            self._debug(1,"Exception scanQueueForIncommingQuerys -{Ex}".format(Ex=e))   
+        except:
+            pass
         else:            
             for que in queue__:
                 data     = queue__[que][0]
