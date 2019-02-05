@@ -73,7 +73,7 @@ class MaapiSelector():
                 
                 if data == "is ok?":
                     self._debug(1, "incomming is ok?")
-                    self.SendDataToServer(recvHost,recvPort,"ok")
+                    self.SendDataToServer(recvHost,int(recvPort),"ok")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
                     self._debug(1, "outgoing is ok")
 
