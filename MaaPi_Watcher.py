@@ -15,7 +15,7 @@ import lib_maapi_db_connection              as Db_connection
 import lib_maapi_socketClient               as SocketClient
 import MaaPi_Config                         as Config
 
-from threading import RLock
+
 from datetime import datetime as dt, timedelta
 from threading import Lock, Thread
 import subprocess
@@ -42,7 +42,7 @@ class MaapiWatcher():
         self.selecorName        = self.config.selectorName
         self.thread             = []
 
-        self.lock               = RLock()
+   
         self.lastResponce       = dt.now() - timedelta(hours=1)
         self.selectorPid        = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
         self.debug = 1
@@ -57,14 +57,9 @@ class MaapiWatcher():
 
 
     def runTcpServerAsThreat(self):
-        try:
             self._debug(2,"Selector run tcp Server")
             self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.watcherHost, self.watcherPort, self.queue, 1)))
             self.thread[0].start()
-        except Exception as e:
-             self._debug(1,e)
-        finally:
-            self.thread[0].join()
 
 
     def startSelectorModule(self):

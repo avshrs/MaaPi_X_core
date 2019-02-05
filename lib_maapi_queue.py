@@ -7,17 +7,15 @@
 #
 ##############################################################
 from datetime import datetime as dt
-from threading import RLock
+
 
 
 class queue():
     def __init__(self):
         self.seqSRnr = 0
         self.queue_tcp_radings = {}
-
-        #self.socketReadings = {"owner": {"fomHost": {"onPort":[{id:["data","reciveTohost","reciveToPort"]]}}} }
         self.socketReadings = {}
-        self.lock = RLock()
+     
 
     def addSocketRadings(self,owner,fomHost,onPort, data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
         if not self.socketReadings:
@@ -29,7 +27,6 @@ class queue():
             port_[onPort]=id_
             host_[fomHost]=port_
             self.socketReadings[owner]=host_
-            #print ("empty",self.socketReadings)
         else:
             self.socketReadings[owner][fomHost][onPort][self.seqSRnr]=[data,reciveToHost,reciveToPort,dt_]
             #print ("adding",self.socketReadings)

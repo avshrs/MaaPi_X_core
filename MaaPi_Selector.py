@@ -15,7 +15,6 @@ import lib_maapi_queue                      as Queue
 import lib_maapi_db_connection              as Db_connection    
 import MaaPi_Config                         as Config
 
-from threading import Lock, Thread
 from datetime import datetime as dt, timedelta
 import time
 import copy
@@ -52,15 +51,10 @@ class MaapiSelector():
 
     
     def runTcpServer(self):
-        try:    
             self._debug(2,"Selector run tcp Server")
             self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.selectorHost, self.selectorPort, self.queue, 1)))
             self.thread[0].start()
-        except Exception as e:
-             self._debug(1,e)
-        finally:
-            self.thread[0].join()
-    
+
 
     def checkDbForOldreadings(self):
         readings = [1,2,3]
