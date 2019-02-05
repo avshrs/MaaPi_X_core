@@ -61,6 +61,8 @@ class MaapiWatcher():
             self._debug(2,"Selector run tcp Server")
             self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.watcherHost, self.watcherPort, self.queue, 1)))
             self.thread[0].start()
+        except Exception as e:
+             self._debug(1,e)
         finally:
             self.thread[0].join()
 
