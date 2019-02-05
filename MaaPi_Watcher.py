@@ -113,7 +113,7 @@ class MaapiWatcher():
     def loop(self):
         while True:
             time.sleep(5)
-            self._debug(1,"self.checkSelector() ")
+            
             self.checkSelector()
     
 if __name__ == "__main__":

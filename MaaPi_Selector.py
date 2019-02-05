@@ -35,8 +35,9 @@ class MaapiSelector():
         self.selectorPort       = self.config.selectorPort
         self.selectorHost       = self.config.selectorHost
         self.thread             = []
-        self.timer1             = dt.now()
+        self.timer_1            = dt.now()
         self.debug = 1
+
         self._debug(1,"Initialising Selector Module ")
         
        
@@ -73,7 +74,7 @@ class MaapiSelector():
                     self._debug(1,"del inserted data ")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
         except Exception as e:
-            self._debug(1,e)
+            self._debug(1,"Exception {Ex}".format(Ex=e))
 
     def DeviceList(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled=True).get()
@@ -100,13 +101,13 @@ class MaapiSelector():
         try:
             self.sendstr.sendStr(host, port, data)
         except Exception as e:
-            self._debug(1,e)
+            self._debug(1,"Exception {Ex}".format(Ex=e))
 
 
     def loop(self):
         
         while True:
-            if (dt.now() - self.timer1).seconds >1:
+            if (dt.now() - self.timer_1).seconds >1:
                 self.DeviceList()
                 self.timer1 = dt.now()
             time.sleep(0.01)

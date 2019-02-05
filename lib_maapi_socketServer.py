@@ -29,7 +29,7 @@ class SocketServer():
                     while True:
                         data = client.recv(20000)
                         if not data: break
-                        self._debug(1,"owner {owner} - Data recived from {address} - data {data} ".format(owner=owner,address=address,data=data))
+                        self._debug(1,"owner {owner} - Data recived from {address} - data {data_} ".format(owner=owner,address=address,data_=data))
                         data_ , ip_, port_ = data.decode("utf-8").split(",")
                        
                         queue.addSocketRadings(owner, host, port, data, ip_, port_)   
