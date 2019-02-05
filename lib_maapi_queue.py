@@ -36,11 +36,11 @@ class queue():
             host_[fomHost]=port_
             self.socketReadings[owner]=host_
             self._debug(1,"insert data: owner= {ow}, fomHost= {fh}, onPort= {op}, data= {dat}, reciveToHost = {recth}, reciveToPort = {rectp} , dt_ ={d}".format(ow=owner,
-                                fm=fomHost,op=onPort, dat=data, recth=reciveToHost, rectp=reciveToPort, d=dt_))
+                                fh=fomHost,op=onPort, dat=data, recth=reciveToHost, rectp=reciveToPort, d=dt_))
         else:
             self.socketReadings[owner][fomHost][onPort][self.seqSRnr]=[data,reciveToHost,reciveToPort,dt_]
             self._debug(1,"insert data: owner= {ow}, fomHost= {fh}, onPort= {op}, data= {dat}, reciveToHost = {recth}, reciveToPort = {rectp} , dt_ ={d}".format(ow=owner,
-                                fm=fomHost,op=onPort, dat=data, recth=reciveToHost, rectp=reciveToPort, d=dt_))
+                                fh=fomHost,op=onPort, dat=data, recth=reciveToHost, rectp=reciveToPort, d=dt_))
             #print ("adding",self.socketReadings)
         self.seqSRnr +=1
 
