@@ -16,7 +16,6 @@ class SocketServer():
     def startServer(self,owner, host, port, queue, object_id):
         try:
             try:
-                #self.sock  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.sock.bind((host, int(port)))
             except:
                 self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -39,7 +38,7 @@ class SocketServer():
                             client.send(response)
                             self._debug(1,"owner {owner} - Responce sended to {address} - data {response}".format(owner=owner,address=address, response=response) ) 
 
-        except Exception as e :
+        except EnvironmentError as  e:
             self._debug(1,"Except detect:")
             self._debug(1,"---------------------------------------------------")
             self._debug(1,"{e}".format(e=e))
