@@ -42,9 +42,11 @@ class queue():
             self.lock.release()
 
     def getSocketRadings(self):
-        self.lock.acquire()
-        return self.socketReadings
-        self.lock.release()
+        try:
+            self.lock.acquire()
+            return self.socketReadings
+        finally:
+            self.lock.release()
     def get_queue_nr(self):
          return self.queue_nr
 
