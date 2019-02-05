@@ -5,9 +5,9 @@ class MaapiVars():
     def __init__(self):
         self.selectorName            = "MaaPi_Selector_5_0.py"
         self.selectorHost            = "127.0.0.1"
-        self.selectorPort            = 55511
+        self.selectorPort            = 55521
         self.watcherHost             = self.selectorHost
-        self.watcherPort             = 55510
+        self.watcherPort             = 55520
 
         self.maapiLocation         ="PI"
         self.maapiDbName           ='MaaPi'
