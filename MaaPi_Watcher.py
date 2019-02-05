@@ -21,7 +21,7 @@ from threading import Lock, Thread
 import subprocess
 import logging
 import time
-
+import copy
 
 
 class MaapiWatcher():
@@ -74,7 +74,7 @@ class MaapiWatcher():
     def scanQueueForSelectorAck(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
-                queue_ = dict(queue)
+                queue_ = copy.deepcopy(queue)
         except:
             pass
         else:
