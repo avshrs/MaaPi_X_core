@@ -74,7 +74,7 @@ class MaapiWatcher():
     def scanQueueForSelectorAck(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
-                queue_ = copy.deepcopy(queue[self.objectname][self.selectorHost][self.selectorPort])
+                queue__ = copy.deepcopy(queue[self.objectname][self.selectorHost][self.selectorPort])
         except:
             pass
         else:
@@ -84,6 +84,7 @@ class MaapiWatcher():
                 recvHost = queue__[que][1]
                 recvPort = queue__[que][2]
                 dtime    = queue__[que][3]
+
                 if data == "ok":                  
                     self._debug(1,"get ok from selector")
                     return "ok"          
