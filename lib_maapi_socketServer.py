@@ -37,9 +37,11 @@ class SocketServer():
                          
 
         except Exception as e :
-             self._debug(1,"\nExcept detect:\n---------------------------------------------------\n{0}".format(e))
-             self._debug(1,"\n---------------------------------------------------\n")
-             sock.close()
+            self._debug(1,"Except detect:")
+            self._debug(1,"---------------------------------------------------")
+            self._debug(1,"{e}".format(e=e))
+            self._debug(1,"---------------------------------------------------")
+            sock.close()
 
         finally:
             sock.close()
