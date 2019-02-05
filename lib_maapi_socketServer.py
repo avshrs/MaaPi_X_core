@@ -11,11 +11,7 @@ class SocketServer():
 
 
     def startServer(self,owner, host, port, queue, object_id):
-        queue_=queue
-        
-        
         try:
-            
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.bind((host, int(port)))
@@ -31,11 +27,10 @@ class SocketServer():
                         data = client.recv(20000)
                         if not data: break
                         data_ , ip_, port_ = data.decode("utf-8").split(",")
-                        queue_.addSocketRadings(owner, host, port, data, ip_, port_)   
-                        if data =="is ok?":
+                        queue.addSocketRadings(owner, host, port, data, ip_, port_)   
+                        if data_ =="is ok?":
                             response = "ok"
                             client.send(response)
-    
                          
 
         except Exception as e :
