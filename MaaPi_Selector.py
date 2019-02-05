@@ -38,13 +38,13 @@ class MaapiSelector():
         self.thread             = []
         self.timer1             = dt.now()
         self.debug = 1
-        
+        self._debug(1,"Initialising Selector Module ")
         
     
     
     def _debug(self, level, msg):
         if self.debug >= level:
-            print("DEBUG MaaPi Selector\t\t\t{0} {1}, {2}".format(level, dt.now(), msg))
+            print("DEBUG MaaPi Selector\t{0} {1}, {2}".format(level, dt.now(), msg))
 
     
     def runTcpServer(self):
