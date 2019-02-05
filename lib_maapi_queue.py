@@ -7,7 +7,7 @@
 #
 ##############################################################
 from datetime import datetime as dt
-
+import logging
 
 
 class queue():
@@ -16,6 +16,14 @@ class queue():
         self.queue_tcp_radings = {}
         self.socketReadings = {}
      
+        self.debug = 1
+    
+
+    def _debug(self, level, msg):
+        if self.debug >= level:
+            print("DEBUG lib socketServer\t\t{0} {1}, {2}".format(level, dt.now(), msg))
+
+    
 
     def addSocketRadings(self,owner,fomHost,onPort, data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
         if not self.socketReadings:
@@ -27,6 +35,8 @@ class queue():
             port_[onPort]=id_
             host_[fomHost]=port_
             self.socketReadings[owner]=host_
+            self._debug(1,"insert data: owner= {ow}, fomHost= {fh}, onPort= {op}, data= {dat}, reciveToHost = {recth}, reciveToPort = {rectp} , dt_ ={d}".format(ow=owner,
+                                fm=fomHost,op=onPort, dat=data, recth=reciveToHost, rectp=reciveToPort, d=dt_))
         else:
             self.socketReadings[owner][fomHost][onPort][self.seqSRnr]=[data,reciveToHost,reciveToPort,dt_]
             #print ("adding",self.socketReadings)
