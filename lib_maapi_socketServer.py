@@ -31,13 +31,11 @@ class SocketServer():
                         data = client.recv(20000)
                         if not data: break
                         data_ , ip_, port_ = data.decode("utf-8").split(",")
+                        queue_.addSocketRadings(owner, host, port, data, ip_, port_)   
                         if data =="is ok?":
-                            response = bytes("{payload}".format(payload="ok"),"utf-8")
+                            response = "ok"
                             client.send(response)
-                            queue_.addSocketRadings(owner, host, port, data, ip_, port_)         
-                        else:
-                            
-                            queue_.addSocketRadings(owner, host, port, data, ip_, port_)         
+    
                          
 
         except Exception as e :
