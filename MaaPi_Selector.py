@@ -65,6 +65,9 @@ class MaapiSelector():
     def scanQueueForIncommingQuerys(self,queue):
         try:
             queue__= copy.deepcopy(queue[self.objectname][self.selectorHost][self.selectorPort])
+        except Exception as e:
+            self._debug(1,"Exception scanQueueForIncommingQuerys -{Ex}".format(Ex=e))   
+        else:            
             for que in queue__:
                 data     = queue__[que][0]
                 recvHost = queue__[que][1]
@@ -73,8 +76,7 @@ class MaapiSelector():
                 if data == "is ok?":
                     self._debug(1,"del inserted data ")
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
-        except Exception as e:
-            self._debug(1,"Exception {Ex}".format(Ex=e))
+
 
     def DeviceList(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled=True).get()
@@ -101,7 +103,7 @@ class MaapiSelector():
         try:
             self.sendstr.sendStr(host, port, data)
         except Exception as e:
-            self._debug(1,"Exception {Ex}".format(Ex=e))
+            self._debug(1,"Exception - SendDataToServer {Ex}".format(Ex=e))
 
 
     def loop(self):
