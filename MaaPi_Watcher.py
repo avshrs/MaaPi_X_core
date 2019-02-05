@@ -86,7 +86,7 @@ class MaapiWatcher():
                 dtime    = (queue_[self.objectname][self.selectorHost][self.selectorPort][que][3])
                 if data == "ok":                  
                     return "ok"          
-                    del queue_[self.objectname][self.selectorHost][self.selectorPort][que]
+                    del queue[self.objectname][self.selectorHost][self.selectorPort][que]
             return "nn"
 
    

@@ -18,7 +18,7 @@ import MaaPi_Config                         as Config
 from threading import Lock, Thread
 from datetime import datetime as dt, timedelta
 import time
-
+import copy
 class MaapiSelector():
 
     def __init__(self):
@@ -62,7 +62,7 @@ class MaapiSelector():
     def scanQueueForIncommingQuerys(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
-                queue__= queue[self.objectname][self.selectorHost][self.selectorPort]
+                queue__= copy.deepcopy(queue[self.objectname][self.selectorHost][self.selectorPort])
         except:
             pass
         else:
