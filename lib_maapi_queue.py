@@ -20,33 +20,24 @@ class queue():
         self.lock = RLock()
 
     def addSocketRadings(self,owner,fomHost,onPort, data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
-        self.lock.acquire()
-        try:
-            
-            if not self.socketReadings:
-                data_=[data,reciveToHost,reciveToPort,dt_]
-                id_={} 
-                port_={}
-                host_={}
-                id_[self.seqSRnr]=data_
-                port_[onPort]=id_
-                host_[fomHost]=port_
-                self.socketReadings[owner]=host_
-                #print ("empty",self.socketReadings)
-            else:
-                self.socketReadings[owner][fomHost][onPort][self.seqSRnr]=[data,reciveToHost,reciveToPort,dt_]
-                #print ("adding",self.socketReadings)
-            self.seqSRnr +=1
-
-        finally:
-            self.lock.release()
+        if not self.socketReadings:
+            data_=[data,reciveToHost,reciveToPort,dt_]
+            id_={} 
+            port_={}
+            host_={}
+            id_[self.seqSRnr]=data_
+            port_[onPort]=id_
+            host_[fomHost]=port_
+            self.socketReadings[owner]=host_
+            #print ("empty",self.socketReadings)
+        else:
+            self.socketReadings[owner][fomHost][onPort][self.seqSRnr]=[data,reciveToHost,reciveToPort,dt_]
+            #print ("adding",self.socketReadings)
+        self.seqSRnr +=1
 
     def getSocketRadings(self):
-        self.lock.acquire()
-        try:
-            return self.socketReadings
-        finally:
-            self.lock.release()
+        return self.socketReadings
+
     def get_queue_nr(self):
          return self.queue_nr
 
