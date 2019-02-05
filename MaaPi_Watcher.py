@@ -46,25 +46,25 @@ class MaapiWatcher():
         self.lastResponce       = dt.now() - timedelta(hours=1)
         self.selectorPid        = subprocess.Popen(["/usr/bin/python3.4","MaaPi_Selector.py"])
         self.debug = 1
-        
-        
-    
+ 
     
     def _debug(self, level, msg):
         if self.debug >= level:
             print("DEBUG MaaPi Watcher\t\t\t{0} {1}, {2}".format(level, dt.now(), msg))
 
 
-    def runTcpServer(self):
+    def runTcpServerAsThreat(self):
         self._debug(1,"run server")
         self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname,self.watcherHost, self.watcherPort, self.queue, 1)))
         self._debug(1,"start server")
         self.thread[0].start()
     
 
-    def startSelector(self):
+    def startSelectorModule(self):
         try:
+            self._debug(1,"Killing Selector - {pid}".format(self.selectorPid))
             self.selectorPid.kill
+
         except Exception as e:
             self._debug(1,e)
         else:
@@ -117,6 +117,6 @@ class MaapiWatcher():
     
 if __name__ == "__main__":
     MaapiSel =  MaapiWatcher()
-    MaapiSel.runTcpServer()
+    MaapiSel.runTcpServerAsThreat()
     MaapiSel.loop() 
 
