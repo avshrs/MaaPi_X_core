@@ -96,9 +96,9 @@ class MaapiWatcher():
         try:
             if (dt.now() - self.lastResponce).seconds >5:
                 self._debug(1,"self.checkSelector() sending ack ")
-                self.socketClient.sendStr(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost,port=self.watcherPort))
+                responce = self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost,port=self.watcherPort))
 
-                responce = self.scanQueueForSelectorAck(self.queue)
+                
                 self._debug(1,"self.checkSelector() responce = |{responce}| ".format(responce=responce))
                 if responce == "ok": 
                      self._debug(1,"ack from selector = ok") 

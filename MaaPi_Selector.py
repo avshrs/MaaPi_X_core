@@ -72,11 +72,7 @@ class MaapiSelector():
                 dtime    = queue__[que][3]
                 
                 if data == "is ok?":
-                    self._debug(1, "incomming is ok?")
-                    self.SendDataToServer(recvHost,int(recvPort),"ok,{host},{port}".format(host=self.selectorPort,port=self.selectorHost))
                     del queue[self.objectname][self.selectorHost][self.selectorPort][que]
-                    self._debug(1, "outgoing is ok")
-
 
     def DeviceList(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled=True).get()

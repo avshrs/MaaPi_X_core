@@ -30,10 +30,16 @@ class SocketServer():
                     while True:
                         data = client.recv(20000)
                         if not data: break
-                        data, ip_, port_ = data.decode("utf-8").split(",")
-                        queue_.addSocketRadings(owner, host, port, data, ip_, port_)         
-                        #response = data # ack ok
-                        #client.send(response)
+                        data_ , ip_, port_ = data.decode("utf-8")
+                        if data =="is ok?":
+                            response = bytes("{payload}".format(payload="ok"),"utf-8")
+                            client.send(response)
+                            queue_.addSocketRadings(owner, host, port, data, ip_, port_)         
+                        else:
+                            
+                            queue_.addSocketRadings(owner, host, port, data, ip_, port_)         
+                         
+
         except Exception as e :
              self._debug(1,"\nExcept detect:\n---------------------------------------------------\n{0}".format(e))
              self._debug(1,"\n---------------------------------------------------\n")
