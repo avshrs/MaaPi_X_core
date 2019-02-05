@@ -74,24 +74,21 @@ class MaapiWatcher():
     def scanQueueForSelectorAck(self,queue):
         try:
             if queue[self.objectname][self.selectorHost][self.selectorPort]:    
-                pass
+                queue_ = dict(queue)
         except:
             pass
         else:
+            
+            for que in queue_[self.objectname][self.selectorHost][self.selectorPort]:
+                data     = (queue_[self.objectname][self.selectorHost][self.selectorPort][que][0].decode("utf-8"))
+                recvHost = (queue_[self.objectname][self.selectorHost][self.selectorPort][que][1])
+                recvPort = (queue_[self.objectname][self.selectorHost][self.selectorPort][que][2])
+                dtime    = (queue_[self.objectname][self.selectorHost][self.selectorPort][que][3])
+                if data == "ok":                  
+                    return "ok"          
+                    del queue_[self.objectname][self.selectorHost][self.selectorPort][que]
+            return "nn"
 
-            if queue[self.objectname][self.selectorHost][self.selectorPort]:
-                queue_ = dict(queue)
-                
-                for que in queue_[self.objectname][self.selectorHost][self.selectorPort]:
-                    data     = (queue[self.objectname][self.selectorHost][self.selectorPort][que][0].decode("utf-8"))
-                    recvHost = (queue[self.objectname][self.selectorHost][self.selectorPort][que][1])
-                    recvPort = (queue[self.objectname][self.selectorHost][self.selectorPort][que][2])
-                    dtime    = (queue[self.objectname][self.selectorHost][self.selectorPort][que][3])
-                    if data == "ok":                  
-                        return "ok"          
-                        del queue[self.objectname][self.selectorHost][self.selectorPort][que]
-                return "nn"
- 
    
     def checkSelector(self):
         try:
