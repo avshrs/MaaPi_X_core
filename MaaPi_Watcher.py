@@ -95,8 +95,9 @@ class MaapiWatcher():
     def checkSelector(self):
         try:
             if (dt.now() - self.lastResponce).seconds >5:
-                self._debug(1,"self.checkSelector() to old ")
+                self._debug(1,"self.checkSelector() sending ack ")
                 self.socketClient.sendStr(self.selectorHost, self.selectorPort, "is ok?,{host},{port}".format(host=self.watcherHost,port=self.watcherPort))
+
                 responce = self.scanQueueForSelectorAck(self.queue)
                 self._debug(1,"self.checkSelector() responce = |{responce}| ".format(responce=responce))
                 if responce == "ok": 
