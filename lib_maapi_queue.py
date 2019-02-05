@@ -35,13 +35,11 @@ class queue():
             port_[onPort]=id_
             host_[fomHost]=port_
             self.socketReadings[owner]=host_
-            self._debug(1,"insert data: owner= {ow}, fomHost= {fh}, onPort= {op}, data= {dat}, reciveToHost = {recth}, reciveToPort = {rectp} , dt_ ={d}".format(ow=owner,
-                                fh=fomHost,op=onPort, dat=data, recth=reciveToHost, rectp=reciveToPort, d=dt_))
+            self._debug(1,"insert new data: {d}".format(d=self.socketReadings))
         else:
             self.socketReadings[owner][fomHost][onPort][self.seqSRnr]=[data,reciveToHost,reciveToPort,dt_]
-            self._debug(1,"insert data: owner= {ow}, fomHost= {fh}, onPort= {op}, data= {dat}, reciveToHost = {recth}, reciveToPort = {rectp} , dt_ ={d}".format(ow=owner,
-                                fh=fomHost,op=onPort, dat=data, recth=reciveToHost, rectp=reciveToPort, d=dt_))
-            #print ("adding",self.socketReadings)
+            self._debug(1,"insert update data: {d}".format(d=self.socketReadings))
+           
         self.seqSRnr +=1
 
     def getSocketRadings(self):
