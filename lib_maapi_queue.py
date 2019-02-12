@@ -16,7 +16,7 @@ class queue():
     def __init__(self):
         self.seqSRnr = 0
         self.queue_tcp_radings = {}
-        self.socketReadings =  {}
+        self.socketReadings =  None
         
         self.debug = 1
     
@@ -25,7 +25,7 @@ class queue():
         if self.debug >= level:
             print("DEBUG lib socketServer\t\t{0} {1}, {2}".format(level, dt.now(), msg))
 
-    def addSocketRadings2(self,owner,fomHost,onPort, data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
+    def addSocketRadings(self,owner,fomHost,onPort, data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
         if not self.socketReadings:
             data_=[data,reciveToHost,reciveToPort,dt_]
             id_={} 
@@ -43,7 +43,7 @@ class queue():
         self.seqSRnr +=1
    
 
-    def addSocketRadings(self,owner,fomHost,onPort, data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
+    def addSocketRadings2(self,owner,fomHost,onPort, data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
             print (self.socketReadings)
             self.socketReadings[str(owner)][str(fomHost)][int(onPort)][int(self.seqSRnr)]=[str(data),str(reciveToHost),int(reciveToPort),dt_]
             self._debug(1,"insert update data: {d}".format(d=self.socketReadings))
