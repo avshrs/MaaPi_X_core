@@ -30,7 +30,7 @@ class SocketServer():
                         if not data: break
                         self._debug(1,"owner {owner} - Data recived from {address} - data {data_} ".format(owner=owner,address=address,data_=data))
                         data_ , ip_, port_ = data.decode("utf-8").split(",")
-                       
+                        
                         queue.addSocketRadings(owner, host, port, data_, ip_, port_)   
                         
                         if data_ =="is ok?":
