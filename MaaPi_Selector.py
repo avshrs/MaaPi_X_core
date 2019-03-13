@@ -68,20 +68,14 @@ class MaapiSelector():
     def runLibraryDeamons(self):
         pass
 
-    def to_sec(self, value, unit):
-        _seconds = 0
-        if unit == 2: _seconds = value * 60
-        elif unit == 3: _seconds = value * 3600
-        else: _seconds = value
-        return _seconds
+
 
     def checkDbForOldreadings(self,devices):
-        cache = {}
         for dev in devices:
-            if (dt.now() - devices[dev]["dev_last_update"]).seconds > self.to_sec(devices[dev]["dev_interval"], devices[dev]["dev_interval_unit_id"]):
-                self._debug(1,"Devices sended to checkout readings {Ex}".format(Ex=devices[dev]["dev_rom_id"]))
+            if (dt.now() - devices[dev]["dev_last_update"]).seconds > self.helpers.to_sec(devices[dev]["dev_interval"], devices[dev]["dev_interval_unit_id"]):
+                self._debug(2,"Devices sended to checkout readings {Ex}".format(Ex=devices[dev]["dev_rom_id"]))
                 self.queue.updateQueueDevList(devices[dev]["dev_type_id"],dev)
-        #print (self.queue.getQueueDevList())
+
 
 
 
@@ -97,7 +91,7 @@ class MaapiSelector():
         for i in board_location:
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
-
+        gdstart = dt.now()
         self.deviceList = self.maapiDB.table("devices").columns(
                 "dev_id",
                 "dev_type_id",
@@ -105,12 +99,24 @@ class MaapiSelector():
                 "dev_bus_type_id",
                 "dev_last_update",
                 "dev_interval",
+                "dev_value",
                 "dev_interval_unit_id",
                 "dev_interval_queue",
                 "dev_machine_location_id",
+                "dev_collect_values_if_cond_e",
+                "dev_collect_values_if_cond_min_e",
+                "dev_collect_values_if_cond_max_e",
+                "dev_collect_values_if_cond_max",
+                "dev_collect_values_if_cond_min",
+                "dev_collect_values_if_cond_from_dev_e",
+                "dev_collect_values_if_cond_from_dev_id",
+                "dev_collect_values_if_cond_force_value_e",
+                "dev_collect_values_if_cond_force_value",
                 ).order_by('dev_id').filters_eq(
                 dev_status = True, dev_machine_location_id = self.board_id).get()
-        self._debug(1,"Devices list updated")
+
+        gdstop = dt.now()
+        self._debug(1,"Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
 
     def sendDataToServer(self,host,port,data):
         try:
@@ -121,12 +127,13 @@ class MaapiSelector():
 
     def loop(self):
         while True:
-            if (dt.now() - self.timer_1).seconds > 5:
+            if (dt.now() - self.timer_1).seconds >=1:
                 self.getDeviceList()
                 self.timer_1 = dt.now()
-            if (dt.now() - self.timer_2).seconds > 60:
+            if (dt.now() - self.timer_2).seconds >= 60:
                 self.getLibraryList()
-            time.sleep(1)
+                self.timer_2
+            time.sleep(0.1)
             self.checkDbForOldreadings(self.deviceList)
 
 
