@@ -44,18 +44,41 @@ class Helpers:
         else: _seconds = value
         return _seconds
 
+    def checkConditionMin(self, device_list, dev_id, value):
+        if device_list[dev_id]["dev_collect_values_if_cond_min_e"]:
+            print ("min true")
+            if device_list[dev_id]["dev_collect_values_if_cond_from_dev_e"]:
+                print ("enable from dev")
+                d_timeStamp = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_last_update"]
+                d_interval = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval"]
+                d_interval_unit = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval_unit_id"]
+                d_value = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_value"]
+                if (dt.now() - dev_rel_timeStamp).seconds > (self.to_sec(dev_rel_interval,dev_rel_interval_unit)*2):
+                    if value < d_value - device_list[dev_id]["dev_collect_values_if_cond_min"]
+                    return value
+                else:
+                    return
+            else:
+                if value < device_list[dev_id]["dev_collect_values_if_cond_min"]
+                return true
 
     def checkCondition(self, device_list, dev_id, value):
-        if device_list[dev_id]["dev_collect_values_if_cond_e"] and device_list[dev_id]["dev_collect_values_if_cond_min_e"]:
-            if device_list[dev_id]["dev_collect_values_if_cond_from_dev_e"]:
-                dev_rel_timeStamp = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_last_update"]
-                dev_rel_interval = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval"]
-                dev_rel_interval_unit = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval_unit_id"]
-                if (dt.now() - dev_rel_timeStamp).seconds >  self.to_sec(dev_rel_interval,dev_rel_interval_unit):
-                    print (dupa)
-            else:
-                print (dupa2)
-
+        if device_list[dev_id]["dev_collect_values_if_cond_e"]:
+            if device_list[dev_id]["dev_collect_values_if_cond_min_e"]:
+            print ("dupa2")
+                if device_list[dev_id]["dev_collect_values_if_cond_from_dev_e"]:
+                    print ("dupa3")
+                    dev_rel_timeStamp = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_last_update"]
+                    dev_rel_interval = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval"]
+                    dev_rel_interval_unit = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval_unit_id"]
+                    if (dt.now() - dev_rel_timeStamp).seconds >  self.to_sec(dev_rel_interval,dev_rel_interval_unit):
+                        print ("dupa4")
+                else:
+                    pass
+            elif device_list[dev_id]["dev_collect_values_if_cond_max_e"]:
+                print ("dupa5")
+        else:
+            print (value)
 """
                 "dev_id",
                 "dev_type_id",

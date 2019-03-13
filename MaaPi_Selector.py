@@ -75,7 +75,7 @@ class MaapiSelector():
             if (dt.now() - devices[dev]["dev_last_update"]).seconds > self.helpers.to_sec(devices[dev]["dev_interval"], devices[dev]["dev_interval_unit_id"]):
                 self._debug(2,"Devices sended to checkout readings {Ex}".format(Ex=devices[dev]["dev_rom_id"]))
                 self.queue.updateQueueDevList(devices[dev]["dev_type_id"],dev)
-
+                self.helpers.checkCondition(self.deviceList,dev,50)
 
 
 
