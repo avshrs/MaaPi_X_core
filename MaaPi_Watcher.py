@@ -30,11 +30,11 @@ class MaapiWatcher():
         # objects
         self.queue              = Queue.Queue()
         self.helpers            = Helpers.Helpers()
-        self.config             = Config.MaapiVars()
+        self.config              = Config.MaapiVars()
         self.socketClient       = SocketClient.socketClient()
         self.socketServer       = SocketServer.SocketServer()
         self.maapiDB            = Db_connection.MaaPiDBConnection()
-        self.loopInterval       =5
+        self.loopInterval       = 5
         # vars
         self.objectname         = "watcher"
         self.selectorHost       = self.config.selectorHost
@@ -55,7 +55,7 @@ class MaapiWatcher():
 
     def _debug(self, level, msg):
         if self.debug >= level:
-            print("DEBUG MaaPi Watcher\t\t{0} {1}, {2}".format(level, dt.now(), msg))
+            print("DEBUG | Watcher \t| {0} {1},\t| {2}".format(level, dt.now(), msg))
 
 
     def runTcpServerAsThreat(self):

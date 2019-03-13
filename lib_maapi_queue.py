@@ -14,14 +14,15 @@ import logging
 
 class Queue():
     def __init__(self):
-        self.seqSRnr           = 0
-        self.queue_tcp_radings = {}
-        self.socketReadings    = {}
-        self.debug             = 1
+        self.seqSRnr            = 0
+        self.queue_tcp_radings  = {}
+        self.socketReadings     = {}
+        self.queueDevList       = {}
+        self.debug              = 1
 
     def _debug(self, level, msg):
         if self.debug >= level:
-            print("DEBUG lib socketServer\t\t{0} {1}, {2}".format(level, dt.now(), msg))
+            print("DEBUG | libQueue \t| {0} {1},\t| {2}".format(level, dt.now(), msg))
 
 
     def addSocketRadings(self, owner, fomHost, onPort, pyload_id ,data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
@@ -45,12 +46,29 @@ class Queue():
         return self.socketReadings
 
 
-    def get_queue_nr(self):
-         return self.queue_nr
 
 
-    def set_queue_nr(self,nr):
-        self.queue_nr = nr
+    def getQueueDevList(self):
+        return self.queueDevList
+
+    def rmFromQueueDevList(self,lib_id,dev_id):
+        self.queueDevList[lib_id].remove(dev_id)
+
+    def updateQueueDevList(self,lib_id,dev_id):
+        try:
+            if dev_id not in self.queueDevList[lib_id]:
+                self.queueDevList[lib_id].append(dev_id)
+        except Exception as e:
+            self._debug(1,"Devices - missing library of bad library id's  {Ex}".format(Ex=e))
+
+    def prepareQueueDevList(self,lib_id):
+        try:
+            if self.queueDevList[lib_id]:
+                pass
+        except:
+            self.queueDevList[lib_id]=[]
+            self._debug(1,"Adding library id's do queue list {libb}".format(libb=lib_id))
+
 
     def get_tcp_radings(self):
         return self.queue_tcp_radings

@@ -12,7 +12,7 @@ class SocketServer():
 
     def _debug(self, level, msg):
         if self.debug >= level:
-            print("DEBUG lib socketServer\t\t{0} {1}, {2}".format(level, dt.now(), msg))
+            print("DEBUG | libSocketServer | {0} {1},\t| {2}".format(level, dt.now(), msg))
 
     def startServer(self, owner, host, port, queue, object_id):
         try:
