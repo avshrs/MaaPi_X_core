@@ -7,8 +7,6 @@ class Helpers:
             "readFromDev_rom_id" : 11,
         }
 
-
-
     def pyloadToPicke(self, message_id, payload, fromHost, fromPort):
         data = {"id":message_id,
                 "payload":payload,
@@ -19,7 +17,6 @@ class Helpers:
     def payloadFromPicke(self, pickled):
         data = pickle.loads(pickled)
         return data["id"], data["payload"], data["fromHost"], data["fromPort"]
-
 
     def scanQueueForIncommingQuerys(self,queue, objectname, selectorHost, selectorPort):
         try:
@@ -45,40 +42,98 @@ class Helpers:
         return _seconds
 
     def checkConditionMin(self, device_list, dev_id, value):
+        # check if min condition is TRUE
         if device_list[dev_id]["dev_collect_values_if_cond_min_e"]:
-            print ("min true")
+
+            # check if condition is related to dev and is TRUE
             if device_list[dev_id]["dev_collect_values_if_cond_from_dev_e"]:
-                print ("enable from dev")
                 d_timeStamp = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_last_update"]
                 d_interval = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval"]
                 d_interval_unit = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval_unit_id"]
                 d_value = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_value"]
-                if (dt.now() - dev_rel_timeStamp).seconds > (self.to_sec(dev_rel_interval,dev_rel_interval_unit)*2):
-                    if value < d_value - device_list[dev_id]["dev_collect_values_if_cond_min"]
-                    return value
-                else:
-                    return
-            else:
-                if value < device_list[dev_id]["dev_collect_values_if_cond_min"]
-                return true
 
-    def checkCondition(self, device_list, dev_id, value):
-        if device_list[dev_id]["dev_collect_values_if_cond_e"]:
-            if device_list[dev_id]["dev_collect_values_if_cond_min_e"]:
-            print ("dupa2")
-                if device_list[dev_id]["dev_collect_values_if_cond_from_dev_e"]:
-                    print ("dupa3")
-                    dev_rel_timeStamp = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_last_update"]
-                    dev_rel_interval = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval"]
-                    dev_rel_interval_unit = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval_unit_id"]
-                    if (dt.now() - dev_rel_timeStamp).seconds >  self.to_sec(dev_rel_interval,dev_rel_interval_unit):
-                        print ("dupa4")
+                # check if valu of reated dev is actual - not older then interval *2
+                if (dt.now() - dev_rel_timeStamp).seconds > (self.to_sec(dev_rel_interval,dev_rel_interval_unit)*2):
+
+                    # check if force value is on
+                    if device_list[dev_id]["dev_collect_values_if_cond_force_value_e"]:
+
+                        #if value < from rel_dev - min value true
+                        if value < (d_value - device_list[dev_id]["dev_collect_values_if_cond_min"]):
+                            return value, True
+                        else:
+                            return device_list[dev_id]["dev_collect_values_if_cond_force_value"], True
+                    else:
+                        if value < (d_value - device_list[dev_id]["dev_collect_values_if_cond_min"]):
+                            return value, True
+                        else:
+                            return 0, None
                 else:
-                    pass
-            elif device_list[dev_id]["dev_collect_values_if_cond_max_e"]:
-                print ("dupa5")
+                    return 0, None
+
+            else:
+                if value < device_list[dev_id]["dev_collect_values_if_cond_min"]:
+                    return value , True
+                else:
+                    return 0, None
         else:
-            print (value)
+            return value
+
+
+    def checkConditionMax(self, device_list, dev_id, value):
+        # check if min condition is TRUE
+        if device_list[dev_id]["dev_collect_values_if_cond_max_e"]:
+
+            # check if condition is related to dev and is TRUE
+            if device_list[dev_id]["dev_collect_values_if_cond_from_dev_e"]:
+                d_timeStamp = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_last_update"]
+                d_interval = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval"]
+                d_interval_unit = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_interval_unit_id"]
+                d_value = device_list[device_list[dev_id]["dev_collect_values_if_cond_from_dev_id"]]["dev_value"]
+
+                # check if valu of reated dev is actual - not older then interval *2
+                if (dt.now() - dev_rel_timeStamp).seconds > (self.to_sec(dev_rel_interval,dev_rel_interval_unit)*2):
+
+                    # check if force value is on
+                    if device_list[dev_id]["dev_collect_values_if_cond_force_value_e"]:
+
+                        #if value < from rel_dev - min value true
+                        if value > (d_value - device_list[dev_id]["dev_collect_values_if_cond_max"]):
+                            return value, True
+                        else:
+                            return device_list[dev_id]["dev_collect_values_if_cond_force_value"], True
+                    else:
+                        if value > (d_value - device_list[dev_id]["dev_collect_values_if_cond_max"]):
+                            return value, True
+                        else: return 0, None
+                else: return 0, None
+
+            else:
+                if value < device_list[dev_id]["dev_collect_values_if_cond_max"]:
+                    return value , True
+                else: return 0, None
+        else:
+            return value
+
+    def checkDevConditions(self, device_list, dev_id, value):
+        if device_list[dev_id]["dev_collect_values_to_db"]:
+            if device_list[dev_id]["dev_collect_values_if_cond_e"]:
+                if device_list[dev_id]["dev_collect_values_if_cond_from_dev_e"]:
+                    if device_list[dev_id]["dev_collect_values_if_cond_force_value_e"]:
+                        
+                else: 
+                    minDev_value, minDev_boolen = checkMinDev()
+                    maxDev_value, maxDev_boolen = checkMaxDev()
+                    if minDev_boolen or maxDev_boolen:
+                        return value, True
+                    else: 
+                        return value true 
+
+            else:
+                return value, True
+        else:
+            return value, False
+
 """
                 "dev_id",
                 "dev_type_id",
@@ -89,6 +144,7 @@ class Helpers:
                 "dev_interval_unit_id",
                 "dev_interval_queue",
                 "dev_machine_location_id",
+                "dev_collect_values_to_db",
                 "dev_collect_values_if_cond_e",
                 "dev_collect_values_if_cond_min_e",
                 "dev_collect_values_if_cond_max_e",

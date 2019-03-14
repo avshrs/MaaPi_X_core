@@ -103,6 +103,7 @@ class MaapiSelector():
                 "dev_interval_unit_id",
                 "dev_interval_queue",
                 "dev_machine_location_id",
+                "dev_collect_values_to_db",
                 "dev_collect_values_if_cond_e",
                 "dev_collect_values_if_cond_min_e",
                 "dev_collect_values_if_cond_max_e",
