@@ -61,7 +61,7 @@ class CheckDevCond:
                 ref_interval      = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_interval']
                 ref_intervalUnit = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_interval_unit_id']
                 ref_intervalSec = self.helpers.to_sec(ref_interval, ref_intervalUnit)
-                print (ref_lastUpdate)
+
                 if (dt.now()- ref_lastUpdate).seconds <= (ref_intervalSec * 2):
                     cond_min = self.conditionDeviceReferenceDev(devices_db, dev_id, value, "min")
                     cond_max = self.conditionDeviceReferenceDev(devices_db, dev_id, value, "max")

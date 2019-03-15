@@ -20,6 +20,8 @@ from threading import Lock, Thread
 from datetime import datetime as dt, timedelta
 import time
 import copy
+
+
 class MaapiSelector():
 
     def __init__(self):
@@ -79,12 +81,11 @@ class MaapiSelector():
                 self.queue.updateQueueDevList(devices[dev]["dev_type_id"],dev)
 
                 value, add_to_db = self.checkDev.checkDevCond(self.deviceList,dev,devices[dev]["dev_value"])
-                print (value, add_to_db)
 
 
     def getLibraryList(self):
         self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
-        
+
         for ids in self.libraryList:
             self.queue.prepareQueueDevList(ids)
         self._debug(1,"Devices library list updated")
@@ -149,7 +150,7 @@ class MaapiSelector():
 
 
 if __name__ == "__main__":
-    MaapiSel =  MaapiSelector()
+    MaapiSel =  MaapiSelector([argv[1]])
     MaapiSel.runTcpServer()
     MaapiSel.startConf()
     MaapiSel.loop()
