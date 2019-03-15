@@ -16,7 +16,7 @@ import os, sys
 from datetime import datetime as dt
 from datetime import timedelta
 from threading import Lock, Thread
-
+import lib_maapi_logger          as MaapiLogger
 import lib_maapi_db_connection as Db_connection
 import lib_maapi_queue as Queue
 import lib_maapi_helpers as Helpers
@@ -34,6 +34,7 @@ class MaapiWatcher():
         self.socketClient       = SocketClient.socketClient()
         self.socketServer       = SocketServer.SocketServer()
         self.maapiDB            = Db_connection.MaaPiDBConnection()
+        self.maapilogger        = MaapiLogger.Logger()
         self.loopInterval       = 5
         # vars
         self.objectname         = "watcher"
@@ -46,49 +47,43 @@ class MaapiWatcher():
         self.interpreterVer       ="/usr/bin/python{0}.{1}".format(sys.version_info[0],sys.version_info[1])
         self.lastResponce       = dt.now() - timedelta(hours = 1)
         self.selectorPid        = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
-        self.debug = 1
 
     def __del__(self):
-        self._debug(1, "Joining tcp server thread ")
+        self.maapilogger.log(1, "Joining tcp server thread ")
         self.thread[0].join()
 
 
-    def _debug(self, level, msg):
-        if self.debug >= level:
-            print("DEBUG | Watcher \t| {0} {1},\t| {2}".format(level, dt.now(), msg))
-
-
     def runTcpServerAsThreat(self):
-            self._debug(2, "Selector run tcp Server")
+            self.maapilogger.log(2, "Selector run tcp Server")
             self.thread.append(Thread(target=self.socketServer.startServer, args=(self.objectname, self.watcherHost, self.watcherPort, self.queue, 1)))
             self.thread[0].start()
 
 
     def startSelectorModule(self):
         try:
-            self._debug(1, self.selectorPid.pid)
-            self._debug(1, "Killing Selector - {pid}".format(pid=self.selectorPid.pid))
+            self.maapilogger.log(1, self.selectorPid.pid)
+            self.maapilogger.log(1, "Killing Selector - {pid}".format(pid=self.selectorPid.pid))
             self.selectorPid.kill()
         except Exception as e:
-            self._debug(1, e)
+            self.maapilogger.log(1, e)
         else:
             self.selectorPid = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
-            self._debug(1, self.selectorPid.pid)
+            self.maapilogger.log(1, self.selectorPid.pid)
 
 
     def checkSelector(self):
         try:
             if (dt.now() - self.lastResponce).seconds > 5:
-                self._debug(1, "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
+                self.maapilogger.log(1, "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
                 payload = self.helpers.pyloadToPicke(00, " ", self.watcherHost,self.watcherPort)
                 recive =  self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, payload)
                 if recive == bytes(0xff):
                     self.lastResponce = dt.now()
-                    self._debug(1, "Get responce from selector")
+                    self.maapilogger.log(1, "Get responce from selector")
                 else:
                     self.startSelectorModule()
         except Exception as e :
-            self._debug(1, "error: {exc}".format(exc = e))
+            self.maapilogger.log(1, "error: {exc}".format(exc = e))
 
     def loop(self):
         while True:

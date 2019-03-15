@@ -10,6 +10,7 @@
 
 import lib_checkDeviceCond                  as CheckDev
 import lib_maapi_queue                      as Queue
+import lib_maapi_logger                     as MaapiLogger
 
 from datetime import datetime as dt
 import sys
@@ -23,11 +24,8 @@ class LinuxCmd(sock):
         self.maapiCommandLine   = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
+        self.maapilogger        = MaapiLogger.Logger()
 
-
-    def _debug(self, level, msg):
-        if self.debug >= level:
-            print("DEBUG | libLinuxCmd | {0} {1},\t| {2}".format(level, dt.now(), msg))
 
     def updateCommandLine(self):
         self.maapiCommandLine = maapidb.MaaPiDBConnection().table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()

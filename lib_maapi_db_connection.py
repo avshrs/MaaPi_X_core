@@ -9,9 +9,10 @@
 import psycopg2
 from datetime import datetime as dt, timedelta
 import MaaPi_Config as Config
+import lib_maapi_logger          as MaapiLogger
 
 class MaaPiDBConnection():
-      
+
     def __init__(self):
         self.filters_ = {}
         self.orders_ = {}
@@ -23,22 +24,15 @@ class MaaPiDBConnection():
         Maapi_dbUser            =self.config.maapiDbUser
         Maapi_dbHost            =self.config.maapiDbHost
         Maapi_dbPasswd          =self.config.maapiDbpass
-        self.debug = 1
+        self.maapilogger        = MaapiLogger.Logger()
 
-        try:    
+        try:
             self.conn = psycopg2.connect("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
         except (Exception, psycopg2.DatabaseError) as error:
-            self._debug(1,error)
+            self.maapilogger.log(1,error)
 
     def __del__(self):
         self.conn.close()
-
-    
-       
-    def _debug(self, level, msg):
-        if self.debug >= level:
-            print("DEBUG MaaPi Watcher\t\t{0} {1}, {2}".format(level, dt.now(), msg))
-
 
 
     def queue(self,dev_id,status,board_id):
@@ -60,50 +54,50 @@ class MaaPiDBConnection():
         except Exception as e:
             print (e)
 
-    
+
 
     def insertRaw(self, where, what):
         string_ = "INSERT INTO {where} ({what})".format(where=where, what=",".join(what))
-        self._debug(1,string_)
+        self.maapilogger.log(1,string_)
         return string_
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
-            # get values 
+            # get values
             x = self.conn.cursor()
             x.execute("SELECT dev_value, dev_rom_id, dev_collect_values_to_db "
                       "FROM devices "
                       "WHERE dev_id='{0}' "
                       "AND dev_status = True".format(device_id))
             devices_data = x.fetchone()
-            
+
             try:
                 x.execute("UPDATE devices "
                           "SET dev_value_old={0} "
                           "WHERE dev_id='{1}' "
                           "AND dev_status=True".format(devices_data[0],device_id))
-                self.conn.commit() 
+                self.conn.commit()
             except Exception as e:
                 print(e)
-                
+
             if status is True:
                 x.execute("UPDATE devices "
                             "SET dev_value={0}, dev_interval_queue = {2}, dev_last_update=NOW(), dev_read_error='ok' "
                             "WHERE dev_id='{1}' and dev_status=True".format((1 if insert_value==True else (0 if insert_value==False else insert_value)),device_id,False))
                 self.conn.commit()
-                # if collcect to db                                         
+                # if collcect to db
                 if devices_data[2]:
                     x.execute("INSERT INTO maapi_dev_rom_{0}_values "
                                 "VALUES (default,{1},default,{2})".format(devices_data[1].replace("-", "_"), device_id,(1 if insert_value==True else (0 if insert_value==False else insert_value))))
                     self.conn.commit()
             else:
-                
+
                 x.execute("UPDATE devices "
                           "SET dev_interval_queue = {2}, dev_value={0}, dev_read_error='Error' "
                           "WHERE dev_id='{1}' and dev_status=True".format(9999,device_id,False))
                 self.conn.commit()
-            
-    
+
+
     def select_last_nr_of_values(self,dev_id,range_nr):
         x = self.conn.cursor()
         x.execute("SELECT dev_rom_id "
@@ -124,9 +118,9 @@ class MaaPiDBConnection():
             values_history_temp = x.fetchall()
             for i in range(int(range_nr)):
                 values_history.append(values_history_temp[i][0])
-        
+
         return  values_history
- 
+
 
     def columns(self, *args):
         self.columns_ = args
@@ -170,9 +164,9 @@ class MaaPiDBConnection():
         else:
             columns = "*"
             self.columns_var = "*"
-        
+
         query = "SELECT {0} FROM {1} ".format(columns, self.table_)
-        
+
         if self.filters_:
             f_len = len(self.filters_)
             f_i = 1
@@ -203,20 +197,20 @@ class MaaPiDBConnection():
                     raise ValueError(
                         "order_by Second Value should be empty or ASC or DESC but get: '{0}'".
                         format(self.orders_[1]))
-        
+
 
         query += ";"
-        
+
         data = self.exec_query_select(query, self.table_)
         self.filters_ = {}
         self.orders_ = {}
         self.columns_ = {}
         self.columns_var = {}
-        self.table_ = {}    
-        return data 
+        self.table_ = {}
+        return data
 
     def exec_query_select(self, query, name):
-      
+
         table_data_dict = {}
         try:
             x = self.conn.cursor()
@@ -270,8 +264,8 @@ class MaaPiDBConnection():
             self.conn.commit()
         except Exception as error:
            print (error)
-            
-        return table_data_dict 
+
+        return table_data_dict
 
 
-  
+
