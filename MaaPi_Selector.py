@@ -14,6 +14,7 @@ import lib_maapi_queue                      as Queue
 import lib_maapi_db_connection              as Db_connection
 import MaaPi_Config                          as Config
 import lib_maapi_helpers                    as Helpers
+import lib_checkDeviceCond                  as CheckDev
 
 from threading import Lock, Thread
 from datetime import datetime as dt, timedelta
@@ -29,6 +30,7 @@ class MaapiSelector():
         self.socketServer       = SocketServer.SocketServer()
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.helpers            = Helpers.Helpers()
+        self.checkDev           = CheckDev.CheckDevCond()
 
         # vars
         self.board_id           = 0
@@ -75,12 +77,14 @@ class MaapiSelector():
             if (dt.now() - devices[dev]["dev_last_update"]).seconds > self.helpers.to_sec(devices[dev]["dev_interval"], devices[dev]["dev_interval_unit_id"]):
                 self._debug(2,"Devices sended to checkout readings {Ex}".format(Ex=devices[dev]["dev_rom_id"]))
                 self.queue.updateQueueDevList(devices[dev]["dev_type_id"],dev)
-                self.helpers.checkCondition(self.deviceList,dev,50)
 
+                value, add_to_db = self.checkDev.checkDevCond(self.deviceList,dev,devices[dev]["dev_value"])
+                print (value, add_to_db)
 
 
     def getLibraryList(self):
         self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
+        
         for ids in self.libraryList:
             self.queue.prepareQueueDevList(ids)
         self._debug(1,"Devices library list updated")

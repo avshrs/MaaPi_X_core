@@ -1,71 +1,100 @@
+import lib_maapi_helpers                    as Helpers
+from datetime import datetime               as dt, timedelta
+
+
 class CheckDevCond:
+    def __init__(self):
+        self.helpers = Helpers.Helpers()
 
-   def conditions(self,devices_db, dev_id, value):
-        condition_min   = False
-        condition_max   = False
-        condition       = False
-        condition_min_max = False
-        force           = False
-        # if collect values is enabled
-        condition = devices_db[dev_id]['dev_collect_values_if_cond_e']
-        if condition:
+    def conditionDeviceReferenceDev(self,devices_db, dev_id, value, minmax):
+        collectValuesCond_bool      = devices_db[dev_id]['dev_collect_values_if_cond_{mm}_e'.format(mm=minmax)]
+        collectValuesCond_value     = devices_db[dev_id]['dev_collect_values_if_cond_{mm}'.format(mm=minmax)]
+        collectValuesRef_bool       = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value']
+        collectValuesRef_value      = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value']
 
-            #if cond. from dev is enabled and id is not empty
-            if devices_db[dev_id]['dev_collect_values_if_cond_from_dev_e'] and devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']:
-
-                #if cond. min ebaled and value is not none
-                if devices_db[dev_id]['dev_collect_values_if_cond_min_e'] and devices_db[dev_id]['dev_collect_values_if_cond_min']:
-
-                    #if value from releted dev is less then min value
-                    if devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value'] < devices_db[dev_id]['dev_collect_values_if_cond_min']:
-                        condition_min = True
-                    else:
-                        condition_min = False
+        if collectValuesCond_bool and collectValuesCond_value:
+            if minmax =="min":
+                if collectValuesRef_bool <= collectValuesRef_value:
+                    condition = 1
                 else:
-                    condition_min = False
-
-                if devices_db[dev_id]['dev_collect_values_if_cond_max_e'] and devices_db[dev_id]['dev_collect_values_if_cond_max']:
-
-                    if devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value'] > devices_db[dev_id]['dev_collect_values_if_cond_max']:
-                        condition_max = True
-                    else:
-                        condition_max = False
+                    condition = 0
+            if minmax =="max":
+                if collectValuesRef_bool >= collectValuesRef_value:
+                    condition = 1
                 else:
-                    condition_max = False
-            else:
+                    condition = 0
+        else:
+            condition = -1
+        return condition
 
-                if devices_db[dev_id]['dev_collect_values_if_cond_min_e'] and devices_db[dev_id]['dev_collect_values_if_cond_min']:
-                    if value <= devices_db[dev_id]['dev_collect_values_if_cond_min']:
-                        condition_min = True
-                    else:
-                        condition_min = False
+
+    def conditionDevice(self,devices_db, dev_id, value, minmax):
+        collectValuesCond_bool      = devices_db[dev_id]['dev_collect_values_if_cond_{mm}_e'.format(mm=minmax)]
+        collectValuesCond_value     = devices_db[dev_id]['dev_collect_values_if_cond_{mm}'.format(mm=minmax)]
+
+        if collectValuesCond_bool and collectValuesCond_value:
+            if minmax =="min":
+                if value <= collectValuesCond_value:
+                    condition = 1
                 else:
-                    condition_min = False
-                if devices_db[dev_id]['dev_collect_values_if_cond_max_e'] and devices_db[dev_id]['dev_collect_values_if_cond_max']:
-                    if value >= devices_db[dev_id]['dev_collect_values_if_cond_max']:
-                        condition_max = True
-                    else:
-                        condition_max = False
+                    condition = 0
+            if minmax =="max":
+                if value >= collectValuesCond_value:
+                    condition = 1
                 else:
-                    condition_max = False
+                    condition = 0
+        else:
+            condition = -1
+        return condition
 
-            if condition_max == False or condition_min == True:
-                condition_min_max = False
-            else:
-                condition_min_max = True
-
-            if condition_min_max == False:
-                if devices_db[dev_id]['dev_collect_values_if_cond_force_value_e']:
-                    force = devices_db[dev_id]['dev_collect_values_if_cond_force_value']
-
-        return condition,condition_min_max, force
 
     def checkDevCond(self, devices_db, dev_id, value):
-        condition, condition_min_max, force_value  = self.conditions(devices_db, dev_id)
-        if condition:
-            if condition_min_max:
-                return value
+        cond_min = -1
+        cond_max = -1
+        cond_result = -1
+        value_ = value
+        boolean = True
+
+        if devices_db[dev_id]['dev_collect_values_if_cond_e']:
+            if devices_db[dev_id]['dev_collect_values_if_cond_from_dev_e'] and devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']:
+                ref_lastUpdate      = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_last_update']
+                ref_interval      = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_interval']
+                ref_intervalUnit = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_interval_unit_id']
+                ref_intervalSec = self.helpers.to_sec(ref_interval, ref_intervalUnit)
+                print (ref_lastUpdate)
+                if (dt.now()- ref_lastUpdate).seconds <= (ref_intervalSec * 2):
+                    cond_min = self.conditionDeviceReferenceDev(devices_db, dev_id, value, "min")
+                    cond_max = self.conditionDeviceReferenceDev(devices_db, dev_id, value, "max")
+                else:
+                    cond_max = -1
+                    cond_min = -1
             else:
-                return value
+                cond_min = self.conditionDevice(devices_db, dev_id, value, "min")
+                cond_max = self.conditionDevice(devices_db, dev_id, value, "max")
+
+            if cond_max != -1 or cond_min != -1:
+                if cond_max == 1 or cond_min == 1:
+                    cond_result = 1
+                else:
+                    cond_result = 0
+            else:
+                cond_result = -1
         else:
-            return value
+            cond_result = -1
+
+        if cond_result !=0:
+            value_ = value
+            boolean = True
+        else:
+            if devices_db[dev_id]['dev_collect_values_if_cond_force_value_e']:
+                value_ = devices_db[dev_id]['dev_collect_values_if_cond_force_value']
+                boolean = True
+            else:
+                value_ = value
+                boolean = False
+
+        if not devices_db[dev_id]['dev_collect_values_to_db']:
+            boolean = False
+        return value_, boolean
+
+
