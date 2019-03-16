@@ -28,18 +28,20 @@ class MaapiSelector():
     def __init__(self):
         # objects
         self.queue              = Queue.Queue()
-        self.config             = Config.MaapiVars()
+        self.config              = Config.MaapiVars()
         self.sendstr            = SocketClient.socketClient()
-        self.socketServer       = SocketServer.SocketServer()
+        self.objectname         = "Selector"
+
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.helpers            = Helpers.Helpers()
         self.checkDev           = CheckDev.CheckDevCond()
         self.maapilogger        = MaapiLogger.Logger()
+        self.maapilogger.name   = self.objectname
 
         # vars
         self.board_id           = 0
         self.maapiLocation      = self.config.maapiLocation
-        self.objectname         = "selector"
+
         self.selectorPort       = self.config.selectorPort
         self.selectorHost       = self.config.selectorHost
         self.thread             = []
@@ -50,42 +52,37 @@ class MaapiSelector():
         self.libraryList_id     = []
         self.devicesGroupedBylib= {}
 
-        self.debug = 1
-        self.maapilogger.log(1,"Initialising Selector Module ")
+        self.socketServer       = SocketServer.SocketServer(self.objectname, self.selectorHost, self.selectorPort, self.queue, 1)
+        self.socketServer.runTcpServer()
+
+        self.maapilogger.log("INFO","Initialising Selector Module ")
 
 
     def __del__(self):
-        self.maapilogger.log(1,"Joining tcp server thread ")
-        self.thread[0].join()
+        self.maapilogger.log("INFO","Joining tcp server thread ")
 
-
-    def runTcpServer(self):
-        self.maapilogger.log(2,"Selector run tcp Server")
-        self.thread.append(Thread(target=self.socketServer.startServer,
-            args=(self.objectname, self.selectorHost, self.selectorPort, self.queue, 1)))
-        self.thread[0].start()
 
 
     def runLibraryDeamons(self):
-        pass
+        for lib in self.libraryList:
+            self.maapilogger.log("INFO","{}".format(self.libraryList[lib][maapi_device_list]))
 
-
-
+maapi_device_list
     def checkDbForOldreadings(self,devices):
         for dev in devices:
-            if (dt.now() - devices[dev]["dev_last_update"]).seconds > self.helpers.to_sec(devices[dev]["dev_interval"], devices[dev]["dev_interval_unit_id"]):
-                self.maapilogger.log(2,"Devices sended to checkout readings {Ex}".format(Ex=devices[dev]["dev_rom_id"]))
+            lastUpdate = devices[dev]["dev_last_update"]
+            interval   = devices[dev]["dev_interval"]
+            interval_u = devices[dev]["dev_interval_unit_id"]
+            if (dt.now() - lastUpdate).seconds > self.helpers.to_sec(interval, interval_u):
+                self.maapilogger.log("DEBUG","Devices sended to checkout readings {Ex}".format(Ex=devices[dev]["dev_rom_id"]))
                 self.queue.updateQueueDevList(devices[dev]["dev_type_id"],dev)
-
-                value, add_to_db = self.checkDev.checkDevCond(self.deviceList,dev,devices[dev]["dev_value"])
 
 
     def getLibraryList(self):
         self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
-
         for ids in self.libraryList:
             self.queue.prepareQueueDevList(ids)
-        self.maapilogger.log(1,"Devices library list updated")
+        self.maapilogger.log("DEBUG","Devices library list updated")
 
 
     def getDeviceList(self):
@@ -119,13 +116,13 @@ class MaapiSelector():
                 dev_status = True, dev_machine_location_id = self.board_id).get()
 
         gdstop = dt.now()
-        self.maapilogger.log(1,"Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
+        self.maapilogger.log("DEBUG","Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
 
     def sendDataToServer(self,host,port,data):
         try:
             self.sendstr.sendStr(host, port, data)
         except Exception as e:
-            self.maapilogger.log(1,"Exception - SendDataToServer {Ex}".format(Ex=e))
+            self.maapilogger.log("ERROR","Exception - SendDataToServer {Ex}".format(Ex=e))
 
 
     def loop(self):
@@ -141,14 +138,13 @@ class MaapiSelector():
 
 
     def startConf(self):
-        self.maapilogger.log(1,"Preparing to start ")
+        self.maapilogger.log("INFO","Preparing to start Selector module")
         self.getDeviceList()
         self.getLibraryList()
 
 
 if __name__ == "__main__":
     MaapiSel =  MaapiSelector()
-    MaapiSel.runTcpServer()
     MaapiSel.startConf()
     MaapiSel.loop()
 

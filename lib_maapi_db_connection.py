@@ -25,6 +25,7 @@ class MaaPiDBConnection():
         Maapi_dbHost            =self.config.maapiDbHost
         Maapi_dbPasswd          =self.config.maapiDbpass
         self.maapilogger        = MaapiLogger.Logger()
+        self.maapilogger.name   = "DB Connect."
 
         try:
             self.conn = psycopg2.connect("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))

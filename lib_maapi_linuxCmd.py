@@ -11,6 +11,8 @@
 import lib_checkDeviceCond                  as CheckDev
 import lib_maapi_queue                      as Queue
 import lib_maapi_logger                     as MaapiLogger
+import lib_maapi_socketClient as SocketClient
+import lib_maapi_socketServer as SocketServer
 
 from datetime import datetime as dt
 import sys
@@ -25,6 +27,9 @@ class LinuxCmd(sock):
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
         self.maapilogger        = MaapiLogger.Logger()
+        self.maapilogger.name   = "LinuxCmd"
+        self.socketServer       = SocketServer.SocketServer(self.objectname, self.watcherHost, self.watcherPort, self.queue, 1)
+        self.socketServer.runTcpServer()
 
 
     def updateCommandLine(self):
@@ -53,8 +58,6 @@ class LinuxCmd(sock):
 
 
 if __name__ == "__main__":
-
-    LinuxCmd_ =  LinuxCmd()
-    LinuxCmd_.runtcpserver()
+    LinuxCmd_ =  LinuxCmd(sys.argv[1],sys.argv[2],sys.argv[2] )
     LinuxCmd_.updateCommandLine()
     LinuxCmd_.loop()

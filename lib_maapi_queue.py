@@ -19,8 +19,8 @@ class Queue():
         self.queue_tcp_radings  = {}
         self.socketReadings     = {}
         self.queueDevList       = {}
-        self.debug              = 1
         self.maapilogger        = MaapiLogger.Logger()
+        self.maapilogger.name   = "Queue"
 
     def addSocketRadings(self, owner, fomHost, onPort, pyload_id ,data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
         if not self.socketReadings:
@@ -32,10 +32,10 @@ class Queue():
             port_[onPort]     = id_
             host_[fomHost]    = port_
             self.socketReadings[owner] = host_
-            self.maapilogger.log(1, "insert new data: {d}".format(d=self.socketReadings))
+            self.maapilogger.log("DEBUG", "insert new data: {d}".format(d=self.socketReadings))
         else:
             self.socketReadings[owner][fomHost][onPort][self.seqSRnr] = [data, reciveToHost, reciveToPort, dt_]
-            self.maapilogger.log(1, "insert update data: {d}".format(d = self.socketReadings))
+            self.maapilogger.log("DEBUG", "insert update data: {d}".format(d = self.socketReadings))
         self.seqSRnr += 1
 
 
@@ -56,7 +56,7 @@ class Queue():
             if dev_id not in self.queueDevList[lib_id]:
                 self.queueDevList[lib_id].append(dev_id)
         except Exception as e:
-            self.maapilogger.log(1,"Devices - missing library of bad library id's  {Ex}".format(Ex=e))
+            self.maapilogger.log("ERROR","Devices - missing library of bad library id's  {Ex}".format(Ex=e))
 
     def prepareQueueDevList(self,lib_id):
         try:
@@ -64,7 +64,7 @@ class Queue():
                 pass
         except:
             self.queueDevList[lib_id]=[]
-            self.maapilogger.log(1,"Adding library id's do queue list {libb}".format(libb=lib_id))
+            self.maapilogger.log("DEBUG","Adding library id's do queue list {libb}".format(libb=lib_id))
 
 
     def get_tcp_radings(self):
