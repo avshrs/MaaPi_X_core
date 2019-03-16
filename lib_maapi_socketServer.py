@@ -41,8 +41,6 @@ class SocketServer():
                         id_, payload_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
                         if id_ == 0 :
                             client.send(bytes(0xff))
-                        if id_ == 0xff :
-                            unpicle payload 
                         if id_ !=0 and id_ !=0xff:
                             queue.addSocketRadings(self.objectname, self.selectorHost, self.selectorPort, id_, payload_, fromHost_, fromPort_)
 

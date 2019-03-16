@@ -7,7 +7,8 @@
 #                           Selector
 #
 ##############################################################
-
+from threading import Lock, Thread
+from datetime import datetime               as dt, timedelta
 import lib_maapi_socketServer               as SocketServer
 import lib_maapi_socketClient               as SocketClient
 import lib_maapi_queue                      as Queue
@@ -16,9 +17,6 @@ import MaaPi_Config                          as Config
 import lib_maapi_helpers                    as Helpers
 import lib_checkDeviceCond                  as CheckDev
 import lib_maapi_logger                     as MaapiLogger
-
-from threading import Lock, Thread
-from datetime import datetime as dt, timedelta
 import time
 import copy
 
@@ -37,7 +35,7 @@ class MaapiSelector():
         self.checkDev           = CheckDev.CheckDevCond()
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = self.objectname
-
+        self.interpreterVer       ="/usr/bin/python{0}.{1}".format(sys.version_info[0],sys.version_info[1])
         # vars
         self.board_id           = 0
         self.maapiLocation      = self.config.maapiLocation
@@ -50,6 +48,7 @@ class MaapiSelector():
         self.deviceList         = []
         self.libraryList        = []
         self.libraryList_id     = []
+        elf.selectorPid         = []
         self.devicesGroupedBylib= {}
 
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.selectorHost, self.selectorPort, self.queue, 1)
@@ -66,8 +65,10 @@ class MaapiSelector():
     def runLibraryDeamons(self):
         for lib in self.libraryList:
             self.maapilogger.log("INFO","{}".format(self.libraryList[lib][maapi_device_list]))
+            self.selectorPid[lib] = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py {0} {1} {2}".format(
+                self.selectorHost, int(self.selectorPort)+int(lib),lib )])
 
-maapi_device_list
+
     def checkDbForOldreadings(self,devices):
         for dev in devices:
             lastUpdate = devices[dev]["dev_last_update"]
@@ -76,6 +77,8 @@ maapi_device_list
             if (dt.now() - lastUpdate).seconds > self.helpers.to_sec(interval, interval_u):
                 self.maapilogger.log("DEBUG","Devices sended to checkout readings {Ex}".format(Ex=devices[dev]["dev_rom_id"]))
                 self.queue.updateQueueDevList(devices[dev]["dev_type_id"],dev)
+                payload = self.helpers.pyloadToPicke(00, dev , self.selectorHost,self.selectorPort)
+                recive =  self.socketClient.sendStrAndRecv(self.selectorHost, int(self.selectorPort)+int(libdevices[dev]["dev_type_id"]), payload)
 
 
     def getLibraryList(self):
