@@ -13,9 +13,9 @@ class MaapiVars():
 
         self.maapiLocation         ="TEST"
         self.maapiDbName           ='MaaPi'
-        self.maapiDbUser           ='maapi_db'
-        self.maapiDbHost           ='192.168.1.110'
-        self.maapiDbpass           ='889192'
+        self.maapiDbUser           ='xxx'
+        self.maapiDbHost           ='192.168.1.xxx'
+        self.maapiDbpass           ='xxx'
 
 
 
