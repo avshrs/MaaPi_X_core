@@ -20,10 +20,22 @@ class Queue():
         self.socketReadings     = {}
         self.queueDevList       = {}
         self.maapilogger        = MaapiLogger.Logger()
-        self.maapilogger.name   = "Queue"
+        self.add                = 0
+
 
     def addSocketRadings(self, owner, fomHost, onPort, pyload_id ,data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
-        if not self.socketReadings:
+        self.maapilogger.name   = f"Queue {owner}"
+
+        try:
+            for query in self.socketReadings[owner][fomHost][onPort]:
+                if data not in self.socketReadings[owner][fomHost][onPort][query][1]:
+                    self.add = 1
+                else:
+                    self.add = 2
+        except:
+            self.add = 0
+
+        if self.add == 0:
             data_ = [pyload_id, data, reciveToHost, reciveToPort, dt_]
             id_   = {}
             port_ = {}
@@ -32,10 +44,11 @@ class Queue():
             port_[onPort]     = id_
             host_[fomHost]    = port_
             self.socketReadings[owner] = host_
-            self.maapilogger.log("DEBUG", "insert new data: {d}".format(d=self.socketReadings))
-        else:
+            self.maapilogger.log("DEBUG", "Insert new data: {d}".format(d=self.socketReadings[owner][fomHost][onPort]))
+        elif self.add == 1 :
             self.socketReadings[owner][fomHost][onPort][self.seqSRnr] = [data, reciveToHost, reciveToPort, dt_]
-            self.maapilogger.log("DEBUG", "insert update data: {d}".format(d = self.socketReadings))
+            self.maapilogger.log("DEBUG", "Update data: {d}".format(d = self.socketReadings[owner][fomHost][onPort]))
+
         self.seqSRnr += 1
 
 

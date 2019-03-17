@@ -17,8 +17,8 @@ import MaaPi_Config                          as Config
 import lib_maapi_helpers                    as Helpers
 import lib_checkDeviceCond                  as CheckDev
 import lib_maapi_logger                     as MaapiLogger
-import time
-import copy
+import time, copy, sys
+import subprocess
 
 
 class MaapiSelector():
@@ -27,9 +27,8 @@ class MaapiSelector():
         # objects
         self.queue              = Queue.Queue()
         self.config              = Config.MaapiVars()
-        self.sendstr            = SocketClient.socketClient()
+        self.socketClient       = SocketClient.socketClient()
         self.objectname         = "Selector"
-
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.helpers            = Helpers.Helpers()
         self.checkDev           = CheckDev.CheckDevCond()
@@ -37,9 +36,8 @@ class MaapiSelector():
         self.maapilogger.name   = self.objectname
         self.interpreterVer       ="/usr/bin/python{0}.{1}".format(sys.version_info[0],sys.version_info[1])
         # vars
-        self.board_id           = 0
+        self.board_id           = 5
         self.maapiLocation      = self.config.maapiLocation
-
         self.selectorPort       = self.config.selectorPort
         self.selectorHost       = self.config.selectorHost
         self.thread             = []
@@ -48,8 +46,9 @@ class MaapiSelector():
         self.deviceList         = []
         self.libraryList        = []
         self.libraryList_id     = []
-        elf.selectorPid         = []
+        self.selectorPid        = {}
         self.devicesGroupedBylib= {}
+        self.localQueue         = {}
 
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.selectorHost, self.selectorPort, self.queue, 1)
         self.socketServer.runTcpServer()
@@ -61,24 +60,42 @@ class MaapiSelector():
         self.maapilogger.log("INFO","Joining tcp server thread ")
 
 
-
     def runLibraryDeamons(self):
+
         for lib in self.libraryList:
-            self.maapilogger.log("INFO","{}".format(self.libraryList[lib][maapi_device_list]))
-            self.selectorPid[lib] = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py {0} {1} {2}".format(
-                self.selectorHost, int(self.selectorPort)+int(lib),lib )])
+            lists =[]
+            lists.append(self.interpreterVer)
+            lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")
+            lists.append(f"{self.selectorHost}")
+            lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")
+            lists.append(f"21")
+
+            self.maapilogger.log("INFO","{}".format(self.libraryList[lib]["id"]))
+            self.selectorPid[lib] = subprocess.Popen(lists)
 
 
-    def checkDbForOldreadings(self,devices):
-        for dev in devices:
-            lastUpdate = devices[dev]["dev_last_update"]
-            interval   = devices[dev]["dev_interval"]
-            interval_u = devices[dev]["dev_interval_unit_id"]
-            if (dt.now() - lastUpdate).seconds > self.helpers.to_sec(interval, interval_u):
-                self.maapilogger.log("DEBUG","Devices sended to checkout readings {Ex}".format(Ex=devices[dev]["dev_rom_id"]))
-                self.queue.updateQueueDevList(devices[dev]["dev_type_id"],dev)
-                payload = self.helpers.pyloadToPicke(00, dev , self.selectorHost,self.selectorPort)
-                recive =  self.socketClient.sendStrAndRecv(self.selectorHost, int(self.selectorPort)+int(libdevices[dev]["dev_type_id"]), payload)
+
+    def checkDbForOldreadings(self):
+        for dev in self.deviceList:
+            lastUpdate = self.deviceList[dev]["dev_last_update"]
+            interval   = self.deviceList[dev]["dev_interval"]
+            interval_u = self.deviceList[dev]["dev_interval_unit_id"]
+            tosec      = self.helpers.to_sec(interval, interval_u)
+            if (dt.now() - lastUpdate).seconds >= tosec:
+                try:
+                    d = self.localQueue[dev]
+                except:
+                    self.maapilogger.log("ERROR",f"self.localQueue[dev] not exist {dev}")
+                    self.localQueue[dev]=lastUpdate
+                if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
+                    self.localQueue[dev]=dt.now()
+                    payload = self.helpers.pyloadToPicke(10, self.deviceList[dev] , self.selectorHost,self.selectorPort)
+                    self.maapilogger.log("INFO",f"Devices sended to checkout readings {self.deviceList[dev]['dev_id']} | {self.deviceList[dev]['dev_user_name']} | {self.deviceList[dev]['dev_rom_id']}")
+                    try:
+                        self.socketClient.sendStr(self.selectorHost, int(self.selectorPort)+int(self.deviceList[dev]["dev_type_id"]), payload)
+                    except Exception as e:
+                        self.maapilogger.log("ERROR","Exception - Send Data to lib {Ex}".format(Ex=e))
+                        self.localQueue[dev]=lastUpdate
 
 
     def getLibraryList(self):
@@ -98,6 +115,7 @@ class MaapiSelector():
                 "dev_id",
                 "dev_type_id",
                 "dev_rom_id",
+                "dev_user_name",
                 "dev_bus_type_id",
                 "dev_last_update",
                 "dev_interval",
@@ -127,17 +145,17 @@ class MaapiSelector():
         except Exception as e:
             self.maapilogger.log("ERROR","Exception - SendDataToServer {Ex}".format(Ex=e))
 
-
     def loop(self):
         while True:
-            if (dt.now() - self.timer_1).seconds >=1:
-                self.getDeviceList()
+            if (dt.now() - self.timer_1).seconds >= 1:
                 self.timer_1 = dt.now()
-            if (dt.now() - self.timer_2).seconds >= 60:
+                self.getDeviceList()
+
+            if (dt.now() - self.timer_2).seconds >= 10:
                 self.getLibraryList()
-                self.timer_2
-            time.sleep(0.1)
-            self.checkDbForOldreadings(self.deviceList)
+                self.timer_2 = dt.now()
+            time.sleep(0.05)
+            self.checkDbForOldreadings()
 
 
     def startConf(self):
@@ -149,5 +167,5 @@ class MaapiSelector():
 if __name__ == "__main__":
     MaapiSel =  MaapiSelector()
     MaapiSel.startConf()
+    MaapiSel.runLibraryDeamons()
     MaapiSel.loop()
-
