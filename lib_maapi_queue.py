@@ -8,54 +8,42 @@
 ##############################################################
 
 from collections import defaultdict
+import queue
 from datetime import datetime as dt
 import lib_maapi_logger          as MaapiLogger
-
+import copy
+from threading import Lock, Thread
+lock = Lock()
 
 
 class Queue():
     def __init__(self):
         self.seqSRnr            = 0
         self.queue_tcp_radings  = {}
-        self.socketReadings     = {}
+        self.socketReadings     = queue.Queue()
         self.queueDevList       = {}
         self.maapilogger        = MaapiLogger.Logger()
         self.add                = 0
 
 
-    def addSocketRadings(self, owner, fomHost, onPort, pyload_id ,data, reciveToHost = None, reciveToPort = None, dt_=dt.now()):
+    def addSocketRadings(self, owner, fomHost, onPort, payload_id, payload, payload2, reciveToHost = None, reciveToPort = None, dateTime=dt.now()):
         self.maapilogger.name   = f"Queue {owner}"
-
-        try:
-            for query in self.socketReadings[owner][fomHost][onPort]:
-                if data not in self.socketReadings[owner][fomHost][onPort][query][1]:
-                    self.add = 1
-                else:
-                    self.add = 2
-        except:
-            self.add = 0
-
-        if self.add == 0:
-            data_ = [pyload_id, data, reciveToHost, reciveToPort, dt_]
-            id_   = {}
-            port_ = {}
-            host_ = {}
-            id_[self.seqSRnr] = data_
-            port_[onPort]     = id_
-            host_[fomHost]    = port_
-            self.socketReadings[owner] = host_
-            self.maapilogger.log("DEBUG", "Insert new data: {d}".format(d=self.socketReadings[owner][fomHost][onPort]))
-        elif self.add == 1 :
-            self.socketReadings[owner][fomHost][onPort][self.seqSRnr] = [data, reciveToHost, reciveToPort, dt_]
-            self.maapilogger.log("DEBUG", "Update data: {d}".format(d = self.socketReadings[owner][fomHost][onPort]))
-
+        ids  = {}
+        port = {}
+        host = {}
+        ow   = {}
+        pickledData = [payload_id, payload, payload2, reciveToHost, reciveToPort, dateTime]
+        ids[self.seqSRnr] = pickledData
+        port[onPort]     = ids
+        host[fomHost]    = port
+        ow[owner]        = host
+        self.socketReadings.put(ow)
+        self.maapilogger.log("DEBUG", "Insert new data to queue")
         self.seqSRnr += 1
 
 
     def getSocketRadings(self):
-        return self.socketReadings
-
-
+        return self.socketReadings.get()
 
 
     def getQueueDevList(self):

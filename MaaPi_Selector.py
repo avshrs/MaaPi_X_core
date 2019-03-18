@@ -52,7 +52,6 @@ class MaapiSelector():
 
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.selectorHost, self.selectorPort, self.queue, 1)
         self.socketServer.runTcpServer()
-
         self.maapilogger.log("INFO","Initialising Selector Module ")
 
 
@@ -61,7 +60,6 @@ class MaapiSelector():
 
 
     def runLibraryDeamons(self):
-
         for lib in self.libraryList:
             lists =[]
             lists.append(self.interpreterVer)
@@ -69,10 +67,8 @@ class MaapiSelector():
             lists.append(f"{self.selectorHost}")
             lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")
             lists.append(f"21")
-
             self.maapilogger.log("INFO","{}".format(self.libraryList[lib]["id"]))
             self.selectorPid[lib] = subprocess.Popen(lists)
-
 
 
     def checkDbForOldreadings(self):
@@ -89,8 +85,8 @@ class MaapiSelector():
                     self.localQueue[dev]=lastUpdate
                 if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
                     self.localQueue[dev]=dt.now()
-                    payload = self.helpers.pyloadToPicke(10, self.deviceList[dev] , self.selectorHost,self.selectorPort)
-                    self.maapilogger.log("INFO",f"Devices sended to checkout readings {self.deviceList[dev]['dev_id']} | {self.deviceList[dev]['dev_user_name']} | {self.deviceList[dev]['dev_rom_id']}")
+                    payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.selectorHost,self.selectorPort)
+                    self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {self.deviceList[dev]['dev_id']} | {self.deviceList[dev]['dev_user_name']} | {self.deviceList[dev]['dev_rom_id']}")
                     try:
                         self.socketClient.sendStr(self.selectorHost, int(self.selectorPort)+int(self.deviceList[dev]["dev_type_id"]), payload)
                     except Exception as e:

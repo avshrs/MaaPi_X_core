@@ -19,8 +19,8 @@ class SocketServer():
         self.thread             = []
 
     def __del__(self):
-        #self.sock.close()
-        #self.thread[0].join()
+        self.sock.close()
+        self.thread[0].join()
         pass
 
     def startServer(self):
@@ -38,12 +38,12 @@ class SocketServer():
                     while True:
                         data = client.recv(200000)
                         if not data: break
-                        id_, payload_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
+                        id_, payload_, payload2_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
                         if id_ == 0 :
                             client.send(bytes(0xff))
                         if id_ !=0:
-                            self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_}")
-                            self.queue.addSocketRadings(self.objectname, self.host, self.port, id_, payload_, fromHost_, fromPort_)
+                            self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
+                            self.queue.addSocketRadings(self.objectname, self.host, self.port, id_, payload_, payload2_, fromHost_, fromPort_)
 
         except EnvironmentError as  e:
             self.maapilogger.log("ERROR","Except detect:")
