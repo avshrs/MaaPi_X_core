@@ -56,7 +56,6 @@ class MaaPiDBConnection():
             print (e)
 
 
-
     def insertRaw(self, where, what):
         string_ = "INSERT INTO {where} ({what})".format(where=where, what=",".join(what))
         self.maapilogger.log(1,string_)
@@ -92,7 +91,6 @@ class MaaPiDBConnection():
                                 "VALUES (default,{1},default,{2})".format(devices_data[1].replace("-", "_"), device_id,(1 if insert_value==True else (0 if insert_value==False else insert_value))))
                     self.conn.commit()
             else:
-
                 x.execute("UPDATE devices "
                           "SET dev_interval_queue = {2}, dev_value={0}, dev_read_error='Error' "
                           "WHERE dev_id='{1}' and dev_status=True".format(9999,device_id,False))

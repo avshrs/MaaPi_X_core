@@ -7,17 +7,18 @@ class Helpers:
             "readFromDev_rom_id" : 11,
         }
 
-    def pyloadToPicke(self, message_id, payload, payload2, fromHost, fromPort):
+    def pyloadToPicke(self, message_id, payload, payload2, payload3, fromHost, fromPort):
         data = {"id":message_id,
                 "payload":payload,
                 "payload2":payload2,
+                "payload3":payload3,
                 "fromHost":fromHost,
                 "fromPort":fromPort}
         return pickle.dumps(data)
 
     def payloadFromPicke(self, pickled):
         data = pickle.loads(pickled)
-        return data["id"], data["payload"], data["payload2"], data["fromHost"], data["fromPort"]
+        return data["id"], data["payload"], data["payload2"], data["payload3"], data["fromHost"], data["fromPort"]
 
     def scanQueueForIncommingQuerys(self,queue, objectname, selectorHost, selectorPort):
         try:

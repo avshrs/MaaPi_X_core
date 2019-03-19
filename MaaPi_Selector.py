@@ -46,10 +46,10 @@ class MaapiSelector():
         self.deviceList         = []
         self.libraryList        = []
         self.libraryList_id     = []
-        self.selectorPid        = {}
+        self.libraryPID         = {}
         self.devicesGroupedBylib= {}
         self.localQueue         = {}
-
+        self.libraryLastResponce= 10 # seconds
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.selectorHost, self.selectorPort, self.queue, 1)
         self.socketServer.runTcpServer()
         self.maapilogger.log("INFO","Initialising Selector Module ")
@@ -58,40 +58,78 @@ class MaapiSelector():
     def __del__(self):
         self.maapilogger.log("INFO","Joining tcp server thread ")
 
-
-    def runLibraryDeamons(self):
+    def startlibraryDeamon(self):
         for lib in self.libraryList:
-            lists =[]
-            lists.append(self.interpreterVer)
-            lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")
-            lists.append(f"{self.selectorHost}")
-            lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")
-            lists.append(f"21")
-            self.maapilogger.log("INFO","{}".format(self.libraryList[lib]["id"]))
-            self.selectorPid[lib] = subprocess.Popen(lists)
+            try:
+                self.runLibraryDeamon(lib)
+            except Exception as e :
+                self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
+    def restartlibraryDeamon(self, lib_id):
+        try:
+            if self.libraryPID[lib_id]:
+                self.libraryPID[lib_id]["pid"].kill()
+        finally:
+            self.runLibraryDeamon(self, lib_id)
+
+    def runLibraryDeamon(self, lib):
+        lists =[]
+        lists.append(self.interpreterVer)                                               # interpreter version
+        lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")                  # library file name
+        lists.append(f"{self.selectorHost}")                                            # host
+        lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")      # port selector port + library unique index
+        lists.append(f"{self.libraryList[lib]['id']}")                                  # library index
+        pid = subprocess.Popen(lists)
+        name = self.libraryList[lib]['device_lib_name']
+        host = self.selectorHost
+        port = int(self.selectorPort)+int(self.libraryList[lib]['id'])
+        self.libraryPID[lib] = {
+                    "id"   : lib,
+                    "name" : name,
+                    "pid"  : pid,
+                    "host" : host,
+                    "port" : port,
+                    "lastResponce":dt.now()
+        }
+        self.maapilogger.log("INFO","{}".format(self.libraryList[lib]["id"]))
+
+    def checkLibraryProcess(self):
+        for lib in libraryPID:
+            try:
+                if (dt.now() - libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
+                    self.maapilogger.log("DEBUG", "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
+
+                    payload = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
+                    recive =  self.socketClient.sendStrAndRecv(self.libraryPID[lib]["host"], self.libraryPID[lib]["port"], payload)
+                    if recive == bytes(0xff):
+                        self.libraryPID[lib]["lastResponce"] = dt.now()
+                        self.maapilogger.log("DEBUG", "Get responce from selector")
+                    else:
+                        self.restartlibraryDeamon(lib)
+            except Exception as e :
+                self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
     def checkDbForOldreadings(self):
         for dev in self.deviceList:
-            lastUpdate = self.deviceList[dev]["dev_last_update"]
-            interval   = self.deviceList[dev]["dev_interval"]
-            interval_u = self.deviceList[dev]["dev_interval_unit_id"]
-            tosec      = self.helpers.to_sec(interval, interval_u)
-            if (dt.now() - lastUpdate).seconds >= tosec:
+            c_dev = self.deviceList[dev]
+            tosec      = self.helpers.to_sec(c_dev["dev_interval"], c_dev["dev_interval_unit_id"])
+            if (dt.now() -  c_dev["dev_last_update"]).seconds >= tosec:
                 try:
-                    d = self.localQueue[dev]
+                    if self.localQueue[dev]:
+                        pass
                 except:
-                    self.maapilogger.log("ERROR",f"self.localQueue[dev] not exist {dev}")
-                    self.localQueue[dev]=lastUpdate
+                    self.maapilogger.log("DEBUG",f"self.localQueue[dev] not exist - adding new{dev}")
+                    self.localQueue[dev]=c_dev["dev_last_update"]
                 if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
                     self.localQueue[dev]=dt.now()
-                    payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.selectorHost,self.selectorPort)
-                    self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {self.deviceList[dev]['dev_id']} | {self.deviceList[dev]['dev_user_name']} | {self.deviceList[dev]['dev_rom_id']}")
+                    payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost,self.selectorPort)
+                    self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name']} | {self.deviceList[dev]['dev_rom_id']}")
+                    pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                     try:
-                        self.socketClient.sendStr(self.selectorHost, int(self.selectorPort)+int(self.deviceList[dev]["dev_type_id"]), payload)
+                        self.socketClient.sendStr(pid["host"], pid["port"], payload)
                     except Exception as e:
-                        self.maapilogger.log("ERROR","Exception - Send Data to lib {Ex}".format(Ex=e))
-                        self.localQueue[dev]=lastUpdate
+                        self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {pid['name']} error: {e}")
+                        self.localQueue[dev]=c_dev["dev_last_update"]
 
 
     def getLibraryList(self):
@@ -130,7 +168,17 @@ class MaapiSelector():
                 "dev_collect_values_if_cond_force_value_e",
                 "dev_collect_values_if_cond_force_value",
                 ).order_by('dev_id').filters_eq(
-                dev_status = True, dev_machine_location_id = self.board_id).get()
+                dev_status = True, dev_machine_location_id=self.board_id).get()
+
+        self.deviceListForRelated = self.maapiDB.table("devices").columns(
+                "dev_id",
+                "dev_last_update",
+                "dev_interval",
+                "dev_value",
+                "dev_interval_unit_id",
+                ).order_by('dev_id').filters_eq(
+                dev_status = True).get()
+
 
         gdstop = dt.now()
         self.maapilogger.log("DEBUG","Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
@@ -143,14 +191,14 @@ class MaapiSelector():
 
     def loop(self):
         while True:
-            if (dt.now() - self.timer_1).seconds >= 1:
+            if (dt.now() - self.timer_1).seconds >= 5:
                 self.timer_1 = dt.now()
                 self.getDeviceList()
 
             if (dt.now() - self.timer_2).seconds >= 10:
                 self.getLibraryList()
                 self.timer_2 = dt.now()
-            time.sleep(0.05)
+            time.sleep(0.1)
             self.checkDbForOldreadings()
 
 
@@ -163,5 +211,6 @@ class MaapiSelector():
 if __name__ == "__main__":
     MaapiSel =  MaapiSelector()
     MaapiSel.startConf()
-    MaapiSel.runLibraryDeamons()
+    MaapiSel.startlibraryDeamon()
+    time.sleep(1)
     MaapiSel.loop()

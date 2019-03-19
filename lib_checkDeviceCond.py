@@ -6,11 +6,11 @@ class CheckDevCond:
     def __init__(self):
         self.helpers = Helpers.Helpers()
 
-    def conditionDeviceReferenceDev(self,devices_db, dev_id, value, minmax):
+    def conditionDeviceReferenceDev(self,devices_db, devices_db_rel, dev_id, value, minmax):
         collectValuesCond_bool      = devices_db[dev_id]['dev_collect_values_if_cond_{mm}_e'.format(mm=minmax)]
         collectValuesCond_value     = devices_db[dev_id]['dev_collect_values_if_cond_{mm}'.format(mm=minmax)]
-        collectValuesRef_bool       = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value']
-        collectValuesRef_value      = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value']
+        collectValuesRef_bool       = devices_db_rel[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value']
+        collectValuesRef_value      = devices_db_rel[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value']
 
         if collectValuesCond_bool and collectValuesCond_value:
             if minmax =="min":
@@ -48,7 +48,7 @@ class CheckDevCond:
         return condition
 
 
-    def checkDevCond(self, devices_db, dev_id, value):
+    def checkDevCond(self, devices_db, devices_db_rel, dev_id, value):
         cond_min = -1
         cond_max = -1
         cond_result = -1
@@ -57,14 +57,14 @@ class CheckDevCond:
 
         if devices_db[dev_id]['dev_collect_values_if_cond_e']:
             if devices_db[dev_id]['dev_collect_values_if_cond_from_dev_e'] and devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']:
-                ref_lastUpdate      = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_last_update']
-                ref_interval      = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_interval']
-                ref_intervalUnit = devices_db[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_interval_unit_id']
+                ref_lastUpdate      = devices_db_rel[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_last_update']
+                ref_interval      = devices_db_rel[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_interval']
+                ref_intervalUnit = devices_db_rel[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_interval_unit_id']
                 ref_intervalSec = self.helpers.to_sec(ref_interval, ref_intervalUnit)
 
                 if (dt.now()- ref_lastUpdate).seconds <= (ref_intervalSec * 2):
-                    cond_min = self.conditionDeviceReferenceDev(devices_db, dev_id, value, "min")
-                    cond_max = self.conditionDeviceReferenceDev(devices_db, dev_id, value, "max")
+                    cond_min = self.conditionDeviceReferenceDev(devices_db, devices_db_rel, dev_id, value, "min")
+                    cond_max = self.conditionDeviceReferenceDev(devices_db, devices_db_rel, dev_id, value, "max")
                 else:
                     cond_max = -1
                     cond_min = -1
