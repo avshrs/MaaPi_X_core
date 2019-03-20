@@ -1,10 +1,8 @@
-
-#!/usr/bin/python3.4
-# -*- coding: utf-8 -*-
-##############################################################
+#!/usr/bin/python3.7
+# -*- coding: utf-8 -*-import sys
+###############################################################
 #
-#                          MAAPI 5.0
-#                           Selector
+#                          MAAPI X
 #
 ##############################################################
 import lib_maapi_main_socketServer               as SocketServer

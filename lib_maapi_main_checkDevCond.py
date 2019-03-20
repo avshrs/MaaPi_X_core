@@ -1,4 +1,11 @@
-import lib_maapi_main_helpers                    as Helpers
+#!/usr/bin/python3.7
+# -*- coding: utf-8 -*-import sys
+###############################################################
+#
+#                          MAAPI X
+#
+##############################################################
+import lib_maapi_main_helpers               as Helpers
 from datetime import datetime               as dt, timedelta
 
 

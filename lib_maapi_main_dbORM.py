@@ -1,9 +1,8 @@
-#!/usr/bin/python3.4
+#!/usr/bin/python3.7
 # -*- coding: utf-8 -*-import sys
 ###############################################################
 #
-#                          MAAPI 5.0
-#                   connection with DB
+#                          MAAPI X
 #
 ##############################################################
 import psycopg2
