@@ -1,3 +1,13 @@
+
+#!/usr/bin/python3.7
+# -*- coding: utf-8 -*-
+##############################################################
+#
+#                          MAAPI 5.0
+#                          Readings
+#
+##############################################################
+
 import logging
 from datetime import datetime as dt
 
@@ -20,5 +30,5 @@ class Logger():
 
     def log(self, level, msg):
         if  self.levels[level] in self.levelsPrior[self.defaultDebugLevel]:
-            time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:<6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
-            print("MaaPi - {0:<15} | {1:^7} | {2:<16} | {3}".format(self.name, self.levels[level], time, msg))
+            time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
+            print("MaaPi | {0:<20} | {1:^6} | {2:<16} | {3}".format(self.name, self.levels[level], time, msg))

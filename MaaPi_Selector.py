@@ -7,7 +7,6 @@
 #                           Selector
 #
 ##############################################################
-from threading import Lock, Thread
 from datetime import datetime               as dt, timedelta
 import lib_maapi_socketServer               as SocketServer
 import lib_maapi_socketClient               as SocketClient
@@ -91,7 +90,7 @@ class MaapiSelector():
                     "port" : port,
                     "lastResponce":dt.now()
         }
-        self.maapilogger.log("INFO","{}".format(self.libraryList[lib]["id"]))
+
 
     def checkLibraryProcess(self):
         for lib in libraryPID:
@@ -109,17 +108,19 @@ class MaapiSelector():
             except Exception as e :
                 self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
+
     def checkDbForOldreadings(self):
         for dev in self.deviceList:
             c_dev = self.deviceList[dev]
-            tosec      = self.helpers.to_sec(c_dev["dev_interval"], c_dev["dev_interval_unit_id"])
-            if (dt.now() -  c_dev["dev_last_update"]).seconds >= tosec:
+            tosec = self.helpers.to_sec(c_dev["dev_interval"], c_dev["dev_interval_unit_id"])
+
+            if (dt.now() - c_dev["dev_last_update"]).seconds >= tosec:
                 try:
-                    if self.localQueue[dev]:
-                        pass
+                    self.localQueue[dev]
                 except:
-                    self.maapilogger.log("DEBUG",f"self.localQueue[dev] not exist - adding new{dev}")
                     self.localQueue[dev]=c_dev["dev_last_update"]
+                    self.maapilogger.log("DEBUG",f"self.localQueue[dev] not exist - adding new{dev}")
+
                 if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost,self.selectorPort)
@@ -138,13 +139,16 @@ class MaapiSelector():
             self.queue.prepareQueueDevList(ids)
         self.maapilogger.log("DEBUG","Devices library list updated")
 
-
-    def getDeviceList(self):
+    def updateBoardLocation(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
         for i in board_location:
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
+
+    def getDeviceList(self):
         gdstart = dt.now()
+
+
         self.deviceList = self.maapiDB.table("devices").columns(
                 "dev_id",
                 "dev_type_id",
@@ -178,10 +182,8 @@ class MaapiSelector():
                 "dev_interval_unit_id",
                 ).order_by('dev_id').filters_eq(
                 dev_status = True).get()
-
-
         gdstop = dt.now()
-        self.maapilogger.log("DEBUG","Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
+        self.maapilogger.log("INFO","Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
 
     def sendDataToServer(self,host,port,data):
         try:
@@ -204,6 +206,7 @@ class MaapiSelector():
 
     def startConf(self):
         self.maapilogger.log("INFO","Preparing to start Selector module")
+        self.updateBoardLocation()
         self.getDeviceList()
         self.getLibraryList()
 

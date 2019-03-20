@@ -1,3 +1,13 @@
+
+#!/usr/bin/python3.7
+# -*- coding: utf-8 -*-
+##############################################################
+#
+#                          MAAPI 5.0
+#                          Readings
+#
+##############################################################
+
 import socket
 import lib_maapi_helpers        as Helpers
 from datetime import datetime   as dt
@@ -13,7 +23,7 @@ class SocketServer():
         self.maapilogger.name   = "{0} Sock.".format(self.objectname )
 
         self.host               = host
-        self.port              = port
+        self.port               = port
         self.object_id          = object_id
         self.queue              = queue
         self.thread             = []
@@ -56,7 +66,7 @@ class SocketServer():
 
 
     def runTcpServer(self):
-        self.maapilogger.log("INFO"," {0} Run TCP Server".format(self.objectname ))
+        self.maapilogger.log("INFO","{0} Run TCP Server".format(self.objectname ))
         self.thread.append(Thread(target=self.startServer))
         self.thread[0].start()
 
