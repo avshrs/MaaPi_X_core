@@ -9,16 +9,16 @@
 import psycopg2
 from datetime import datetime as dt, timedelta
 import MaaPi_Config as Config
-import lib_maapi_logger          as MaapiLogger
+import lib_maapi_main_logger          as MaapiLogger
 
 class MaaPiDBConnection():
 
     def __init__(self):
-        self.filters_ = {}
-        self.orders_ = {}
-        self.columns_ = {}
-        self.columns_var = {}
-        self.table_ = {}
+        self.filters_           = {}
+        self.orders_            = {}
+        self.columns_           = {}
+        self.columns_var        = {}
+        self.table_             = {}
         self.config             = Config.MaapiVars()
         Maapi_dbName            =self.config.maapiDbName
         Maapi_dbUser            =self.config.maapiDbUser
@@ -70,7 +70,6 @@ class MaaPiDBConnection():
                       "WHERE dev_id='{0}' "
                       "AND dev_status = True".format(device_id))
             devices_data = x.fetchone()
-
             try:
                 x.execute("UPDATE devices "
                           "SET dev_value_old={0} "
@@ -196,8 +195,6 @@ class MaaPiDBConnection():
                     raise ValueError(
                         "order_by Second Value should be empty or ASC or DESC but get: '{0}'".
                         format(self.orders_[1]))
-
-
         query += ";"
 
         data = self.exec_query_select(query, self.table_)
@@ -214,7 +211,6 @@ class MaaPiDBConnection():
         try:
             x = self.conn.cursor()
             try:
-#                print(query)
                 x.execute(query)
             except Exception as e:
                 print (e)

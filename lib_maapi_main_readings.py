@@ -8,10 +8,10 @@
 #
 ##############################################################
 
-import lib_checkDeviceCond                  as CheckDev
-import lib_maapi_db_connection              as Db_connection
-import lib_maapi_logger                     as MaapiLogger
-import lib_maapi_helpers                    as Helpers
+import lib_maapi_main_checkDevCond               as CheckDev
+import lib_maapi_main_dbORM                      as Db_connection
+import lib_maapi_main_logger                     as MaapiLogger
+import lib_maapi_main_helpers                    as Helpers
 
 
 class Readings:

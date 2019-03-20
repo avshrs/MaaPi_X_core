@@ -9,9 +9,9 @@
 ##############################################################
 
 import socket
-import lib_maapi_helpers        as Helpers
-from datetime import datetime   as dt
-import lib_maapi_logger         as MaapiLogger
+import lib_maapi_main_helpers        as Helpers
+import lib_maapi_main_logger         as MaapiLogger
+from datetime import datetime        as dt
 from threading import Lock, Thread
 
 class SocketServer():

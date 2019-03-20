@@ -10,7 +10,7 @@
 from collections import defaultdict
 import queue
 from datetime import datetime as dt
-import lib_maapi_logger          as MaapiLogger
+import lib_maapi_main_logger          as MaapiLogger
 import copy
 from threading import Lock, Thread
 lock = Lock()
