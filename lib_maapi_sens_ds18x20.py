@@ -71,7 +71,7 @@ class DS18X20():
                 error = 2
         else:
             error = 1
-            self._debug("ERROR", f"ERROR reading values from rom_id[1]: {dev_id}")
+            self.maapilogger.log("ERROR", "ERROR reading values from rom_id[1]: {dev_id}")
         return value, error
 
 
