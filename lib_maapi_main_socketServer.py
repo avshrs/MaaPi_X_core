@@ -63,6 +63,7 @@ class SocketServer():
             while True:
                 data, address = sockUDP.recvfrom(4096)
                 if not data: break
+                self.maapilogger.log("INFO",f"Udp data decoded {data.decode("utf-8")}")
                 payload_id, dev_id, value, name  = data.decode("utf-8").split(",")
                 if data:
                     if payload_id == "SOCKET":
