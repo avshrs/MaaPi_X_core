@@ -66,7 +66,7 @@ class SocketServer():
                 self.maapilogger.log("INFO",f"Udp data decoded {data.decode('utf-8')}")
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
                 if data:
-                    if str(payload_id == "SOCKET":
+                    if str(payload_id) == "SOCKET":
                         self.maapilogger.log("INFO",f"payload_id: {payload_id}")
                         self.maapilogger.log("INFO",f"payload_id: {dev_id}")
                         self.maapilogger.log("INFO",f"payload_id: {value}")
