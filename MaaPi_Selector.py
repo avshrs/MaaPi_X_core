@@ -31,7 +31,7 @@ class MaapiSelector():
         self.checkDev           = CheckDev.CheckDevCond()
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = self.objectname
-        self.interpreterVer       ="/usr/bin/python{0}.{1}".format(sys.version_info[0],sys.version_info[1])
+        self.interpreterVer       =f"{sys.executable}"
         # vars
         self.board_id           = 5
         self.maapiLocation      = self.config.maapiLocation
