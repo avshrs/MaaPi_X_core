@@ -42,6 +42,9 @@ class UdpServer():
 
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
+        self.maapilogger.log("DEBUG",f"dev_id: {dev_id}")
+        self.maapilogger.log("DEBUG",f"devices_db: {devices_db}")
+        self.maapilogger.log("DEBUG",f"devices_db_rel: {devices_db_rel}")
         value = float(devices_db)
         return value, 0
 
