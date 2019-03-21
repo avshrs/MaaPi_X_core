@@ -34,7 +34,7 @@ class UdpServer():
         self.readings           = Readings.Readings(self.objectname,self.host, self.port)
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,id_)
-        self.socketServer.runUdpServer(self.host, 50505)
+        self.socketServer.runUdpServer(self.host, self.port)
 
 
     def checkQueueForReadings(self):
