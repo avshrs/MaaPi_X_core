@@ -59,6 +59,7 @@ class SocketServer():
     def startServerUDP(self, host, port):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sockUDP:
             sockUDP.bind((host, int(port)))
+            self.maapilogger.log("INFO",sockUDP)
             while True:
                 data, address = sockUDP.recvfrom(4096)
                 if not data: break
