@@ -35,8 +35,8 @@ class MaaPiMath():
         self.maapilogger.name   = self.objectname
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.readings           = Readings.Readings(self.objectname,self.host, self.port)
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.host, self.port, self.queue, id_)
-        self.socketServer.runTcpServer()
+        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
+        self.socketServer.runTcpServer(self.host, self.port)
 
 
     def updateMathTable(self):

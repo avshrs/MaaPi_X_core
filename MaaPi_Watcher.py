@@ -43,8 +43,8 @@ class MaapiWatcher():
         self.thread             = []
         self.interpreterVer       =f"{sys.executable}"
         self.lastResponce       = dt.now() - timedelta(hours = 1)
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.watcherHost, self.watcherPort, self.queue, 1)
-        self.socketServer.runTcpServer()
+        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
+        self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
         self.selectorPid        = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
 
 

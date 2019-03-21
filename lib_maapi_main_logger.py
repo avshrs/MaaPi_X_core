@@ -40,6 +40,6 @@ class Logger():
     def log(self, level, msg):
         if  self.levels[level] in self.levelsPrior[self.defaultDebugLevel]:
             time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
-            #print("MaaPi | {0:<20} | {1:^6} | {2:<16} | {3}".format(self.name, self.levels[level], time, msg))
+            print("MaaPi | {0:<20} | {1:^6} | {2:<16} | {3}".format(self.name, self.levels[level], time, msg))
             logging.debug("MaaPi_Selector\t\t-\t{0}".format(msg))
 

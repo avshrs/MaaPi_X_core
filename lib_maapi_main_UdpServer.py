@@ -23,7 +23,7 @@ import subprocess
 class LinuxCmd():
     def __init__(self,host,port,id_):
         self.queue              = Queue.Queue()
-        self.objectname         = "LinuxCmd"
+        self.objectname         = "UdpServer"
         self.host               = host
         self.port               = port
         self.maapiCommandLine   = []
@@ -33,13 +33,8 @@ class LinuxCmd():
         self.maapilogger.name   = self.objectname
         self.readings           = Readings.Readings(self.objectname,self.host, self.port)
         self.maapiDB            = Db_connection.MaaPiDBConnection()
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
-        self.socketServer.runTcpServer(self.host, self.port)
-
-
-    def updateCommandLine(self):
-        self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()
-        self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
+        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,id_)
+        self.socketServer.runUdpServer(self.host, self.port)
 
 
     def checkQueueForReadings(self):
@@ -47,7 +42,7 @@ class LinuxCmd():
 
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
-        value = (subprocess.check_output(self.maapiCommandLine[f"{dev_id}"]['cmd_command'],shell=True,)).decode("utf-8")
+        value = float(devices_db)
         return value, 0
 
 
@@ -62,5 +57,4 @@ class LinuxCmd():
 
 if __name__ == "__main__":
     LinuxCmd_ =  LinuxCmd(sys.argv[1],sys.argv[2],sys.argv[3] )
-    LinuxCmd_.updateCommandLine()
     LinuxCmd_.loop()

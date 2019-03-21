@@ -6,65 +6,75 @@
 #
 ##############################################################
 
-import socket
+import socket, sys
 import lib_maapi_main_helpers        as Helpers
 import lib_maapi_main_logger         as MaapiLogger
 from datetime import datetime        as dt
 from threading import Lock, Thread
 
 class SocketServer():
-    def __init__(self, objectname, host, port, queue, object_id):
+    def __init__(self, objectname, queue, object_id):
         self.objectname         = objectname
         self.helpers            = Helpers.Helpers()
-        self.sock               = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = "{0} Sock.".format(self.objectname )
-
-        self.host               = host
-        self.port               = port
         self.object_id          = object_id
         self.queue              = queue
-        self.thread             = []
+        self.threadTcp          = []
+        self.threadUdp          = []
+
 
     def __del__(self):
-        self.sock.close()
         self.thread[0].join()
+        self.threadUdp[0].join()
 
-
-    def startServer(self):
+    def startServerTCP(self, host, port):
         try:
+            sockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                self.sock.bind((self.host, int(self.port)))
+                sockTCP.bind((host, int(port)))
             except:
-                self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                self.sock.bind((host, int(port)))
-            self.sock.listen(10000)
-            self.maapilogger.log("INFO",self.sock)
+                sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                sockTCP.bind((host, int(port)))
+            sockTCP.listen(10000)
+            self.maapilogger.log("INFO",sockTCP)
             while True:
-                client, address = self.sock.accept()
+                client, address = sockTCP.accept()
                 with client:
                     while True:
                         data = client.recv(200000)
-                        if not data: break
-                        id_, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
-                        if id_ == 0 :
+                        if not data:
+                            break
+                        payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
+                        if payload_id == 0 :
                             client.send(bytes(0xff))
-                        if id_ !=0:
+                        if payload_id !=0:
                             self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
-                            self.queue.addSocketRadings(self.objectname, self.host, self.port, id_, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
 
-        except EnvironmentError as  e:
-            self.maapilogger.log("ERROR","Except detect:")
-            self.maapilogger.log("ERROR","---------------------------------------------------")
-            self.maapilogger.log("ERROR","{e}".format(e=e))
-            self.maapilogger.log("ERROR","---------------------------------------------------")
-            self.sock.close()
-        finally:
-            self.sock.close()
+        except Exception as e:
+            self.maapilogger.log("ERROR",f"startServerTCP {e}")
 
 
-    def runTcpServer(self):
+    def startServerUDP(self, host, port):
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sockUDP:
+            sockUDP.bind((host, int(port)))
+            while True:
+                data, address = sockUDP.recvfrom(4096)
+                if not data: break
+                payload_id, dev_id, value, name  = data.split(",")
+                if data:
+                    if payload_id == "SOCKET":
+                        self.queue.addSocketRadings(self.objectname, host, port, payload_id, dev_id, value, name )
+
+
+    def runTcpServer(self, host, port):
         self.maapilogger.log("INFO","{0} Run TCP Server".format(self.objectname ))
-        self.thread.append(Thread(target=self.startServer))
-        self.thread[0].start()
+        self.threadTcp.append(Thread(target=self.startServerTCP,args=(host, port)))
+        self.threadTcp[0].start()
 
+
+    def runUdpServer(self, host, port):
+        self.maapilogger.log("INFO","{0} Run UDP Server".format(self.objectname ))
+        self.threadUdp.append(Thread(target=self.startServerUDP, args=(host, port)))
+        self.threadUdp[0].start()

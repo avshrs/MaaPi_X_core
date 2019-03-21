@@ -33,7 +33,7 @@ class MaapiSelector():
         self.maapilogger.name   = self.objectname
         self.interpreterVer       =f"{sys.executable}"
         # vars
-        self.board_id           = 5
+        self.board_id           = 99
         self.maapiLocation      = self.config.maapiLocation
         self.selectorPort       = self.config.selectorPort
         self.selectorHost       = self.config.selectorHost
@@ -47,8 +47,8 @@ class MaapiSelector():
         self.devicesGroupedBylib= {}
         self.localQueue         = {}
         self.libraryLastResponce= 10 # seconds
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.selectorHost, self.selectorPort, self.queue, 1)
-        self.socketServer.runTcpServer()
+        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
+        self.socketServer.runTcpServer(self.selectorHost, self.selectorPort)
         self.maapilogger.log("INFO","Initialising Selector Module ")
 
 
@@ -96,7 +96,7 @@ class MaapiSelector():
                 if (dt.now() - libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
                     self.maapilogger.log("DEBUG", "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
 
-                    payload = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
+                    payload = self.helpers.pyloadToPicke(00, " ", " ", " ", " ",self.watcherHost,self.watcherPort)
                     recive =  self.socketClient.sendStrAndRecv(self.libraryPID[lib]["host"], self.libraryPID[lib]["port"], payload)
                     if recive == bytes(0xff):
                         self.libraryPID[lib]["lastResponce"] = dt.now()
@@ -142,6 +142,7 @@ class MaapiSelector():
         for i in board_location:
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
+
 
     def getDeviceList(self):
         gdstart = dt.now()

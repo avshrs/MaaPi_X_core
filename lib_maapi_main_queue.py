@@ -25,13 +25,13 @@ class Queue():
         self.add                = 0
 
 
-    def addSocketRadings(self, owner, fomHost, onPort, payload_id, payload, payload2, reciveToHost = None, reciveToPort = None, dateTime=dt.now()):
+    def addSocketRadings(self, owner, fomHost, onPort, payload_id, payload, payload2, payload3, reciveToHost = None, reciveToPort = None, dateTime=dt.now()):
         self.maapilogger.name   = f"Queue {owner}"
         ids  = {}
         port = {}
         host = {}
         ow   = {}
-        pickledData = [payload_id, payload, payload2, reciveToHost, reciveToPort, dateTime]
+        pickledData = [payload_id, payload, payload2, payload3, reciveToHost, reciveToPort, dateTime]
         ids[self.seqSRnr] = pickledData
         port[onPort]     = ids
         host[fomHost]    = port
