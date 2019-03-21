@@ -33,7 +33,7 @@ class Readings:
                 devices_db          = queue_[nr][2]
                 devices_db_rel      = queue_[nr][3]
 
-                if queue_[nr][0] == "SOCKET":
+                if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
                     self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
 
                     try:
@@ -46,8 +46,8 @@ class Readings:
                         self.maapilogger.log("ERROR",f"Error while reading values: {e}")
                         self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
 
-        except EnvironmentError as e :
-            self.maapilogger.log("ERROR",f"checkQueueForReadings {e}")
+        except Exception as e :
+            self.maapilogger.log("ERROR",f"checkQueueForReadings{e}")
 
     def insertReadingsToDB(self, nr, readed_value, dev_id, devices_db, devices_db_rel,  error_code):
         try:
