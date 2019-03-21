@@ -52,7 +52,7 @@ class LinuxCmd():
         value = 0
         if os.path.isfile(f'/sys/bus/w1/devices/{rom_id}/w1_slave'):
             w1_file = open(f'/sys/bus/w1/devices/{rom_id}/w1_slave','r')
-             self.maapilogger.log("DEBUG",f"Open file /sys/bus/w1/devices/{rom_id}/w1_slave")
+            self.maapilogger.log("DEBUG",f"Open file /sys/bus/w1/devices/{rom_id}/w1_slave")
             w1_line = w1_file.readline()
             w1_crc = w1_line.rsplit(' ', 1)
             w1_crc = w1_crc[1].replace('\n', '')
