@@ -182,7 +182,7 @@ class MaapiSelector():
                 ).order_by('dev_id').filters_eq(
                 dev_status = True).get()
         gdstop = dt.now()
-        self.maapilogger.log("INFO","Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
+        self.maapilogger.log("DEBUG","Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
 
     def sendDataToServer(self,host,port,data):
         try:
