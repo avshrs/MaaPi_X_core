@@ -63,13 +63,10 @@ class SocketServer():
             while True:
                 data, address = sockUDP.recvfrom(4096)
                 if not data: break
-                self.maapilogger.log("INFO",f"Udp data decoded {data.decode('utf-8')}")
+                self.maapilogger.log("DEBUG",f"Udp data decoded {data.decode('utf-8')}")
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
                 if data:
                     if int(payload_id) == 99:
-                        self.maapilogger.log("INFO",f"payload_id: {payload_id}")
-                        self.maapilogger.log("INFO",f"payload_id: {dev_id}")
-                        self.maapilogger.log("INFO",f"payload_id: {value}")
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
 
 

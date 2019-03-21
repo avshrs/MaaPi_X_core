@@ -43,18 +43,17 @@ class UdpServer():
             queueTmp  = self.queue.getSocketRadings()
             queue_ = queueTmp[self.objectname][self.host][self.port]
 
-
-
-
             for nr in queue_:
                 payload_id          = queue_[nr][0]
                 dev_id              = queue_[nr][1]
                 devices_db          = queue_[nr][2]
                 devices_db_rel      = queue_[nr][3]
-                self.maapilogger.log("INFO",f"payload_id: {payload_id}")
-                self.maapilogger.log("INFO",f"dev_id: {dev_id}")
-                self.maapilogger.log("INFO",f"devices_db: {devices_db}")
-                self.maapilogger.log("INFO",f"devices_db_rel: {devices_db_rel}")
+
+                self.maapilogger.log("DEBUG",f"payload_id: {payload_id}")
+                self.maapilogger.log("DEBUG",f"dev_id: {dev_id}")
+                self.maapilogger.log("DEBUG",f"devices_db: {devices_db}")
+                self.maapilogger.log("DEBUG",f"devices_db_rel: {devices_db_rel}")
+
                 if int(queue_[nr][0]) == self.helpers.instructions["recive_from_UDP"]:
                     self.maapiDB.insert_readings(int(queue_[nr][1]),float(queue_[nr][2])," ",True)
                     self.maapilogger.log("INFO",f"Recived id: {nr:<10} DevID: {int(queue_[nr][1]):<8} Name: {'Recive From UDP':<20} \tValue: {float(float(queue_[nr][2]))} ")
