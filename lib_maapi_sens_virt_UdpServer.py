@@ -42,12 +42,12 @@ class UdpServer():
             queueTmp  = queue.getSocketRadings()
             queue_ = queueTmp[self.owner][self.host][self.port]
 
-        except:
             for nr in queue_:
                 if queue_[nr][0] == self.helpers.instructions["recive_from_UDP"]:
                     insert_readings(int(queue_[nr][1]),float(queue_[nr][2])," ",boolean)
                     self.maapilogger.log("INFO",f"Recived id: {nr:<10} DevID: {int(queue_[nr][1]):<8} Name: {'Recive From UDP':<20} \tValue: {float(float(queue_[nr][2]))} ")
-
+        except Exception as e :
+            self.maapilogger.log("ERROR",f"checkQueueForReadings{e}")
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         self.maapilogger.log("DEBUG",f"dev_id: {dev_id}")
