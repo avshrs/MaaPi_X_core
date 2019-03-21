@@ -41,7 +41,7 @@ class MaapiWatcher():
         self.watcherPort        = self.config.watcherPort
         self.selecorName        = self.config.selectorName
         self.thread             = []
-        self.interpreterVer       ="/usr/bin/python{0}.{1}".format(sys.version_info[0],sys.version_info[1])
+        self.interpreterVer       =f"{sys.executable}"
         self.lastResponce       = dt.now() - timedelta(hours = 1)
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.watcherHost, self.watcherPort, self.queue, 1)
         self.socketServer.runTcpServer()
@@ -50,7 +50,6 @@ class MaapiWatcher():
 
     def startSelectorModule(self):
         try:
-
             self.maapilogger.log("DEBUG", f"Killing Selector - {self.selectorPid.pid}")
             self.selectorPid.kill()
         except Exception as e:
