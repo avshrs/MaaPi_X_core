@@ -33,7 +33,7 @@ class Readings:
                 devices_db          = queue_[nr][2]
                 devices_db_rel      = queue_[nr][3]
 
-                if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
+                if queue_[nr][0] == "SOCKET":
                     self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
 
                     try:

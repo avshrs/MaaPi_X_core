@@ -67,9 +67,9 @@ class SocketServer():
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
                 if data:
                     if str(payload_id) == "SOCKET":
-                        self.maapilogger.log("DEBUG",f"payload_id: {payload_id}")
-                        self.maapilogger.log("DEBUG",f"payload_id: {dev_id}")
-                        self.maapilogger.log("DEBUG",f"payload_id: {value}")
+                        self.maapilogger.log("INFO",f"payload_id: {payload_id}")
+                        self.maapilogger.log("INFO",f"payload_id: {dev_id}")
+                        self.maapilogger.log("INFO",f"payload_id: {value}")
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
 
 
