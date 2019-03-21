@@ -70,7 +70,7 @@ class SocketServer():
                         self.maapilogger.log("DEBUG",f"payload_id: {payload_id}")
                         self.maapilogger.log("DEBUG",f"payload_id: {dev_id}")
                         self.maapilogger.log("DEBUG",f"payload_id: {value}")
-                        self.queue.addSocketRadings(self.objectname, host, int(port), str(payload_id), int(dev_id), float(value), str(name) )
+                        self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
 
 
     def runTcpServer(self, host, port):
