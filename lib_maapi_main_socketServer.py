@@ -63,7 +63,7 @@ class SocketServer():
             while True:
                 data, address = sockUDP.recvfrom(4096)
                 if not data: break
-                payload_id, dev_id, value, name  = data.split(",")
+                payload_id, dev_id, value, name  = data.decode("utf-8").split(",")
                 if data:
                     if payload_id == "SOCKET":
                         self.queue.addSocketRadings(self.objectname, host, port, payload_id, dev_id, value, name )
