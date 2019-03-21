@@ -12,7 +12,7 @@ import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_checkDevCond               as CheckDev
 import lib_maapi_main_logger                     as MaapiLogger
-import MaaPi_Config                              as Config
+import MaaPi_Config                               as Config
 from datetime import datetime                    as dt, timedelta
 import time, copy, sys
 import subprocess
