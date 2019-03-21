@@ -40,7 +40,7 @@ class UdpServer():
     def checkQueueForReadings(self):
         try:
             queueTmp  = self.queue.getSocketRadings()
-            queue_ = queueTmp[self.owner][self.host][self.port]
+            queue_ = queueTmp[self.objectname][self.host][self.port]
             payload_id          = queue_[nr][0]
             dev_id              = queue_[nr][1]
             devices_db          = queue_[nr][2]
