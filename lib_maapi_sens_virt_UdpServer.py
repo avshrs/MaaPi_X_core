@@ -27,6 +27,7 @@ class UdpServer():
         self.host               = host
         self.port               = port
         self.maapiCommandLine   = []
+        self.helpers            = Helpers.Helpers()
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
         self.maapilogger        = MaapiLogger.Logger()
