@@ -41,6 +41,15 @@ class UdpServer():
         try:
             queueTmp  = self.queue.getSocketRadings()
             queue_ = queueTmp[self.owner][self.host][self.port]
+            payload_id          = queue_[nr][0]
+            dev_id              = queue_[nr][1]
+            devices_db          = queue_[nr][2]
+            devices_db_rel      = queue_[nr][3]
+            self.maapilogger.log("INFO",f"payload_id: {payload_id}")
+            self.maapilogger.log("INFO",f"dev_id: {payload_id}")
+            self.maapilogger.log("INFO",f"devices_db: {payload_id}")
+            self.maapilogger.log("INFO",f"devices_db_rel: {payload_id}")
+
 
             for nr in queue_:
                 if int(queue_[nr][0]) == self.helpers.instructions["recive_from_UDP"]:
