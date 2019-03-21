@@ -61,7 +61,7 @@ class DS18X20():
                 w1_line = w1_file.readline()
                 w1_temp = w1_line.rsplit('t=', 1)
                 value = float(float(w1_temp[1]) / float(1000))
-                self.maapilogger.log("DEBUG", f"Read_data_from_1w - Value is {temp} for rom_id[1] {dev_id}")
+                self.maapilogger.log("DEBUG", f"Read_data_from_1w - Value is {value} for rom_id[1] {dev_id}")
                 w1_file.close()
                 self.maapilogger.log("DEBUG", "Close file")
                 error = 0
