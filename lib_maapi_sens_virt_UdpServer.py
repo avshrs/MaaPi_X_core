@@ -56,7 +56,7 @@ class UdpServer():
                 self.maapilogger.log("INFO",f"devices_db: {devices_db}")
                 self.maapilogger.log("INFO",f"devices_db_rel: {devices_db_rel}")
                 if int(queue_[nr][0]) == self.helpers.instructions["recive_from_UDP"]:
-                    insert_readings(int(queue_[nr][1]),float(queue_[nr][2])," ",boolean)
+                    self.maapiDB.insert_readings(int(queue_[nr][1]),float(queue_[nr][2])," ",boolean)
                     self.maapilogger.log("INFO",f"Recived id: {nr:<10} DevID: {int(queue_[nr][1]):<8} Name: {'Recive From UDP':<20} \tValue: {float(float(queue_[nr][2]))} ")
 
         except EnvironmentError as e :
