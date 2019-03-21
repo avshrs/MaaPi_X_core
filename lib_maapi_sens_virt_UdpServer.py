@@ -46,24 +46,17 @@ class UdpServer():
             devices_db          = queue_[nr][2]
             devices_db_rel      = queue_[nr][3]
             self.maapilogger.log("INFO",f"payload_id: {payload_id}")
-            self.maapilogger.log("INFO",f"dev_id: {payload_id}")
-            self.maapilogger.log("INFO",f"devices_db: {payload_id}")
-            self.maapilogger.log("INFO",f"devices_db_rel: {payload_id}")
+            self.maapilogger.log("INFO",f"dev_id: {dev_id}")
+            self.maapilogger.log("INFO",f"devices_db: {devices_db}")
+            self.maapilogger.log("INFO",f"devices_db_rel: {devices_db_rel}")
 
 
             for nr in queue_:
                 if int(queue_[nr][0]) == self.helpers.instructions["recive_from_UDP"]:
                     insert_readings(int(queue_[nr][1]),float(queue_[nr][2])," ",boolean)
                     self.maapilogger.log("INFO",f"Recived id: {nr:<10} DevID: {int(queue_[nr][1]):<8} Name: {'Recive From UDP':<20} \tValue: {float(float(queue_[nr][2]))} ")
-        except Exception as e :
+        except EnvironmentError as e :
             self.maapilogger.log("ERROR",f"checkQueueForReadings{e}")
-
-    def readValues(self, que, dev_id, devices_db, devices_db_rel):
-        self.maapilogger.log("DEBUG",f"dev_id: {dev_id}")
-        self.maapilogger.log("DEBUG",f"devices_db: {devices_db}")
-        self.maapilogger.log("DEBUG",f"devices_db_rel: {devices_db_rel}")
-        value = float(devices_db)
-        return value, 0
 
 
     def loop(self):
@@ -73,5 +66,5 @@ class UdpServer():
 
 
 if __name__ == "__main__":
-    UdpServer =  UdpServer(sys.argv[1],sys.argv[2],sys.argv[3] )
+    UdpServer =  UdpServer(sys.argv[1],sys.argv[2],sys.argv[3])
     UdpServer.loop()
