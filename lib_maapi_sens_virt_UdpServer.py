@@ -20,7 +20,7 @@ from datetime import datetime as dt
 import sys
 import subprocess
 
-class LinuxCmd():
+class UdpServer():
     def __init__(self,host,port,id_):
         self.queue              = Queue.Queue()
         self.objectname         = "UdpServer"
@@ -48,13 +48,10 @@ class LinuxCmd():
 
     def loop(self):
         while True:
-            if (dt.now() - self.timer_2).seconds >= 10:
-                self.timer_2 = dt.now()
-                self.updateCommandLine()
             time.sleep(0.01)
             self.checkQueueForReadings()
 
 
 if __name__ == "__main__":
-    LinuxCmd_ =  LinuxCmd(sys.argv[1],sys.argv[2],sys.argv[3] )
-    LinuxCmd_.loop()
+    UdpServer =  UdpServer(sys.argv[1],sys.argv[2],sys.argv[3] )
+    UdpServer.loop()
