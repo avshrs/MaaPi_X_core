@@ -33,6 +33,10 @@ class Readings:
                 devices_db          = queue_[nr][2]
                 devices_db_rel      = queue_[nr][3]
 
+                print(dev_id,type(dev_id))
+                print(devices_db,type(devices_db))
+                print(devices_db_rel,type(devices_db_rel))
+
                 if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
                     self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
 
