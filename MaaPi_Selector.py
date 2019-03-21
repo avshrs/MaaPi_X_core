@@ -12,7 +12,7 @@ import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_checkDevCond               as CheckDev
 import lib_maapi_main_logger                     as MaapiLogger
-import MaaPi_Config                               as Config
+import MaaPi_Config                              as Config
 from datetime import datetime                    as dt, timedelta
 import time, copy, sys
 import subprocess
@@ -94,7 +94,7 @@ class MaapiSelector():
         for lib in libraryPID:
             try:
                 if (dt.now() - libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
-                    self.maapilogger.log("INFO", "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
+                    self.maapilogger.log("DEBUG", "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
 
                     payload = self.helpers.pyloadToPicke(00, " ", " ", " ", " ",self.watcherHost,self.watcherPort)
                     recive =  self.socketClient.sendStrAndRecv(self.libraryPID[lib]["host"], self.libraryPID[lib]["port"], payload)
@@ -103,7 +103,7 @@ class MaapiSelector():
                         self.maapilogger.log("DEBUG", "Get responce from selector")
                     else:
                         self.restartlibraryDeamon(lib)
-            except EnvironmentError() as e :
+            except Exception as e :
                 self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
 
