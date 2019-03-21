@@ -57,7 +57,7 @@ class LinuxCmd():
             w1_crc = w1_line.rsplit(' ', 1)
             w1_crc = w1_crc[1].replace('\n', '')
             if w1_crc == 'YES':
-                 self.maapilogger.log("DEBUG", "CRC - YES")
+                self.maapilogger.log("DEBUG", "CRC - YES")
                 w1_line = w1_file.readline()
                 w1_temp = w1_line.rsplit('t=', 1)
                 value = float(float(w1_temp[1]) / float(1000))
