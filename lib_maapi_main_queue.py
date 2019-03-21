@@ -25,7 +25,7 @@ class Queue():
         self.add                = 0
 
 
-    def addSocketRadings(self, owner, fomHost, onPort, payload_id, payload, payload2, payload3, reciveToHost = None, reciveToPort = None, dateTime=dt.now()):
+    def addSocketRadings(self, owner, fomHost, onPort, payload_id, payload, payload2, payload3, reciveToHost = " ", reciveToPort = " ", dateTime=dt.now()):
         self.maapilogger.name   = f"Queue {owner}"
         ids  = {}
         port = {}
