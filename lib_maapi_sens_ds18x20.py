@@ -14,16 +14,16 @@ import lib_maapi_main_socketServer               as SocketServer
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_readings                   as Readings
-import time, copy, sys
+import time, copy, sys, os
 
 from datetime import datetime as dt
 import sys
 import subprocess
 
-class LinuxCmd():
+class DS18X20():
     def __init__(self,host,port,id_):
         self.queue              = Queue.Queue()
-        self.objectname         = "LinuxCmd"
+        self.objectname         = "DS18X20"
         self.host               = host
         self.port               = port
         self.maapiCommandLine   = []
@@ -85,6 +85,6 @@ class LinuxCmd():
 
 
 if __name__ == "__main__":
-    LinuxCmd_ =  LinuxCmd(sys.argv[1],sys.argv[2],sys.argv[3] )
-    LinuxCmd_.updateCommandLine()
-    LinuxCmd_.loop()
+    DS18X20_ =  DS18X20(sys.argv[1],sys.argv[2],sys.argv[3] )
+    DS18X20_.updateCommandLine()
+    DS18X20_.loop()
