@@ -47,7 +47,7 @@ class Readings:
                         self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
 
         except Exception as e :
-            self.maapilogger.log("ERROR",f"{e}")
+            self.maapilogger.log("ERROR",f"checkQueueForReadings {e}")
 
     def insertReadingsToDB(self, nr, readed_value, dev_id, devices_db, devices_db_rel,  error_code):
         try:
