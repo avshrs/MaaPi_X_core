@@ -15,6 +15,7 @@ import lib_maapi_main_helpers                    as Helpers
 class Readings:
     def __init__(self, owner, host, port):
         self.owner      =        owner
+        self.checkDev           = CheckDev.CheckDevCond()
         self.host               = host
         self.port               = port
         self.maapiDB            = Db_connection.MaaPiDBConnection()
