@@ -50,13 +50,13 @@ class MaapiWatcher():
 
     def startSelectorModule(self):
         try:
-            self.maapilogger.log("DEBUG", f"Killing Selector - {self.selectorPid.pid}")
+            self.maapilogger.log("INFO", f"Killing Selector - {self.selectorPid.pid}")
             self.selectorPid.kill()
         except Exception as e:
             self.maapilogger.log("ERROR", e)
         else:
             self.selectorPid = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
-            self.maapilogger.log("DEBUG", f"Selector PID: {self.selectorPid.pid}")
+            self.maapilogger.log("INFO", f"Sterting Selector PID: {self.selectorPid.pid}")
 
 
     def checkSelector(self):
