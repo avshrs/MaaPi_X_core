@@ -40,13 +40,13 @@ class Readings:
                         value, error = method(nr, dev_id, devices_db, devices_db_rel)
                         self.maapilogger.log("INFO",f"Readed  id: {nr:<10} DevID: {dev_id:<8} Name: {devices_db[dev_id]['dev_user_name']:<20} \tValue: {float(value)} ")
 
-                    except Exception as e:
+                    except EnvironmentError as e:
                         value = 0
                         error = 2
                         self.maapilogger.log("ERROR",f"Error while reading values: {e}")
                         self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
 
-        except Exception as e :
+        except EnvironmentError as e :
             self.maapilogger.log("ERROR",f"checkQueueForReadings{e}")
 
     def insertReadingsToDB(self, nr, readed_value, dev_id, devices_db, devices_db_rel,  error_code):
