@@ -131,7 +131,7 @@ class MaapiSelector():
                         pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
                     except Exception as e:
-                        self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {pid['name']} library for dev not exist  - error: {e}")
+                        self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist  - error: {e}")
                         self.localQueue[dev]=c_dev["dev_last_update"]
 
 
