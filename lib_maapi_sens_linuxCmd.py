@@ -25,7 +25,7 @@ class LinuxCmd():
         self.queue              = Queue.Queue()
         self.objectname         = "LinuxCmd"
         self.host               = host
-        self.port               = port
+        self.port               = int(port)
         self.maapiCommandLine   = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()

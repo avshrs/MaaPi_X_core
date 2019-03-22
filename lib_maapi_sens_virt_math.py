@@ -27,7 +27,7 @@ class MaaPiMath():
         self.queue              = Queue.Queue()
         self.objectname         = "MaaPiMath"
         self.host               = host
-        self.port               = port
+        self.port               = int(port)
         self.maapiMathTable     = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()

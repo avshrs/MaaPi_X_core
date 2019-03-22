@@ -25,7 +25,7 @@ class DS18X20():
         self.queue              = Queue.Queue()
         self.objectname         = "DS18X20"
         self.host               = host
-        self.port               = port
+        self.port               = int(port)
         self.maapiCommandLine   = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
