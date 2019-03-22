@@ -64,12 +64,16 @@ class MaapiWatcher():
             if (dt.now() - self.lastResponce).seconds > 5:
                 self.maapilogger.log("DEBUG", f"Sending query to Selector: is ok? {self.selectorHost}, {self.selectorPort}")
                 payload = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
-                recive =  self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, payload)
-                if recive == bytes(0xff):
-                    self.lastResponce = dt.now()
-                    self.maapilogger.log("DEBUG", "Get responce from selector")
-                else:
+                try:
+                    recive =  self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, payload)
+                except:
                     self.startSelectorModule()
+                else:
+                    if recive == bytes(0xff):
+                        self.lastResponce = dt.now()
+                        self.maapilogger.log("DEBUG", "Get responce from selector")
+                    else:
+                        self.startSelectorModule()
         except Exception as e :
             self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
