@@ -6,7 +6,7 @@ cd $path
 if [ "$1" == "start" ]; then
     if ! kill $pid > /dev/null 2>&1; then
         echo starting $maapiWatcher
-        nohup $interpreter $maapiWatcher > /dev/null 2>&1 & echo $! > .MaaPi.pid
+        nohup $interpreter $maapiWatcher >> log/Maapi_Selector.log  2>&1 & echo $! > .MaaPi.pid
         echo $pid
     fi
 fi
