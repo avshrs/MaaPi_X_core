@@ -96,9 +96,9 @@ class MaapiSelector():
 
 
     def checkLibraryProcess(self):
-        for lib in libraryPID:
+        for lib in self.libraryPID:
             try:
-                if (dt.now() - libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
+                if (dt.now() - self.libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
                     self.maapilogger.log("INFO", "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
 
                     payload = self.helpers.pyloadToPicke(00, " ", " ", " ", " ",self.watcherHost,self.watcherPort)
