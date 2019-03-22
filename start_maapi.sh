@@ -12,6 +12,6 @@ fi
 if [ "$1" == "stop" ]; then
     if  kill $pid > /dev/null 2>&1; then
         echo stoping $maapiWatcher
-        kill pid
+        kill $pid
     fi
 fi
