@@ -59,19 +59,19 @@ class MaapiSelector():
         for lib in self.libraryList:
             try:
                 self.runLibraryDeamon(lib)
-                self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name'}")
+                self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name']}")
 
             except Exception as e :
                 self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
     def restartlibraryDeamon(self, lib_id):
         try:
-            self.maapilogger.log("INFO", f"Killing not respondign library deamon {self.libraryList[lib]['device_lib_name'}")
+            self.maapilogger.log("INFO", f"Killing not respondign library deamon {self.libraryList[lib]['device_lib_name']}")
             if self.libraryPID[lib_id]:
                 self.libraryPID[lib_id]["pid"].kill()
         finally:
             self.runLibraryDeamon(self, lib_id)
-            self.maapilogger.log("INFO", f"Restarting library deamon {self.libraryList[lib]['device_lib_name'}")
+            self.maapilogger.log("INFO", f"Restarting library deamon {self.libraryList[lib]['device_lib_name']}")
 
     def runLibraryDeamon(self, lib):
         # self.maapilogger.log("INFO", f"tart library deamon {self.libraryList[lib]['device_lib_name'}")
