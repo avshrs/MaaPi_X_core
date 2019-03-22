@@ -99,7 +99,7 @@ class MaapiSelector():
         for lib in self.libraryPID:
             try:
                 if (dt.now() - self.libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
-                    self.maapilogger.log("INFO", f"Sending query to Selector: is ok? {self.libraryPID[lib]["name"]} {self.libraryPID[lib]["host"]}, {self.libraryPID[lib]["port"]}")
+                    self.maapilogger.log("INFO", f"Sending query to Selector: is ok? {self.libraryPID[lib]['name']} {self.libraryPID[lib]['host']}, {self.libraryPID[lib]['port']}")
 
                     payload = self.helpers.pyloadToPicke(00, " ", " ", " ",self.selectorHost,self.selectorPort)
                     try:
