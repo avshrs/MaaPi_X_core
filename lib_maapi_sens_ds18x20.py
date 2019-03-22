@@ -41,7 +41,6 @@ class DS18X20():
         self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()
         self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
 
-
     def checkQueueForReadings(self):
         self.readings.checkQueueForReadings(self.readValues, self.queue)
 
@@ -52,7 +51,10 @@ class DS18X20():
             error = 0
             value = 0
             if os.path.isfile(f'/sys/bus/w1/devices/{rom_id}/w1_slave'):
-                w1_file = open(f'/sys/bus/w1/devices/{rom_id}/w1_slave','r')
+                try:
+                    w1_file = open(f'/sys/bus/w1/devices/{rom_id}/w1_slave','r')
+                except EnvironmentError as e:
+                    self.maapilogger.log("ERROR", f"throw : {e}")
                 self.maapilogger.log("DEBUG",f"Open file /sys/bus/w1/devices/{rom_id}/w1_slave")
                 w1_line = w1_file.readline()
                 w1_crc = w1_line.rsplit(' ', 1)
@@ -75,7 +77,7 @@ class DS18X20():
                 self.maapilogger.log("ERROR", f"ERROR reading values from rom_id[1]: {dev_id}")
             return value, error
         except EnvironmentError as e:
-            self.maapilogger.log("ERROR", f"throw : {dev_id}")
+            self.maapilogger.log("ERROR", f"throw : {e}")
 
     def loop(self):
         while True:
