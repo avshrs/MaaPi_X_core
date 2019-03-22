@@ -57,7 +57,7 @@ class Readings:
                 #9999.1 device not exist
                 #9999.2 error while reading
                 self.maapilogger.log("DEBUG","Error while reading ")
-                self.maapiDB.insert_readings(dev_id,float(f"9999.{error_code}"," ",False))
+                self.maapiDB.insert_readings(dev_id,float(f"9999.{error_code}")," ",False)
 
             else:
                 value, boolean = self.checkDev.checkDevCond( devices_db, devices_db_rel, dev_id, readed_value)
