@@ -38,8 +38,8 @@ class Readings:
 
                     try:
                         value, error = method(nr, dev_id, devices_db, devices_db_rel)
-
-                        self.maapilogger.log("INFO",f"Readed  id: {nr:<10} DevID: {dev_id:<8} Name: {devices_db[dev_id]['dev_user_name'].encode('utf-8').strip():<20} \tValue: {value} ")
+                        name = (devices_db[dev_id]['dev_user_name']).encode('utf-8').strip()
+                        self.maapilogger.log("INFO",f"Readed  id: {nr:<10} DevID: {dev_id:<8} Name: {name:<20} \tValue: {value} ")
 
                     except EnvironmentError as e:
                         value = 0
