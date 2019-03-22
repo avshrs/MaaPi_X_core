@@ -130,7 +130,7 @@ class MaapiSelector():
                 if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost,self.selectorPort)
-                    self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']}")
+                    self.maapilogger.log("INFO",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']}")
                     try:
                         pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
