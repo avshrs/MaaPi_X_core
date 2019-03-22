@@ -61,7 +61,7 @@ class MaaPiMath():
 
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
         value = 0
-        error = True
+        error = 0
         for math_id in self.maapiMathTable:
             if int(self.maapiMathTable[math_id]["math_update_rom_id"]) == dev_id:
                 value = 0
