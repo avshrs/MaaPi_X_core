@@ -32,10 +32,10 @@ class SocketServer():
         try:
             sockTCP = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                sockTCP.bind((host, int(port)))
+                sockTCP.bind((host, int(port)+1))
             except:
                 sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                sockTCP.bind((host, int(port)))
+                sockTCP.bind((host, int(port)+1))
             sockTCP.listen(10000)
             self.maapilogger.log("INFO",sockTCP)
             while True:
@@ -50,7 +50,7 @@ class SocketServer():
                             client.send(bytes(0xff))
                         if payload_id !=0:
                             self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
-                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+                            self.queue.addSocketRadings(self.objectname, host, int(port)+1, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
 
         except Exception as e:
             self.maapilogger.log("ERROR",f"startServerTCP {e}")
