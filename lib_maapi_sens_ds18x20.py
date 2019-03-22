@@ -72,8 +72,8 @@ class DS18X20():
         except EnvironmentError as e:
             self.maapilogger.log("ERROR", f"throw : {e}")
             return value, 1
-
-        return value, error
+        else:
+            return value, error
 
     def loop(self):
         while True:

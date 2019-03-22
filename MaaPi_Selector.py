@@ -70,7 +70,7 @@ class MaapiSelector():
             if self.libraryPID[lib_id]:
                 self.libraryPID[lib_id]["pid"].kill()
         finally:
-            self.runLibraryDeamon(self, lib_id)
+            self.runLibraryDeamon(lib_id)
             self.maapilogger.log("INFO", f"Restarting library deamon {self.libraryList[lib]['device_lib_name']}")
 
     def runLibraryDeamon(self, lib):

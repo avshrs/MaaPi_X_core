@@ -50,7 +50,7 @@ class SocketServer():
                             client.send(bytes(0xff))
                         if payload_id !=0:
                             self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
-                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+                            self.queue.addSocketRadings(self.objectname, host, int(port), payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
 
         except Exception as e:
             self.maapilogger.log("ERROR",f"startServerTCP {e}")
