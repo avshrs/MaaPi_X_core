@@ -59,17 +59,22 @@ class MaapiSelector():
         for lib in self.libraryList:
             try:
                 self.runLibraryDeamon(lib)
+                self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name'}")
+
             except Exception as e :
                 self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
     def restartlibraryDeamon(self, lib_id):
         try:
+            self.maapilogger.log("INFO", f"Killing not respondign library deamon {self.libraryList[lib]['device_lib_name'}")
             if self.libraryPID[lib_id]:
                 self.libraryPID[lib_id]["pid"].kill()
         finally:
             self.runLibraryDeamon(self, lib_id)
+            self.maapilogger.log("INFO", f"Restarting library deamon {self.libraryList[lib]['device_lib_name'}")
 
     def runLibraryDeamon(self, lib):
+        # self.maapilogger.log("INFO", f"tart library deamon {self.libraryList[lib]['device_lib_name'}")
         lists =[]
         lists.append(self.interpreterVer)                                               # interpreter version
         lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")                  # library file name
@@ -94,13 +99,13 @@ class MaapiSelector():
         for lib in libraryPID:
             try:
                 if (dt.now() - libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
-                    self.maapilogger.log("DEBUG", "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
+                    self.maapilogger.log("INFO", "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
 
                     payload = self.helpers.pyloadToPicke(00, " ", " ", " ", " ",self.watcherHost,self.watcherPort)
                     recive =  self.socketClient.sendStrAndRecv(self.libraryPID[lib]["host"], self.libraryPID[lib]["port"], payload)
                     if recive == bytes(0xff):
                         self.libraryPID[lib]["lastResponce"] = dt.now()
-                        self.maapilogger.log("DEBUG", "Get responce from selector")
+                        self.maapilogger.log("INFO", "Get responce from selector")
                     else:
                         self.restartlibraryDeamon(lib)
             except Exception as e :
@@ -118,16 +123,15 @@ class MaapiSelector():
                 except:
                     self.localQueue[dev]=c_dev["dev_last_update"]
                     self.maapilogger.log("DEBUG",f"self.localQueue[dev] not exist - adding new{dev}")
-
                 if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost,self.selectorPort)
-                    self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name']} | {self.deviceList[dev]['dev_rom_id']}")
-                    pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
+                    self.maapilogger.log("INFO",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name']} | {self.deviceList[dev]['dev_rom_id']}")
                     try:
+                        pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
                     except Exception as e:
-                        self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {pid['name']} error: {e}")
+                        self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {pid['name']} library for dev not exist  - error: {e}")
                         self.localQueue[dev]=c_dev["dev_last_update"]
 
 
@@ -198,6 +202,7 @@ class MaapiSelector():
 
             if (dt.now() - self.timer_2).seconds >= 10:
                 self.getLibraryList()
+                self.checkLibraryProcess()
                 self.timer_2 = dt.now()
             time.sleep(0.1)
             self.checkDbForOldreadings()
