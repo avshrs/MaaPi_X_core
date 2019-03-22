@@ -46,43 +46,34 @@ class DS18X20():
 
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
+        error = 0
+        value = 0
         try:
             rom_id = devices_db[dev_id]["dev_rom_id"]
-            error = 0
-            value = 0
             if os.path.isfile(f'/sys/bus/w1/devices/{rom_id}/w1_slave'):
-                try:
-                    w1_file = open(f'/sys/bus/w1/devices/{rom_id}/w1_slave','r')
-                except EnvironmentError as e:
-                    self.maapilogger.log("ERROR", f"throw : {e}")
-                    return 0,1
+                w1_file = open(f'/sys/bus/w1/devices/{rom_id}/w1_slave','r')
+
+                w1_crc = w1_file.readline().rsplit(' ', 1)
+                w1_crc = w1_crc[1].replace('\n', '')
+                self.maapilogger.log("DEBUG", f"CRC - {w1_crc}")
+                if w1_crc == 'YES':
+
+                    value = float(float((w1_file.readline()).rsplit('t=', 1)[1]) / float(1000))
+                    self.maapilogger.log("DEBUG", f"Read_data_from_1w - Value is {value} for rom_id[1] {dev_id}")
+                    w1_file.close()
+
                 else:
-                    self.maapilogger.log("DEBUG",f"Open file /sys/bus/w1/devices/{rom_id}/w1_slave")
-                    w1_line = w1_file.readline()
-                    w1_crc = w1_line.rsplit(' ', 1)
-                    w1_crc = w1_crc[1].replace('\n', '')
-                    if w1_crc == 'YES':
-                        self.maapilogger.log("DEBUG", "CRC - YES")
-                        w1_line = w1_file.readline()
-                        w1_temp = w1_line.rsplit('t=', 1)
-                        value = float(float(w1_temp[1]) / float(1000))
-                        self.maapilogger.log("DEBUG", f"Read_data_from_1w - Value is {value} for rom_id[1] {dev_id}")
-                        w1_file.close()
-                        self.maapilogger.log("DEBUG", "Close file")
-                        error = 0
-                        return value, error
-                    else:
-                        w1_file.close()
-                        self.maapilogger.log("ERROR", "CRC False")
-                        error = 2
-                        return value, error
+                    w1_file.close()
+                    self.maapilogger.log("ERROR", "CRC False")
+                    error = 2
             else:
-                error = 1
                 self.maapilogger.log("ERROR", f"ERROR reading values from rom_id[1]: {dev_id}")
-            return value, error
+
         except EnvironmentError as e:
             self.maapilogger.log("ERROR", f"throw : {e}")
             return value, 1
+
+        return value, error
 
     def loop(self):
         while True:
