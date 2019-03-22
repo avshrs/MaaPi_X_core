@@ -62,7 +62,8 @@ class MaaPiDBConnection():
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
-            self.maapilogger.log("INFO",f"Inserting sensor: {device_id}, value: {insert_value}, status: {status}")
+            self.maapilogger.log("INFO",f"Insert  id: {0:<10} DevID: {device_id:<8} Status:{status:<20} \tValue: {insert_value} ")
+
             # get values
             x = self.conn.cursor()
             x.execute("SELECT dev_value, dev_rom_id, dev_collect_values_to_db "

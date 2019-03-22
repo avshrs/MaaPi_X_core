@@ -40,7 +40,7 @@ class Readings:
                         value, error = method(nr, dev_id, devices_db, devices_db_rel)
                         name = str(devices_db[dev_id]['dev_user_name'].encode('utf-8'))
                         self.maapilogger.log("INFO",f"Readed  id: {nr:<10} DevID: {dev_id:<8} Name: {name:<20} \tValue: {value} ")
-
+                        self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
                     except EnvironmentError as e:
                         value = 0
                         error = 2
