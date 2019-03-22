@@ -101,7 +101,7 @@ class MaapiSelector():
                 if (dt.now() - self.libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
                     self.maapilogger.log("INFO", "Sending query to Selector: is ok? {0}, {1}".format(self.selectorHost, self.selectorPort))
 
-                    payload = self.helpers.pyloadToPicke(00, " ", " ", " ", " ",self.watcherHost,self.watcherPort)
+                    payload = self.helpers.pyloadToPicke(00, " ", " ", " ", " ",self.selectorHost,self.selectorPort)
                     recive =  self.socketClient.sendStrAndRecv(self.libraryPID[lib]["host"], self.libraryPID[lib]["port"], payload)
                     if recive == bytes(0xff):
                         self.libraryPID[lib]["lastResponce"] = dt.now()
@@ -126,7 +126,7 @@ class MaapiSelector():
                 if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost,self.selectorPort)
-                    self.maapilogger.log("INFO",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']}")
+                    self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']}")
                     try:
                         pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
