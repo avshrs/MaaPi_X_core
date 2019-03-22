@@ -7,11 +7,13 @@ if [ "$1" == "start" ]; then
     if ! kill $pid > /dev/null 2>&1; then
         echo starting $maapiWatcher
         nohup $interpreter $maapiWatcher > /dev/null 2>&1 & echo $! > .MaaPi.pid
+        echo $pid
     fi
 fi
 if [ "$1" == "stop" ]; then
     if  kill $pid > /dev/null 2>&1; then
         echo stoping $maapiWatcher
         kill $pid
+        rm .MaaPi.pid
     fi
 fi
