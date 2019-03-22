@@ -25,7 +25,8 @@ class UdpServer():
         self.queue              = Queue.Queue()
         self.objectname         = "UdpServer"
         self.host               = host
-        self.port               = port
+        self.tcpPort            = int(port)
+        self.udpPort            = 60000
         self.maapiCommandLine   = []
         self.helpers            = Helpers.Helpers()
         self.timer_1            = dt.now()
@@ -35,14 +36,14 @@ class UdpServer():
         self.readings           = Readings.Readings(self.objectname,self.host, self.port)
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, id_)
-        self.socketServer.runTcpServer(self.host, self.port)
+        self.socketServer.runTcpServer(self.host, self.tcpPort)
         self.socketServer.runUdpServer(self.host, self.port)
 
 
     def checkQueueForReadings(self):
         try:
             queueTmp  = self.queue.getSocketRadings()
-            queue_ = queueTmp[self.objectname][self.host][int(self.port)+1]
+            queue_ = queueTmp[self.objectname][self.host][self.tcpPort]
 
             for nr in queue_:
                 payload_id          = queue_[nr][0]
