@@ -42,10 +42,10 @@ class Logger():
             time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
             print(f"MaaPi | {self.name:<16} | {self.levels[level]:^6} | {time:<16} | {msg}")
             if self.levels[level] == "INFO":
-                logging.info(f"\t{self.name} \t- {msg}")
+                logging.info( f"\t| {self.name:<16} | {msg}")
             elif self.levels[level] == "DEBUG":
-                logging.debug(f"\t{self.name} \t- {msg}")
+                logging.debug(f"\t| {self.name:<16} | {msg}")
             elif self.levels[level] == "ERROR":
-                logging.error(f"\t{self.name} \t- {msg}")
+                logging.error(f"\t| {self.name:<16} | {msg}")
             elif self.levels[level] == "EXCEPT":
-                logging.exception(f"\t{self.name} \t- {msg}")
+                logging.exception(f"\t| {self.name:<16} | {msg}")
