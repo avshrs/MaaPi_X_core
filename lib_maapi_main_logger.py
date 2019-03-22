@@ -14,7 +14,7 @@ import os
 pwd =os.getcwd()
 
 logging.basicConfig(
-    filename=f'{pwd}/log/Maapi_Selector.log',
+    filename=f'{pwd}/log/Maapi_logger.log',
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%m/%d/%Y %H:%M:%S')
@@ -41,4 +41,11 @@ class Logger():
         if  self.levels[level] in self.levelsPrior[self.defaultDebugLevel]:
             time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
             print(f"MaaPi | {self.name:<16} | {self.levels[level]:^6} | {time:<16} | {msg}")
-
+            if self.levels[level] == "INFO":
+                logging.info(f"\t{self.name} \t- {msg}")
+            elif self.levels[level] == "DEBUG":
+                logging.debug(f"\t{self.name} \t- {msg}")
+            elif self.levels[level] == "ERROR":
+                logging.error(f"\t{self.name} \t- {msg}")
+            elif self.levels[level] == "EXCEPT":
+                logging.exception(f"\t{self.name} \t- {msg}")
