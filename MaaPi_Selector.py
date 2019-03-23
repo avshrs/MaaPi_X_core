@@ -12,7 +12,7 @@ import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_checkDevCond               as CheckDev
 import lib_maapi_main_logger                     as MaapiLogger
-import MaaPi_Config                              as Config
+import MaaPi_Config                               as Config
 from datetime import datetime                    as dt, timedelta
 import time, copy, sys
 import subprocess
@@ -99,7 +99,7 @@ class MaapiSelector():
                             "port" : port,
                             "lastResponce":dt.now()
                 }
-        except EnvironmentError as e :
+        except Exception() as e :
             self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
     def checkLibraryProcess(self):
@@ -145,7 +145,7 @@ class MaapiSelector():
                         pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
 
-                    except EnvironmentError as e:
+                    except Exception as e:
                         self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist  - error: {e}")
                         self.skippDev.append(dev)
                         self.localQueue[dev]=c_dev["dev_last_update"]
