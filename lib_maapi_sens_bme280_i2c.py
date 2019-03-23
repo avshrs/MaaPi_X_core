@@ -48,25 +48,28 @@ class BME280I2C():
 
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
-        try:
-            # 1 - temp
-            # 2 - hum
-            # 4 - press
-            unit_id = devices_db[dev_id]['dev_unit_id']
+        value = 0
+        error = 0
+        # 1 - temp
+        # 2 - hum
+        # 4 - press
+        unit_id = devices_db[dev_id]['dev_unit_id']
 
-            if unit_id == 1:
-                sensor = BME280(p_mode=BME280_OSAMPLE_8)
-                value = float(sensor.read_temperature())
+        if unit_id == 1:
+            sensor = BME280(p_mode=BME280_OSAMPLE_8)
+            value = float(sensor.read_temperature())
 
-            elif unit_id == 4:
-                sensor2 = BME280(p_mode=BME280_OSAMPLE_8)
-                value = float(sensor2.read_pressure())
+        elif unit_id == 4:
+            sensor2 = BME280(p_mode=BME280_OSAMPLE_8)
+            value = float(sensor2.read_pressure())
 
-            elif unit_id == 2:
-                sensor3 = BME280(h_mode=BME280_OSAMPLE_8)
-                value = float(sensor3.read_humidity())
+        elif unit_id == 2:
+            sensor3 = BME280(h_mode=BME280_OSAMPLE_8)
+            value = float(sensor3.read_humidity())
+        else:
+            error = 1
 
-            return value, 0
+        return value, error
 
 
     def loop(self):
