@@ -48,10 +48,6 @@ class BME280I2C():
 
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
-        value = (subprocess.check_output(self.maapiCommandLine[f"{dev_id}"]['cmd_command'],shell=True,)).decode("utf-8")
-        return float(value), 0
-
-    def readValues(self, que, dev_id, devices_db, devices_db_rel):
         try:
             # 1 - temp
             # 2 - hum
@@ -71,7 +67,6 @@ class BME280I2C():
                 value = float(sensor3.read_humidity())
 
             return value, 0
-
 
 
     def loop(self):
