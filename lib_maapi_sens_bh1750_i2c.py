@@ -69,7 +69,7 @@ class BME280I2C():
         ONE_TIME_LOW_RES_MODE = 0x23
 
         bus = smbus.SMBus(1) # Rev 1 Pi uses 0
-        data = bus.read_i2c_block_data(addr,ONE_TIME_HIGH_RES_MODE_1)
+        data = bus.read_i2c_block_data(DEVICE,ONE_TIME_HIGH_RES_MODE_1)
 
         # bus = I2C_MaaPi(1)  # Rev 2 Pi uses 1
         # data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,)
