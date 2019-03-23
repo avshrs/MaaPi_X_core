@@ -5,7 +5,7 @@
 #                          MAAPI X
 #
 ##############################################################
-from lib.Adafruit_BME280 import *
+from Adafruit_BME280 import *
 
 import lib_maapi_main_checkDevCond               as CheckDev
 import lib_maapi_main_queue                      as Queue
