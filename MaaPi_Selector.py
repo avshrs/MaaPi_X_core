@@ -197,6 +197,7 @@ class MaapiSelector():
                 "dev_last_update",
                 "dev_interval",
                 "dev_value",
+                "dev_unit_id",
                 "dev_interval_unit_id",
                 "dev_interval_queue",
                 "dev_machine_location_id",

@@ -24,7 +24,7 @@ import subprocess
 class BME280I2C():
     def __init__(self,host,port,id_):
         self.queue              = Queue.Queue()
-        self.objectname         = "LinuxCmd"
+        self.objectname         = "BME_280"
         self.host               = host
         self.port               = int(port)
         self.maapiCommandLine   = []
