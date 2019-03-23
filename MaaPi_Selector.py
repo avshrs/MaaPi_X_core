@@ -79,7 +79,7 @@ class MaapiSelector():
 
     def runLibraryDeamon(self, lib, force):
         try:
-            if lib not in self.libraryPID[lib] or force:
+            if lib not in self.libraryPID or force:
                 lists =[]
                 lists.append(self.interpreterVer)                                               # interpreter version
                 lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")                  # library file name
