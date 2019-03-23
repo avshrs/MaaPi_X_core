@@ -68,11 +68,11 @@ class BME280I2C():
         # Device is automatically set to Power Down after measurement.
         ONE_TIME_LOW_RES_MODE = 0x23
 
-        #bus = smbus.SMBus(1) # Rev 1 Pi uses 0
-        bus = I2C_MaaPi(1)  # Rev 2 Pi uses 1
-        data = bus.write_byte(DEVICE, RESET)
-        time.sleep(0.005)
-        data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,32)
+        bus = smbus.SMBus(1) # Rev 1 Pi uses 0
+        data = bus.read_i2c_block_data(addr,ONE_TIME_HIGH_RES_MODE_1)
+
+        # bus = I2C_MaaPi(1)  # Rev 2 Pi uses 1
+        # data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,)
         value = ((data[1] + (256 * data[0])) / 1.2)
         return value, error
 
