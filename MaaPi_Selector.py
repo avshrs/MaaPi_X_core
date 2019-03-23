@@ -64,7 +64,7 @@ class MaapiSelector():
                 self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name']}")
 
             except Exception as e :
-                self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
+                self.maapilogger.log("Exception", "Error: startlibraryDeamon() {exc}".format(exc = e))
 
     def restartlibraryDeamon(self, lib_id):
         try:
@@ -100,7 +100,7 @@ class MaapiSelector():
                             "lastResponce":dt.now()
                 }
         except Exception as e :
-            self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
+            self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
 
     def checkLibraryProcess(self):
         for lib in self.libraryPID:
@@ -120,7 +120,7 @@ class MaapiSelector():
                         else:
                             self.restartlibraryDeamon(lib)
             except Exception as e :
-                self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
+                self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
 
 
     def checkDbForOldreadings(self):
@@ -146,7 +146,7 @@ class MaapiSelector():
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
 
                     except Exception as e:
-                        self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist  - error: {e}")
+                        self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist  - error: {e}")
                         self.skippDev.append(dev)
                         self.localQueue[dev]=c_dev["dev_last_update"]
 
