@@ -38,6 +38,11 @@ class BME280I2C():
         self.socketServer.runTcpServer(self.host, self.port)
 
 
+    def updateCommandLine(self):
+        self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()
+        self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
+
+
     def checkQueueForReadings(self):
         self.readings.checkQueueForReadings(self.readValues, self.queue)
 
@@ -45,36 +50,56 @@ class BME280I2C():
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         value = 0
         error = 0
-        # 1 - temp
-        # 2 - hum
-        # 4 - press
-        unit_id = devices_db[dev_id]['dev_unit_id']
 
-        if unit_id == 1:
-            sensor = BME280(p_mode=BME280_OSAMPLE_8)
-            value = float(sensor.read_temperature())
+        DEVICE = 0x23  # Default device I2C address
+        POWER_DOWN = 0x00  # No active state
+        POWER_ON = 0x01  # Power on
+        RESET = 0x07  # Reset data register value
+        # Start measurement at 4lx resolution. Time typically 16ms.
+        CONTINUOUS_LOW_RES_MODE = 0x13
+        # Start measurement at 1lx resolution. Time typically 120ms
+        CONTINUOUS_HIGH_RES_MODE_1 = 0x10
+        # Start measurement at 0.5lx resolution. Time typically 120ms
+        CONTINUOUS_HIGH_RES_MODE_2 = 0x11
+        # Start measurement at 1lx resolution. Time typically 120ms
+        # Device is automatically set to Power Down after measurement.
+        ONE_TIME_HIGH_RES_MODE_1 = 0x20
+        # Start measurement at 0.5lx resolution. Time typically 120ms
+        # Device is automatically set to Power Down after measurement.
+        ONE_TIME_HIGH_RES_MODE_2 = 0x21
+        # Start measurement at 1lx resolution. Time typically 120ms
+        # Device is automatically set to Power Down after measurement.
+        ONE_TIME_LOW_RES_MODE = 0x23
 
-        elif unit_id == 4:
-            sensor2 = BME280(p_mode=BME280_OSAMPLE_8)
-            value = float(sensor2.read_pressure())
+        #bus = smbus.SMBus(1) # Rev 1 Pi uses 0
+        bus = I2C_MaaPi(1)  # Rev 2 Pi uses 1
 
-        elif unit_id == 2:
-            sensor3 = BME280(h_mode=BME280_OSAMPLE_8)
-            value = float(sensor3.read_humidity())
-        else:
-            error = 1
-
+        data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,32)
+        value = (data[1] + (256 * data[0])) / 1.2)
         return value, error
+
 
 
     def loop(self):
         while True:
+            if (dt.now() - self.timer_2).seconds >= 10:
+                self.timer_2 = dt.now()
+                self.updateCommandLine()
             time.sleep(0.01)
             self.checkQueueForReadings()
 
 
 if __name__ == "__main__":
     BME280I2C_ =  BME280I2C(sys.argv[1],sys.argv[2],sys.argv[3])
+    BME280I2C_.updateCommandLine()
     BME280I2C_.loop()
+
+
+
+from lim_maapi_i2c_bus import I2C_MaaPi
+import smbus
+
+
+
 
 
