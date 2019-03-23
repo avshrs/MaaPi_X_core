@@ -63,7 +63,7 @@ class MaapiSelector():
                 self.runLibraryDeamon(lib, False)
                 self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name']}")
 
-            except EnvironmentError as e :
+            except Exception as e :
                 self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
     def restartlibraryDeamon(self, lib_id):
@@ -99,7 +99,7 @@ class MaapiSelector():
                             "port" : port,
                             "lastResponce":dt.now()
                 }
-        except Exception() as e :
+        except Exception as e :
             self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
     def checkLibraryProcess(self):
@@ -119,7 +119,7 @@ class MaapiSelector():
                             self.maapilogger.log("INFO", "Get responce from selector")
                         else:
                             self.restartlibraryDeamon(lib)
-            except EnvironmentError as e :
+            except Exception as e :
                 self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
 
@@ -211,7 +211,7 @@ class MaapiSelector():
     def sendDataToServer(self,host,port,data):
         try:
             self.sendstr.sendStr(host, port, data)
-        except EnvironmentError as e:
+        except Exception as e:
             self.maapilogger.log("ERROR","Exception - SendDataToServer {Ex}".format(Ex=e))
 
     def loop(self):
