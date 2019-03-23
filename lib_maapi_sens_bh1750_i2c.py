@@ -17,6 +17,10 @@ import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_readings                   as Readings
 import time, copy, sys
 
+from lim_maapi_i2c_bus import I2C_MaaPi
+import smbus
+
+
 from datetime import datetime as dt
 import sys
 import subprocess
@@ -89,8 +93,6 @@ if __name__ == "__main__":
 
 
 
-from lim_maapi_i2c_bus import I2C_MaaPi
-import smbus
 
 
 
