@@ -62,7 +62,7 @@ class MaaPiDBConnection():
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
-            self.maapilogger.log("INFO",f"Insert  id: {0:<10} DevID: {device_id:<8} Status:{status:<30} \tValue: {insert_value} ")
+            self.maapilogger.log("DEBUG",f"Insert  id: {0:<10} DevID: {device_id:<8} Status:{status:<30} \tValue: {insert_value} ")
 
             # get values
             x = self.conn.cursor()
