@@ -40,6 +40,7 @@ class MaapiSelector():
         self.thread             = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
+        self.timer_3            = dt.now()
         self.deviceList         = []
         self.libraryList        = []
         self.libraryList_id     = []
@@ -50,6 +51,7 @@ class MaapiSelector():
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
         self.socketServer.runTcpServer(self.selectorHost, self.selectorPort)
         self.maapilogger.log("INFO","Initialising Selector Module ")
+        self.skippDev           = []
 
 
     def __del__(self):
@@ -58,7 +60,7 @@ class MaapiSelector():
     def startlibraryDeamon(self):
         for lib in self.libraryList:
             try:
-                self.runLibraryDeamon(lib)
+                self.runLibraryDeamon(lib, False)
                 self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name']}")
 
             except Exception as e :
@@ -69,30 +71,33 @@ class MaapiSelector():
             self.maapilogger.log("INFO", f"Killing not respondign library deamon {self.libraryList[lib]['device_lib_name']}")
             if self.libraryPID[lib_id]:
                 self.libraryPID[lib_id]["pid"].kill()
+                del self.libraryPID[lib_id]
         finally:
-            self.runLibraryDeamon(lib_id)
+            self.runLibraryDeamon(lib_id, False)
             self.maapilogger.log("INFO", f"Restarting library deamon {self.libraryList[lib]['device_lib_name']}")
 
-    def runLibraryDeamon(self, lib):
-        # self.maapilogger.log("INFO", f"tart library deamon {self.libraryList[lib]['device_lib_name'}")
-        lists =[]
-        lists.append(self.interpreterVer)                                               # interpreter version
-        lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")                  # library file name
-        lists.append(f"{self.selectorHost}")                                            # host
-        lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")      # port selector port + library unique index
-        lists.append(f"{self.libraryList[lib]['id']}")                                  # library index
-        pid = subprocess.Popen(lists)
-        name = self.libraryList[lib]['device_lib_name']
-        host = self.selectorHost
-        port = int(self.selectorPort)+int(self.libraryList[lib]['id'])
-        self.libraryPID[lib] = {
-                    "id"   : lib,
-                    "name" : name,
-                    "pid"  : pid,
-                    "host" : host,
-                    "port" : port,
-                    "lastResponce":dt.now()
-        }
+
+    def runLibraryDeamon(self, lib, force):
+        if lib not in self.libraryPID[lib] or force:
+            lists =[]
+            lists.append(self.interpreterVer)                                               # interpreter version
+            lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")                  # library file name
+            lists.append(f"{self.selectorHost}")                                            # host
+            lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")      # port selector port + library unique index
+            lists.append(f"{self.libraryList[lib]['id']}")                                  # library index
+
+            pid = subprocess.Popen(lists)
+            name = self.libraryList[lib]['device_lib_name']
+            host = self.selectorHost
+            port = int(self.selectorPort)+int(self.libraryList[lib]['id'])
+            self.libraryPID[lib] = {
+                        "id"   : lib,
+                        "name" : name,
+                        "pid"  : pid,
+                        "host" : host,
+                        "port" : port,
+                        "lastResponce":dt.now()
+            }
 
 
     def checkLibraryProcess(self):
@@ -121,32 +126,41 @@ class MaapiSelector():
             c_dev = self.deviceList[dev]
             tosec = self.helpers.to_sec(c_dev["dev_interval"], c_dev["dev_interval_unit_id"])
 
-            if (dt.now() - c_dev["dev_last_update"]).seconds >= tosec:
+            if (dt.now() - c_dev["dev_last_update"]).seconds >= tosec and dev not in self.skippDev:
                 try:
                     self.localQueue[dev]
+
                 except:
                     self.localQueue[dev]=c_dev["dev_last_update"]
                     self.maapilogger.log("DEBUG",f"self.localQueue[dev] not exist - adding new{dev}")
+
                 if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost,self.selectorPort)
                     self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']}")
+
                     try:
                         pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
+
                     except Exception as e:
                         self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist  - error: {e}")
+                        self.skippDev.append(dev)
                         self.localQueue[dev]=c_dev["dev_last_update"]
 
 
     def getLibraryList(self):
         self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
+
         for ids in self.libraryList:
             self.queue.prepareQueueDevList(ids)
+
         self.maapilogger.log("DEBUG","Devices library list updated")
+
 
     def updateBoardLocation(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
+
         for i in board_location:
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
@@ -154,7 +168,6 @@ class MaapiSelector():
 
     def getDeviceList(self):
         gdstart = dt.now()
-
 
         self.deviceList = self.maapiDB.table("devices").columns(
                 "dev_id",
@@ -189,6 +202,7 @@ class MaapiSelector():
                 "dev_interval_unit_id",
                 ).order_by('dev_id').filters_eq(
                 dev_status = True).get()
+
         gdstop = dt.now()
         self.maapilogger.log("DEBUG","Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
 
@@ -208,6 +222,11 @@ class MaapiSelector():
                 self.getLibraryList()
                 self.checkLibraryProcess()
                 self.timer_2 = dt.now()
+
+            if (dt.now() - self.timer_3).seconds >= 60:
+                self.skippDev = []
+                self.timer_3 = dt.now()
+
             time.sleep(0.1)
             self.checkDbForOldreadings()
 
