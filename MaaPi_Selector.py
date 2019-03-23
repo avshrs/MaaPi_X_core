@@ -63,7 +63,7 @@ class MaapiSelector():
                 self.runLibraryDeamon(lib, False)
                 self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name']}")
 
-            except Exception as e :
+            except EnvironmentError as e :
                 self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
     def restartlibraryDeamon(self, lib_id):
@@ -78,27 +78,29 @@ class MaapiSelector():
 
 
     def runLibraryDeamon(self, lib, force):
-        if lib not in self.libraryPID[lib] or force:
-            lists =[]
-            lists.append(self.interpreterVer)                                               # interpreter version
-            lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")                  # library file name
-            lists.append(f"{self.selectorHost}")                                            # host
-            lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")      # port selector port + library unique index
-            lists.append(f"{self.libraryList[lib]['id']}")                                  # library index
+        try:
+            if lib not in self.libraryPID[lib] or force:
+                lists =[]
+                lists.append(self.interpreterVer)                                               # interpreter version
+                lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")                  # library file name
+                lists.append(f"{self.selectorHost}")                                            # host
+                lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")      # port selector port + library unique index
+                lists.append(f"{self.libraryList[lib]['id']}")                                  # library index
 
-            pid = subprocess.Popen(lists)
-            name = self.libraryList[lib]['device_lib_name']
-            host = self.selectorHost
-            port = int(self.selectorPort)+int(self.libraryList[lib]['id'])
-            self.libraryPID[lib] = {
-                        "id"   : lib,
-                        "name" : name,
-                        "pid"  : pid,
-                        "host" : host,
-                        "port" : port,
-                        "lastResponce":dt.now()
-            }
-
+                pid = subprocess.Popen(lists)
+                name = self.libraryList[lib]['device_lib_name']
+                host = self.selectorHost
+                port = int(self.selectorPort)+int(self.libraryList[lib]['id'])
+                self.libraryPID[lib] = {
+                            "id"   : lib,
+                            "name" : name,
+                            "pid"  : pid,
+                            "host" : host,
+                            "port" : port,
+                            "lastResponce":dt.now()
+                }
+        except EnvironmentError as e :
+            self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
     def checkLibraryProcess(self):
         for lib in self.libraryPID:
@@ -117,7 +119,7 @@ class MaapiSelector():
                             self.maapilogger.log("INFO", "Get responce from selector")
                         else:
                             self.restartlibraryDeamon(lib)
-            except Exception as e :
+            except EnvironmentError as e :
                 self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
 
@@ -143,7 +145,7 @@ class MaapiSelector():
                         pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
 
-                    except Exception as e:
+                    except EnvironmentError as e:
                         self.maapilogger.log("ERROR",f"Exception - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist  - error: {e}")
                         self.skippDev.append(dev)
                         self.localQueue[dev]=c_dev["dev_last_update"]
@@ -209,7 +211,7 @@ class MaapiSelector():
     def sendDataToServer(self,host,port,data):
         try:
             self.sendstr.sendStr(host, port, data)
-        except Exception as e:
+        except EnvironmentError as e:
             self.maapilogger.log("ERROR","Exception - SendDataToServer {Ex}".format(Ex=e))
 
     def loop(self):
