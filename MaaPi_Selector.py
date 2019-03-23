@@ -99,6 +99,8 @@ class MaapiSelector():
                             "port" : port,
                             "lastResponce":dt.now()
                             }
+                self.maapilogger.log("INFO", f"Lib:{self.libraryPID[lib]['name']} pid:{self.libraryPID[lib]['pid']}")
+
         except Exception as e :
             self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
 
