@@ -43,7 +43,7 @@ class BME280I2C():
         self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
 
 
-    def checkQueueForReadin(self):
+    def checkQueueForReadings(self):
         self.readings.checkQueueForReadings(self.readValues, self.queue)
 
 
