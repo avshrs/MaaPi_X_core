@@ -5,8 +5,6 @@
 #                          MAAPI X
 #
 ##############################################################
-from Adafruit_BME280 import *
-
 import lib_maapi_main_checkDevCond               as CheckDev
 import lib_maapi_main_queue                      as Queue
 import lib_maapi_main_logger                     as MaapiLogger
@@ -18,7 +16,7 @@ import lib_maapi_main_readings                   as Readings
 import time, copy, sys
 
 from lim_maapi_i2c_bus import I2C_MaaPi
-# import smbus
+import smbus
 
 from datetime import datetime as dt
 import sys
@@ -72,7 +70,8 @@ class BME280I2C():
 
         #bus = smbus.SMBus(1) # Rev 1 Pi uses 0
         bus = I2C_MaaPi(1)  # Rev 2 Pi uses 1
-
+        data = bus.write_byte(DEVICE, RESET)
+        time.sleep(0.005)
         data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,32)
         value = ((data[1] + (256 * data[0])) / 1.2)
         return value, error
