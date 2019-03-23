@@ -18,8 +18,7 @@ import lib_maapi_main_readings                   as Readings
 import time, copy, sys
 
 from lim_maapi_i2c_bus import I2C_MaaPi
-import smbus
-
+# import smbus
 
 from datetime import datetime as dt
 import sys
@@ -79,16 +78,13 @@ class BME280I2C():
         return value, error
 
 
-
     def loop(self):
         while True:
             time.sleep(0.01)
             self.checkQueueForReadings()
 
-
 if __name__ == "__main__":
     BME280I2C_ =  BME280I2C(sys.argv[1],sys.argv[2],sys.argv[3])
-
     BME280I2C_.loop()
 
 
