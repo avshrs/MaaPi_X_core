@@ -57,22 +57,21 @@ class BME280I2C():
             # 2 - hum
             # 4 - press
             unit_id = devices_db[dev_id]['dev_unit_id']
-            if name == 1:
+
+            if unit_id == 1:
                 sensor = BME280(p_mode=BME280_OSAMPLE_8)
-                temp = float(sensor.read_temperature())
-                return temp, 0
+                value = float(sensor.read_temperature())
 
-            elif name == 4:
+            elif unit_id == 4:
                 sensor2 = BME280(p_mode=BME280_OSAMPLE_8)
-                pressure = float(sensor2.read_pressure())
-                return pressure, 0
+                value = float(sensor2.read_pressure())
 
-            elif name == 2:
+            elif unit_id == 2:
                 sensor3 = BME280(h_mode=BME280_OSAMPLE_8)
-                hum = float(sensor3.read_humidity())
-                return hum, 0
-        except:
-            return 0, 1
+                value = float(sensor3.read_humidity())
+
+            return value, 0
+
 
 
     def loop(self):
