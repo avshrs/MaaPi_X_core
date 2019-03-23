@@ -24,7 +24,7 @@ import subprocess
 class BME280I2C():
     def __init__(self,host,port,id_):
         self.queue              = Queue.Queue()
-        self.objectname         = "BME_280"
+        self.objectname         = "BH_1750"
         self.host               = host
         self.port               = int(port)
         self.maapiCommandLine   = []
@@ -37,10 +37,6 @@ class BME280I2C():
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
         self.socketServer.runTcpServer(self.host, self.port)
 
-
-    def updateCommandLine(self):
-        self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()
-        self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
 
 
     def checkQueueForReadings(self):
@@ -75,23 +71,20 @@ class BME280I2C():
         bus = I2C_MaaPi(1)  # Rev 2 Pi uses 1
 
         data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,32)
-        value = (data[1] + (256 * data[0])) / 1.2)
+        value = ((data[1] + (256 * data[0])) / 1.2)
         return value, error
 
 
 
     def loop(self):
         while True:
-            if (dt.now() - self.timer_2).seconds >= 10:
-                self.timer_2 = dt.now()
-                self.updateCommandLine()
             time.sleep(0.01)
             self.checkQueueForReadings()
 
 
 if __name__ == "__main__":
     BME280I2C_ =  BME280I2C(sys.argv[1],sys.argv[2],sys.argv[3])
-    BME280I2C_.updateCommandLine()
+
     BME280I2C_.loop()
 
 
