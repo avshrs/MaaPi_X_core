@@ -25,8 +25,13 @@ class SocketServer():
 
 
     def __del__(self):
-        self.thread[0].join()
-        self.threadUdp[0].join()
+        try:
+            self.maapilogger.log("INFO",f"JOINING threads")
+            self.thread[0].join()
+            self.threadUdp[0].join()
+        except Exception as e:
+            self.maapilogger.log("ERROR",f"__del__ {e}")
+
 
     def startServerTCP(self, host, port):
         try:

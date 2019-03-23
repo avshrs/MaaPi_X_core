@@ -57,29 +57,41 @@ class MaapiSelector():
     def __del__(self):
         self.maapilogger.log("INFO","Joining tcp server thread ")
 
-    def startlibraryDeamon(self):
+
+    def startAllLibraryDeamon(self):
         for lib in self.libraryList:
             try:
-                self.runLibraryDeamon(lib, False)
-                self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name']}")
-
+                self.startLibraryDeamon(lib)
             except Exception as e :
                 self.maapilogger.log("Exception", "Error: startlibraryDeamon() {exc}".format(exc = e))
 
-    def restartlibraryDeamon(self, lib_id):
+
+    def stopLibraryDeamon(self, lib_id):
         try:
-            self.maapilogger.log("INFO", f"Killing not respondign library deamon {self.libraryList[lib_id]['device_lib_name']}")
+            self.maapilogger.log("INFO", f"Killing library deamon {lib_id}")
             if self.libraryPID[lib_id]:
                 self.libraryPID[lib_id]["pid"].kill()
-                del self.libraryPID[lib_id]
-        finally:
-            self.runLibraryDeamon(lib_id, False)
-            self.maapilogger.log("INFO", f"Restarting library deamon {self.libraryList[lib_id]['device_lib_name']}")
+                try:
+                    del self.libraryPID[lib_id]
+
+                except Exception as e:
+                    self.maapilogger.log("Exception", "Error: stoplibraryDeamon() pid not exist in libraryPID{exc}".format(exc = e))
+
+        except Exception as e:
+            self.maapilogger.log("Exception", f"library {lib_id} not exist in library libraryPID ")
 
 
-    def runLibraryDeamon(self, lib, force):
+    def restartLibraryDeamon(self, lib_id):
         try:
-            if lib not in self.libraryPID or force:
+            self.stopLibraryDeamon(lib_id)
+            self.startLibraryDeamon(lib_id)
+        except Exception as e:
+            self.maapilogger.log("Exception", "Error: stoplibraryDeamon() {exc}".format(exc = e))
+
+    def startLibraryDeamon(self, lib):
+        try:
+            if lib not in self.libraryPID:
+                self.maapilogger.log("INFO", f"Starting library deamon {self.libraryList[lib]['device_lib_name']}")
                 lists =[]
                 lists.append(self.interpreterVer)                                               # interpreter version
                 lists.append(f"{self.libraryList[lib]['device_lib_name']}.py")                  # library file name
@@ -105,25 +117,28 @@ class MaapiSelector():
             self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
 
     def checkLibraryProcess(self):
-        for lib in self.libraryPID:
-            try:
-                if (dt.now() - self.libraryPID[lib]["lastResponce"]).seconds > self.libraryLastResponce:
-                    self.maapilogger.log("INFO", f"Sending query to Selector: is ok? {self.libraryPID[lib]['name']} {self.libraryPID[lib]['host']}, {self.libraryPID[lib]['port']}")
+        lib_temp = copy.copy(self.libraryPID)
+        for lib in lib_temp:
+            if lib in self.libraryList:
+                try:
+                    if (dt.now() - lib_temp[lib]["lastResponce"]).seconds > self.libraryLastResponce:
+                        self.maapilogger.log("DEBUG", f"Sending query to Selector: is ok? {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
 
-                    payload = self.helpers.pyloadToPicke(00, " ", " ", " ",self.selectorHost,self.selectorPort)
-                    try:
-                        recive =  self.socketClient.sendStrAndRecv(self.libraryPID[lib]["host"], self.libraryPID[lib]["port"], payload)
-                    except:
-                        self.restartlibraryDeamon(lib)
-                    else:
-                        if recive == bytes(0xff):
-                            self.libraryPID[lib]["lastResponce"] = dt.now()
-                            self.maapilogger.log("INFO", "Get responce from selector")
-                        else:
+                        payload = self.helpers.pyloadToPicke(00, " ", " ", " ",self.selectorHost,self.selectorPort)
+                        try:
+                            recive =  self.socketClient.sendStrAndRecv(lib_temp[lib]["host"], lib_temp[lib]["port"], payload)
+                        except:
                             self.restartlibraryDeamon(lib)
-            except Exception as e :
-                self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
-
+                        else:
+                            if recive == bytes(0xff):
+                                lib_temp[lib]["lastResponce"] = dt.now()
+                                self.maapilogger.log("DEBUG", "Get responce from selector")
+                            else:
+                                self.restartlibraryDeamon(lib)
+                except Exception as e :
+                    self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
+            else:
+                self.stopLibraryDeamon(lib)
 
     def checkDbForOldreadings(self):
         for dev in self.deviceList:
@@ -148,7 +163,7 @@ class MaapiSelector():
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
 
                     except Exception as e:
-                        self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist  - error: {e}")
+                        self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist in database for this location/board")
                         self.skippDev.append(dev)
                         self.localQueue[dev]=c_dev["dev_last_update"]
 
@@ -224,11 +239,13 @@ class MaapiSelector():
 
             if (dt.now() - self.timer_2).seconds >= 10:
                 self.getLibraryList()
+                self.startAllLibraryDeamon()
                 self.checkLibraryProcess()
                 self.timer_2 = dt.now()
 
             if (dt.now() - self.timer_3).seconds >= 60:
                 self.skippDev = []
+
                 self.timer_3 = dt.now()
 
             time.sleep(0.1)
@@ -245,6 +262,6 @@ class MaapiSelector():
 if __name__ == "__main__":
     MaapiSel =  MaapiSelector()
     MaapiSel.startConf()
-    MaapiSel.startlibraryDeamon()
+    MaapiSel.startAllLibraryDeamon()
     time.sleep(1)
     MaapiSel.loop()
