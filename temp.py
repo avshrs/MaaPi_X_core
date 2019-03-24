@@ -19,7 +19,7 @@ class class_get_values(object):
     def readFromI2C(self):
 
         data = self.bus.write_read_i2c_block_data32(int(self.addr,16),int(self.sensor),int(self.sensor),int(self.loop))
-
+        print (data)
         print (f"min \tvalue: {min(data)}")
         print (f"mean \tvalue: {mean(data)}")
         print (f"max \tvalue: {max(data)}")
