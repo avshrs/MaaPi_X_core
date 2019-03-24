@@ -22,14 +22,25 @@ class class_get_values(object):
         print (data)
         out = []
         for d in data:
-            tym = abs(d - self.rel)
+            tym = d - self.rel
             out.append(tym)
-
         print (f"min \tvalue: {min(out)}")
         print (f"mean \tvalue: {mean(out)}")
         print (f"max \tvalue: {max(out)}")
         print (f"median \tvalue: {median(out)}")
         print (f"stdev \tvalue: {stdev(out)}")
+
+        out=[]
+        for o in out:
+            tym = abs(o)
+            out.append(tym)
+        print (f"min \tvalue: {min(out)}")
+        print (f"mean \tvalue: {mean(out)}")
+        print (f"max \tvalue: {max(out)}")
+        print (f"median \tvalue: {median(out)}")
+        print (f"stdev \tvalue: {stdev(out)}")
+
+
 
 if __name__ == "__main__":
     class_get_values_ =  class_get_values(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
