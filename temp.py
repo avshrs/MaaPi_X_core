@@ -29,10 +29,10 @@ class class_get_values(object):
         print (f"max \tvalue: {max(out)}")
         print (f"median \tvalue: {median(out)}")
         print (f"stdev \tvalue: {stdev(out)}")
-
+        me = mean(out)
         out2=[]
         for o in out:
-            tym = abs(o)-(mean(out))
+            tym = abs(o)-(me)
             out2.append(tym)
 
         print (f"min \tvalue: {min(out2)}")
