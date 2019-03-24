@@ -16,7 +16,7 @@ class class_get_values(object):
         self.bus = I2C_MaaPi(1)
 
 
-    def readFromI2C(self,sensor, address, loops):
+    def readFromI2C(self):
         data = []
         for i in range(0,loops):
             data.append(self.bus.write_read_i2c_block_data32(self.addr,int(self.sensor),int(self.sensor),loops))
