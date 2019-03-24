@@ -32,7 +32,7 @@ class class_get_values(object):
         print (f"stdev \tvalue: {stdev(out)}")
 
 if __name__ == "__main__":
-    class_get_values_ =  class_get_values(sys.argv[1], sys.argv[2], sys.argv[3])
+    class_get_values_ =  class_get_values(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     class_get_values_.readFromI2C()
 
 
