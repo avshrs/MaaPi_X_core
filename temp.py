@@ -4,11 +4,7 @@ from statistics import median, stdev, mean
 from datetime import datetime as dt
 from lim_maapi_i2c_bus import I2C_MaaPi
 
-logging.basicConfig(
-    filename='/home/pi/MaaPi110/bin/logs/Maapi_Selector.log',
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%m/%d/%Y %H:%M:%S')
+
 
 class class_get_values(object):
     debug = 1
