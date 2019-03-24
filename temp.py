@@ -32,7 +32,7 @@ class class_get_values(object):
 
         out2=[]
         for o in out:
-            tym = abs(o)
+            tym = abs(o)-(mean(out))
             out2.append(tym)
 
         print (f"min \tvalue: {min(out2)}")
