@@ -12,7 +12,7 @@ class class_get_values(object):
         self.addr = address
         self.loop = loops
         self.sensor = sens
-        self.rel = rel
+        self.rel = int(rel)
         self.bus = I2C_MaaPi(1)
 
 
