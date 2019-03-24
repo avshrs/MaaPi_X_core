@@ -333,7 +333,7 @@ class I2C_MaaPi(object):
 
                 r_msg.data.contents.byte = 32
                 self.ioctl_def_wr(self.fd, I2C_SMBUS,w_msg, r_msg)
-                d+= r_msg.data.contents.block[8:33]
+                d+= r_msg.data.contents.block[1:32+1]
         return d
 
 
