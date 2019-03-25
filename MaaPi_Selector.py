@@ -101,7 +101,7 @@ class MaapiSelector():
             self.stopLibraryDeamon(lib_id)
             self.startLibraryDeamon(lib_id)
         except Exception as e:
-            self.maapilogger.log("Exception", "Error: stoplibraryDeamon() {exc}".format(exc = e))
+            self.maapilogger.log("Exception", "Error: restartLibraryDeamon() {exc}".format(exc = e))
 
 
     def startLibraryDeamon(self, lib):
@@ -130,7 +130,7 @@ class MaapiSelector():
                 self.maapilogger.log("INFO", f"Lib:{self.libraryPID[lib]['name']} pid:{self.libraryPID[lib]['pid']}")
 
         except Exception as e :
-            self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
+            self.maapilogger.log("ERROR", "Exception: startLibraryDeamon() {exc}".format(exc = e))
 
 
     def checkLibraryProcess(self):
@@ -153,7 +153,7 @@ class MaapiSelector():
                             else:
                                 self.restartlibraryDeamon(lib)
                 except Exception as e :
-                    self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
+                    self.maapilogger.log("ERROR", "Exception: checkLibraryProcess() {exc}".format(exc = e))
             else:
                 self.stopLibraryDeamon(lib)
 
