@@ -322,7 +322,18 @@ class I2C_MaaPi(object):
     def write_read_i2c_block_data32(self, i2c_addr, w_register, r_register, length):
         d=[]
         self._set_address(i2c_addr)
+        for i in range(0,1):
+                w_msg = i2c_smbus_ioctl_data.create(
+                   read_write=I2C_SMBUS_WRITE, command=w_register, size=I2C_SMBUS_BYTE
+                )
+                r_msg = i2c_smbus_ioctl_data.create(
+                    read_write=I2C_SMBUS_READ, command=r_register, size=I2C_SMBUS_I2C_BLOCK_DATA
+                )
 
+                r_msg.data.contents.byte = 32
+                self.ioctl_def_wr(self.fd, I2C_SMBUS,w_msg, r_msg)
+                d+= r_msg.data.contents.block[1:32+1]
+        d=[]
         for i in range(0,length):
                 w_msg = i2c_smbus_ioctl_data.create(
                    read_write=I2C_SMBUS_WRITE, command=w_register, size=I2C_SMBUS_BYTE
