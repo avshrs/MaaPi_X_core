@@ -93,11 +93,11 @@ class BME280I2C():
                     out.append(abs(d - middle))
                 value = (max(out)*(ref_volt/255))
 
-                if unit_id = 21:
+                if unit_id == 21:
                     value = value / toAmper
-                elif unit_id = 19:
+                elif unit_id == 19:
                     value = (value / toAmper) * to_wats
-                elif unit_id = 20:
+                elif unit_id == 20:
                     vzlie = value * to_volts
 
         return value, error
