@@ -14,7 +14,7 @@ import lib_maapi_main_checkDevCond               as CheckDev
 import lib_maapi_main_logger                     as MaapiLogger
 import MaaPi_Config                               as Config
 from datetime import datetime                    as dt, timedelta
-import time, copy, sys
+import time, copy, sys, os, signal
 import subprocess
 
 
@@ -37,7 +37,6 @@ class MaapiSelector():
         self.maapiLocation      = self.config.maapiLocation
         self.selectorPort       = self.config.selectorPort
         self.selectorHost       = self.config.selectorHost
-        self.thread             = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
         self.timer_3            = dt.now()
@@ -52,10 +51,27 @@ class MaapiSelector():
         self.socketServer.runTcpServer(self.selectorHost, self.selectorPort)
         self.maapilogger.log("INFO","Initialising Selector Module ")
         self.skippDev           = []
+        self.pid                = os.getpid()
+        self.writePid(self.pid)
+
+        signal.signal(signal.SIGTERM, self.service_shutdown)
+        signal.signal(signal.SIGINT, self.service_shutdown)
+
+    def service_shutdown(self, signum, frame):
+        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi { self.objectname }')
+        self.socketServer.killServers()
+        for p in self.libraryPID:
+            self.libraryPID[p]["pid"].kill()
+        self.writePid("")
+        #sys.exit()
+        raise SystemExit
 
 
-    def __del__(self):
-        self.maapilogger.log("INFO","Joining tcp server thread ")
+
+    def writePid(self, pid):
+        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
+        f.write(f"{pid}")
+        f.close()
 
 
     def startAllLibraryDeamon(self):

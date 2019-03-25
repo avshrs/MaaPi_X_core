@@ -14,10 +14,9 @@ import lib_maapi_main_socketServer               as SocketServer
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_readings                   as Readings
-import time, copy, sys
+import time, copy, sys, os
 
 from datetime import datetime as dt
-import sys
 import subprocess
 
 class UdpServer():
@@ -39,6 +38,11 @@ class UdpServer():
         self.socketServer.runTcpServer(self.host, self.tcpPort)
         self.socketServer.runUdpServer(self.host, self.udpPort )
 
+    def getPidAndWriteToFile(self):
+        pid = os.getpid()
+        f = open(f"pid/MaaPi_{self.objectname}.pid", "w")
+        f.write(f"{pid}")
+        f.close()
 
     def checkQueueForReadings(self):
         try:
@@ -72,4 +76,5 @@ class UdpServer():
 
 if __name__ == "__main__":
     UdpServer =  UdpServer(sys.argv[1],sys.argv[2],sys.argv[3])
+    UdpServer.getPidAndWriteToFile()
     UdpServer.loop()

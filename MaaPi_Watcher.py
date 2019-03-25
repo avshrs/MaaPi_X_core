@@ -9,7 +9,7 @@ import copy
 import logging
 import subprocess
 import time
-import os, sys
+import os, sys, signal
 from datetime import datetime as dt
 from datetime import timedelta
 from threading import Lock, Thread
@@ -40,13 +40,39 @@ class MaapiWatcher():
         self.watcherHost        = self.config.watcherHost
         self.watcherPort        = self.config.watcherPort
         self.selecorName        = self.config.selectorName
-        self.thread             = []
         self.interpreterVer       =f"{sys.executable}"
         self.lastResponce       = dt.now() - timedelta(hours = 1)
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
         self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
         self.selectorPid        = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
+        self.runningSS          =[]
+        self.maapiDB.cleanSocketServerList()
+        self.pid                = os.getpid()
+        self.writePid(self.pid)
 
+        signal.signal(signal.SIGTERM, self.service_shutdown)
+        signal.signal(signal.SIGINT, self.service_shutdown)
+
+    def service_shutdown(self, signum, frame):
+        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi SocetServer')
+        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
+        payload = self.helpers.pyloadToPicke(99, " ", " ", " ", self.watcherHost,self.watcherPort)
+        for i in self.runningSS:
+            self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
+        self.socketServer.killServers()
+        self.writePid("")
+        raise SystemExit
+
+
+
+    def writePid(self, pid):
+        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
+        f.write(f"{pid}")
+        f.close()
+
+    def getRunnigSocketServers(self):
+        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
+        self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
 
     def startSelectorModule(self):
         try:
@@ -83,5 +109,5 @@ class MaapiWatcher():
             self.checkSelector()
 
 if __name__ == "__main__":
-    MaapiSel =  MaapiWatcher()
-    MaapiSel.loop()
+    MaapiW =  MaapiWatcher()
+    MaapiW.loop()

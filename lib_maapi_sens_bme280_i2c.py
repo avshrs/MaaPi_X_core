@@ -15,10 +15,9 @@ import lib_maapi_main_socketServer               as SocketServer
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_readings                   as Readings
-import time, copy, sys
+import time, copy, sys, os
 
 from datetime import datetime as dt
-import sys
 import subprocess
 
 class BME280I2C():
@@ -36,6 +35,12 @@ class BME280I2C():
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
         self.socketServer.runTcpServer(self.host, self.port)
+
+    def getPidAndWriteToFile(self):
+        pid = os.getpid()
+        f = open(f"pid/MaaPi_{self.objectname}.pid", "w")
+        f.write(f"{pid}")
+        f.close()
 
 
     def checkQueueForReadings(self):
@@ -75,6 +80,7 @@ class BME280I2C():
 
 if __name__ == "__main__":
     BME280I2C_ =  BME280I2C(sys.argv[1],sys.argv[2],sys.argv[3])
+    BME280I2C_.getPidAndWriteToFile()
     BME280I2C_.loop()
 
 

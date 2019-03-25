@@ -14,11 +14,11 @@ import lib_maapi_main_socketServer               as SocketServer
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_readings                   as Readings
-import time, copy, sys
+import time, copy, sys, os, signal
 
 
 from datetime import datetime as dt
-import sys
+
 import subprocess
 
 
@@ -38,7 +38,23 @@ class MaaPiMath():
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
         self.socketServer.runTcpServer(self.host, self.port)
 
+        self.pid                = os.getpid()
+        self.writePid(self.pid)
 
+        signal.signal(signal.SIGTERM, self.service_shutdown)
+        signal.signal(signal.SIGINT, self.service_shutdown)
+
+    def service_shutdown(self, signum, frame):
+        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        self.writePid("")
+        #self.socketServer.killServers()
+        raise SystemExit
+
+
+    def writePid(self, pid):
+        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
+        f.write(f"{pid}")
+        f.close()
     def updateMathTable(self):
         self.maapiMathTable = self.maapiDB.table("maapi_math").columns( 'id',
                                                                         'math_user_id',

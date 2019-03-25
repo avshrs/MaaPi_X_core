@@ -17,7 +17,6 @@ import lib_maapi_main_readings                   as Readings
 import time, copy, sys, os
 
 from datetime import datetime as dt
-import sys
 import subprocess
 
 class DS18X20():
@@ -35,6 +34,12 @@ class DS18X20():
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, id_)
         self.socketServer.runTcpServer( self.host, self.port)
+
+    def getPidAndWriteToFile(self):
+        pid = os.getpid()
+        f = open(f"pid/MaaPi_{self.objectname}.pid", "w")
+        f.write(f"{pid}")
+        f.close()
 
 
     def updateCommandLine(self):
@@ -86,4 +91,5 @@ class DS18X20():
 if __name__ == "__main__":
     DS18X20_ =  DS18X20(sys.argv[1],sys.argv[2],sys.argv[3] )
     DS18X20_.updateCommandLine()
+    DS18X20_.getPidAndWriteToFile()
     DS18X20_.loop()

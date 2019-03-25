@@ -56,9 +56,19 @@ class MaaPiDBConnection():
 
 
     def insertRaw(self, where, what):
-        string_ = "INSERT INTO {where} ({what})".format(where=where, what=",".join(what))
-        self.maapilogger.log(1,string_)
-        return string_
+        string_ = "INSERT INTO {where} VALUES  ({what})".format(where=where, what=",".join(what))
+        self.maapilogger.log("DEBUG",string_)
+        x = self.conn.cursor()
+        x.execute(f"{string_}")
+        self.conn.commit()
+
+    def cleanSocketServerList(self):
+        string_ = "DELETE FROM maapi_running_socket_servers WHERE ss_port>1"
+        self.maapilogger.log("DEBUG",string_)
+        x = self.conn.cursor()
+        x.execute(f"{string_}")
+        self.conn.commit()
+
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
