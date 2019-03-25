@@ -38,7 +38,7 @@ class UdpServer():
         self.socketServer.runTcpServer(self.host, self.tcpPort)
         self.socketServer.runUdpServer(self.host, self.udpPort )
 
-       self.pid                = os.getpid()
+        self.pid                = os.getpid()
         self.writePid(self.pid)
 
         signal.signal(signal.SIGTERM, self.service_shutdown)

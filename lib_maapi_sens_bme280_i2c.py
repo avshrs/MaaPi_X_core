@@ -36,7 +36,7 @@ class BME280I2C():
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
         self.socketServer.runTcpServer(self.host, self.port)
 
-       self.pid                = os.getpid()
+        self.pid                = os.getpid()
         self.writePid(self.pid)
 
         signal.signal(signal.SIGTERM, self.service_shutdown)
