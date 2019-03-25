@@ -15,7 +15,7 @@ import lib_maapi_main_socketServer               as SocketServer
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_readings                   as Readings
-import time, copy, sys, os
+import time, copy, sys, os, signal
 
 from datetime import datetime as dt
 import subprocess

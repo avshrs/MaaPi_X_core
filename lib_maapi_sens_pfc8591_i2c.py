@@ -13,7 +13,7 @@ import lib_maapi_main_socketServer               as SocketServer
 import lib_maapi_main_helpers                    as Helpers
 import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_readings                   as Readings
-import time, copy, sys, smbus, os
+import time, copy, sys, smbus, os, signal
 from lim_maapi_i2c_bus import I2C_MaaPi
 from statistics import median, stdev, mean
 
@@ -88,7 +88,7 @@ class BME280I2C():
                 toAmper = self.pfcTable[pfc]['pfc_to_amper']
                 to_wats = self.pfcTable[pfc]['pfc_to_wats']
                 to_volts = self.pfcTable[pfc]['pfc_to_volts']
-                data = self.bus.write_read_i2c_block_data32(address,sens_nr,sens_nr,accuracy))
+                data = self.bus.write_read_i2c_block_data32(address,sens_nr,sens_nr,accuracy)
                 for d in data:
                     out.append(abs(d - middle))
                 value = (max(out)*(ref_volt/255))
