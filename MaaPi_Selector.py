@@ -19,7 +19,6 @@ import subprocess
 
 
 class MaapiSelector():
-
     def __init__(self):
         # objects
         self.queue              = Queue.Queue()
@@ -57,15 +56,15 @@ class MaapiSelector():
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
+
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi { self.objectname }')
-        self.socketServer.killServers()
-        for p in self.libraryPID:
-            self.libraryPID[p]["pid"].kill()
+        # self.socketServer.killServers()
+        time.sleep(1)
+        # for p in self.libraryPID:
+            # self.libraryPID[p]["pid"].kill()
         self.writePid("")
-        #sys.exit()
         raise SystemExit
-
 
 
     def writePid(self, pid):
@@ -104,6 +103,7 @@ class MaapiSelector():
         except Exception as e:
             self.maapilogger.log("Exception", "Error: stoplibraryDeamon() {exc}".format(exc = e))
 
+
     def startLibraryDeamon(self, lib):
         try:
             if lib not in self.libraryPID:
@@ -132,6 +132,7 @@ class MaapiSelector():
         except Exception as e :
             self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
 
+
     def checkLibraryProcess(self):
         lib_temp = copy.copy(self.libraryPID)
         for lib in lib_temp:
@@ -155,6 +156,7 @@ class MaapiSelector():
                     self.maapilogger.log("ERROR", "Exception: runLibraryDeamon() {exc}".format(exc = e))
             else:
                 self.stopLibraryDeamon(lib)
+
 
     def checkDbForOldreadings(self):
         for dev in self.deviceList:
@@ -247,6 +249,7 @@ class MaapiSelector():
             self.sendstr.sendStr(host, port, data)
         except Exception as e:
             self.maapilogger.log("ERROR","Exception - SendDataToServer {Ex}".format(Ex=e))
+
 
     def loop(self):
         while True:

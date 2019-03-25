@@ -38,9 +38,21 @@ class UdpServer():
         self.socketServer.runTcpServer(self.host, self.tcpPort)
         self.socketServer.runUdpServer(self.host, self.udpPort )
 
-    def getPidAndWriteToFile(self):
-        pid = os.getpid()
-        f = open(f"pid/MaaPi_{self.objectname}.pid", "w")
+       self.pid                = os.getpid()
+        self.writePid(self.pid)
+
+        signal.signal(signal.SIGTERM, self.service_shutdown)
+        signal.signal(signal.SIGINT, self.service_shutdown)
+
+    def service_shutdown(self, signum, frame):
+        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        self.writePid("")
+        #self.socketServer.killServers()
+        raise SystemExit
+
+
+    def writePid(self, pid):
+        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
         f.write(f"{pid}")
         f.close()
 
@@ -76,5 +88,4 @@ class UdpServer():
 
 if __name__ == "__main__":
     UdpServer =  UdpServer(sys.argv[1],sys.argv[2],sys.argv[3])
-    UdpServer.getPidAndWriteToFile()
     UdpServer.loop()

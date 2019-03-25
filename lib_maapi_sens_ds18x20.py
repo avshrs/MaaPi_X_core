@@ -35,9 +35,21 @@ class DS18X20():
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, id_)
         self.socketServer.runTcpServer( self.host, self.port)
 
-    def getPidAndWriteToFile(self):
-        pid = os.getpid()
-        f = open(f"pid/MaaPi_{self.objectname}.pid", "w")
+        self.pid                = os.getpid()
+        self.writePid(self.pid)
+
+        signal.signal(signal.SIGTERM, self.service_shutdown)
+        signal.signal(signal.SIGINT, self.service_shutdown)
+
+    def service_shutdown(self, signum, frame):
+        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        self.writePid("")
+        #self.socketServer.killServers()
+        raise SystemExit
+
+
+    def writePid(self, pid):
+        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
         f.write(f"{pid}")
         f.close()
 
@@ -91,5 +103,4 @@ class DS18X20():
 if __name__ == "__main__":
     DS18X20_ =  DS18X20(sys.argv[1],sys.argv[2],sys.argv[3] )
     DS18X20_.updateCommandLine()
-    DS18X20_.getPidAndWriteToFile()
     DS18X20_.loop()

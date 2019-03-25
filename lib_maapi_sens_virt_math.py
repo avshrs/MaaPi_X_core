@@ -55,6 +55,8 @@ class MaaPiMath():
         f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
         f.write(f"{pid}")
         f.close()
+
+
     def updateMathTable(self):
         self.maapiMathTable = self.maapiDB.table("maapi_math").columns( 'id',
                                                                         'math_user_id',

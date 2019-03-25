@@ -37,12 +37,23 @@ class BME280I2C():
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
         self.socketServer.runTcpServer(self.host, self.port)
 
-    def getPidAndWriteToFile(self):
-        pid = os.getpid()
-        f = open(f"pid/MaaPi_{self.objectname}.pid", "w")
+       self.pid                = os.getpid()
+        self.writePid(self.pid)
+
+        signal.signal(signal.SIGTERM, self.service_shutdown)
+        signal.signal(signal.SIGINT, self.service_shutdown)
+
+    def service_shutdown(self, signum, frame):
+        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        self.writePid("")
+        #self.socketServer.killServers()
+        raise SystemExit
+
+
+    def writePid(self, pid):
+        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
         f.write(f"{pid}")
         f.close()
-
 
     def checkQueueForReadings(self):
         self.readings.checkQueueForReadings(self.readValues, self.queue)
@@ -89,7 +100,6 @@ class BME280I2C():
 
 if __name__ == "__main__":
     BME280I2C_ =  BME280I2C(sys.argv[1],sys.argv[2],sys.argv[3])
-    BME280I2C_.getPidAndWriteToFile()
     BME280I2C_.loop()
 
 

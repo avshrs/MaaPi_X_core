@@ -26,7 +26,6 @@ import MaaPi_Config                 as Config
 class MaapiWatcher():
     def __init__(self):
         self.objectname         = "Watcher"
-        # objects
         self.queue              = Queue.Queue()
         self.helpers            = Helpers.Helpers()
         self.config              = Config.MaapiVars()
@@ -34,7 +33,7 @@ class MaapiWatcher():
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = self.objectname
-        self.loopInterval       = 5
+        self.loopInterval       = 99
         self.selectorHost       = self.config.selectorHost
         self.selectorPort       = self.config.selectorPort
         self.watcherHost        = self.config.watcherHost
@@ -43,26 +42,29 @@ class MaapiWatcher():
         self.interpreterVer       =f"{sys.executable}"
         self.lastResponce       = dt.now() - timedelta(hours = 1)
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
-        self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
         self.selectorPid        = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
         self.runningSS          =[]
-        self.maapiDB.cleanSocketServerList()
         self.pid                = os.getpid()
+
+        self.maapiDB.cleanSocketServerList()
+        self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
         self.writePid(self.pid)
 
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
-    def service_shutdown(self, signum, frame):
-        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi SocetServer')
-        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
-        payload = self.helpers.pyloadToPicke(99, " ", " ", " ", self.watcherHost,self.watcherPort)
-        for i in self.runningSS:
-            self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
-        self.socketServer.killServers()
-        self.writePid("")
-        raise SystemExit
 
+    def service_shutdown(self, signum, frame):
+        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
+
+        payload = self.helpers.pyloadToPicke(777, " ", " ", " ", self.watcherHost,self.watcherPort)
+        self.writePid("")
+
+        for i in self.runn0ingSS:
+            self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
+        self.maapilogger.log("INFO",f'stoping {self.objectname}')
+        raise SystemExit
 
 
     def writePid(self, pid):
@@ -70,9 +72,11 @@ class MaapiWatcher():
         f.write(f"{pid}")
         f.close()
 
+
     def getRunnigSocketServers(self):
         self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
         self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
+
 
     def startSelectorModule(self):
         try:
@@ -103,10 +107,12 @@ class MaapiWatcher():
         except Exception as e :
             self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
 
+
     def loop(self):
         while True:
             time.sleep(self.loopInterval)
             self.checkSelector()
+
 
 if __name__ == "__main__":
     MaapiW =  MaapiWatcher()
