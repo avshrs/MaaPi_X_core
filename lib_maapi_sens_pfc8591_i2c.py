@@ -31,6 +31,8 @@ class BME280I2C():
         self.timer_2            = dt.now()
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = self.objectname
+        self.pfcTable           = []
+        self.busOptionsTable    = []
         self.readings           = Readings.Readings(self.objectname,self.host, self.port)
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
@@ -58,12 +60,45 @@ class BME280I2C():
         self.readings.checkQueueForReadings(self.readValues, self.queue)
 
 
+    def getTables(self):
+        self.pfcTable = self.maapiDB.table("maapi_pfc8591").get()
+        self.busOptionsTable = self.maapiDB.table("maaapi_bus_options").get()
+        self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
+
+
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         value = 0
         error = 0
-        data=[]
-        for i in range(0,32)
-        data.append(self.bus.write_read_i2c_block_data32(address,int(sensor),int(sensor),accuracy))
+        data  = []
+        out   = []
+        unit_id = devices_db[dev_id]['dev_unit_id']
+        # 20 - V
+        # 21 - A
+        # 19 - W
+        bus_options_addres = self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_options']
+        bus_options_bus_id = self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_id']
+        type
+        for pfc in self.pfcTable:
+            if self.pfcTable[pfc]['pfc_address'] == bus_options_addres and  self.pfcTable[pfc]['pfc_id'] == bus_options_bus_id:
+                address = bus_options_addres
+                sens_nr = bus_options_bus_id
+                ref_volt = self.pfcTable[pfc]['pfc_ref_voltage']
+                middle = self.pfcTable[pfc]['pfc_middle_point']
+                accuracy = self.pfcTable[pfc]['pfc_read_accuracy']
+                toAmper = self.pfcTable[pfc]['pfc_to_amper']
+                to_wats = self.pfcTable[pfc]['pfc_to_wats']
+                to_volts = self.pfcTable[pfc]['pfc_to_volts']
+                data = self.bus.write_read_i2c_block_data32(address,sens_nr,sens_nr,accuracy))
+                for d in data:
+                    out.append(abs(d - middle))
+                value = (max(out)*(ref_volt/255))
+
+                if unit_id = 21:
+                    value = value / toAmper
+                elif unit_id = 19:
+                    value = (value / toAmper) * to_wats
+                elif unit_id = 20:
+                    vzlie = value * to_volts
 
         return value, error
 
