@@ -79,7 +79,9 @@ class PFC8591():
         bus_options_bus_id = self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_id']
         type
         for pfc in self.pfcTable:
+            self.maapilogger.log("INFO",f'check dev {dev_id} |  {self.pfcTable[pfc]['pfc_address']} vs {bus_options_addres} and {self.pfcTable[pfc]['pfc_id']} vs {bus_options_bus_id}')
             if self.pfcTable[pfc]['pfc_address'] == bus_options_addres and  self.pfcTable[pfc]['pfc_id'] == bus_options_bus_id:
+                print ("entered to inf pfc")
                 address = bus_options_addres
                 sens_nr = bus_options_bus_id
                 ref_volt = self.pfcTable[pfc]['pfc_ref_voltage']
