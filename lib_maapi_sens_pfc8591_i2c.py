@@ -75,7 +75,7 @@ class PFC8591():
         # 20 - V
         # 21 - A
         # 19 - W
-        bus_options_addres = self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_options']
+        bus_options_addres = int(self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_options'],16)
         bus_options_bus_id = self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_id']
         type
         for pfc in self.pfcTable:
