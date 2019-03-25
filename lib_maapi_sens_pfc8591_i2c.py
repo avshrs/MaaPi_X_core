@@ -20,10 +20,10 @@ from statistics import median, stdev, mean
 from datetime import datetime as dt
 import subprocess
 
-class BME280I2C():
+class PFC8591():
     def __init__(self,host,port,id_):
         self.queue              = Queue.Queue()
-        self.objectname         = "BH_1750"
+        self.objectname         = "PFC8591"
         self.host               = host
         self.port               = int(port)
         self.maapiCommandLine   = []
@@ -109,8 +109,8 @@ class BME280I2C():
             self.checkQueueForReadings()
 
 if __name__ == "__main__":
-    BME280I2C_ =  BME280I2C(sys.argv[1],sys.argv[2],sys.argv[3])
-    BME280I2C_.loop()
+    PFC8591_ =  PFC8591(sys.argv[1],sys.argv[2],sys.argv[3])
+    PFC8591_.loop()
 
 
 
