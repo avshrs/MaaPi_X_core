@@ -61,7 +61,7 @@ class MaapiWatcher():
         payload = self.helpers.pyloadToPicke(777, " ", " ", " ", self.watcherHost,self.watcherPort)
         self.writePid("")
 
-        for i in self.runn0ingSS:
+        for i in self.runningSS:
             self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
         self.maapilogger.log("INFO",f'stoping {self.objectname}')
         raise SystemExit
