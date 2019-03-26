@@ -37,7 +37,7 @@ class PFC8591():
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
         self.socketServer.runTcpServer(self.host, self.port)
-
+        self.bus                = I2C_MaaPi(1)
         self.pid                = os.getpid()
         self.writePid(self.pid)
 
