@@ -8,7 +8,7 @@
 import psycopg2
 from datetime import datetime as dt, timedelta
 import MaaPi_Config as Config
-import lib_maapi_main_logger          as MaapiLogger
+#import lib_maapi_main_logger          as MaapiLogger
 
 class MaaPiDBConnection():
 
@@ -23,13 +23,14 @@ class MaaPiDBConnection():
         Maapi_dbUser            =self.config.maapiDbUser
         Maapi_dbHost            =self.config.maapiDbHost
         Maapi_dbPasswd          =self.config.maapiDbpass
-        self.maapilogger        = MaapiLogger.Logger()
+        #self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = "DB Connect."
 
         try:
             self.conn = psycopg2.connect("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
         except (Exception, psycopg2.DatabaseError) as error:
-            self.maapilogger.log(1,error)
+        #    self.maapilogger.log(1,error)
+            pass
 
     def __del__(self):
         self.conn.close()
@@ -57,14 +58,14 @@ class MaaPiDBConnection():
 
     def insertRaw(self, where, what):
         string_ = "INSERT INTO {where} VALUES  ({what})".format(where=where, what=",".join(what))
-        #self.maapilogger.log("DEBUG",string_)
+        # self.maapilogger.log("DEBUG",string_)
         x = self.conn.cursor()
         x.execute(f"{string_}")
         self.conn.commit()
 
     def cleanSocketServerList(self):
         string_ = "DELETE FROM maapi_running_socket_servers WHERE ss_port>1"
-        self.maapilogger.log("DEBUG",string_)
+        # self.maapilogger.log("DEBUG",string_)
         x = self.conn.cursor()
         x.execute(f"{string_}")
         self.conn.commit()
@@ -72,7 +73,7 @@ class MaaPiDBConnection():
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
-            self.maapilogger.log("DEBUG",f"Insert  id: {0:<10} DevID: {device_id:<8} Status:{status:<30} \tValue: {insert_value} ")
+            # self.maapilogger.log("DEBUG",f"Insert  id: {0:<10} DevID: {device_id:<8} Status:{status:<30} \tValue: {insert_value} ")
 
             # get values
             x = self.conn.cursor()

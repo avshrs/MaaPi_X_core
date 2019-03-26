@@ -28,8 +28,8 @@ class Logger():
     def __init__(self):
         self.config              = Config.MaapiVars()
         self.maapiLocation      = self.config.maapiLocation
-        self.defaultDebugLevel = 3
-        self.printable = 0
+        self.defaultDebugLevel  = 3
+        self.printable          = 0
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.name = "logger"
         self.levels={ 0:"OFF", 1:"ERROR", 2:"WARN", 3:"INFO", 4:"DEBUG", 5:"ALL",
