@@ -212,6 +212,7 @@ class MaapiSelector():
                 "dev_rom_id",
                 "dev_user_name",
                 "dev_bus_type_id",
+                "dev_bus_options_id",
                 "dev_last_update",
                 "dev_interval",
                 "dev_value",

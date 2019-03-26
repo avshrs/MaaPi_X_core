@@ -76,8 +76,8 @@ class PFC8591():
         # 20 - V
         # 21 - A
         # 19 - W
-        bus_options_addres = int(self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_options'],16)
-        bus_options_bus_id = self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_id']
+        bus_options_addres = int(self.busOptionsTable[devices_db[dev_id]['dev_bus_options_id']]['bus_options'],16)
+        bus_options_bus_id = self.busOptionsTable[devices_db[dev_id]['dev_bus_options_id']]['bus_id']
         for pfc in self.pfcTable:
             self.maapilogger.log("INFO",f"check dev {dev_id} |  {self.pfcTable[pfc]['pfc_address']} vs {bus_options_addres} and {self.pfcTable[pfc]['pfc_id']} vs {bus_options_bus_id}")
             if self.pfcTable[pfc]['pfc_address'] == bus_options_addres and  self.pfcTable[pfc]['pfc_id'] == bus_options_bus_id:
