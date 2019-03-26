@@ -47,8 +47,9 @@ class Logger():
     def log(self, level, msg):
         if  self.levels[level] in self.levelsPrior[self.defaultDebugLevel]:
             time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
-
-            self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg}'", f"'{self.maapiLocation}'"))
+            msg_ = msg.replace("'","")
+            #msg = msg_.replace()
+            self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg_}'", f"'{self.maapiLocation}'"))
 
             if self.printable == 1:
                 print(f"MaaPi  |  {self.name:<17}  |  {self.levels[level]:^6}  |  {time:<16}  |  {msg}")
