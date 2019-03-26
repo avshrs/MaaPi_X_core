@@ -63,7 +63,7 @@ class LinuxCmd():
         a = Astral()
         location = a['Warsaw'] # finaly data from DB conf table
         timezone = location.timezone
-        moon = location.moon_phase(date=datetime.now())
+        moon = location.moon_phase(date=dt.now())
 
         value = round(float(moon) / 14 * 100,0)+(moon/100)+0.001
         if value > 100:
