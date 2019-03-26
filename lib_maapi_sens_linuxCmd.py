@@ -49,7 +49,7 @@ class LinuxCmd():
 
 
     def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
+        f = open(f"pid/MaaPi_{self.objectname}.sens.pid", "w")
         f.write(f"{pid}")
         f.close()
 

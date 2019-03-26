@@ -36,38 +36,40 @@ class SocketServer():
 
 
     def startServerTCP(self, host, port):
-        self.maapilogger.log("DEBUG",f"Adding {self.objectname} Socket to dataBase - Active Sockets List")
-        self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()"))
         try:
-            self.sockTCP.bind((host, port))
-        except:
-            self.sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.sockTCP.bind((host, port))
-        self.sockTCP.listen(10000)
-        self.maapilogger.log("INFO",self.sockTCP)
+            self.maapilogger.log("DEBUG",f"Adding {self.objectname} Socket to dataBase - Active Sockets List")
+            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()"))
+            try:
+                self.sockTCP.bind((host, port))
+            except:
+                self.sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                self.sockTCP.bind((host, port))
+            self.sockTCP.listen(10000)
+            self.maapilogger.log("INFO",self.sockTCP)
 
-        while True:
-            client, address = self.sockTCP.accept()
-            with client:
-                while True:
-                    data = client.recv(200000)
-                    if not data:
-                        break
-                    payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
+            while True:
+                client, address = self.sockTCP.accept()
+                with client:
+                    while True:
+                        data = client.recv(200000)
+                        if not data:
+                            break
+                        payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
 
-                    if payload_id == 0 :
-                        client.send(bytes(0xff))
+                        if payload_id == 0 :
+                            client.send(bytes(0xff))
 
-                    elif payload_id == 777 :
-                        self.maapilogger.log("INFO",f"Get Slef Kill instruction via Socket")
-                        self.sockTCP.close()
-                        self.writePid(" ")
-                        raise SystemExit
+                        elif payload_id == 777 :
+                            self.maapilogger.log("INFO",f"Get Slef Kill instruction via Socket")
+                            self.sockTCP.close()
+                            self.writePid(" ")
+                            raise SystemExit
 
-                    else:
-                        self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
-                        self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
-
+                        else:
+                            self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
+                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+        except Exception() as e:
+            self.maapilogger.log("ERROR", f"Exception in startServerTCP {self.objectname}: {e}")
 
     def startServerUDP(self, host, port):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sockUDP:

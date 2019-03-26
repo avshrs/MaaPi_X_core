@@ -52,7 +52,7 @@ class PFC8591():
 
 
     def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
+        f = open(f"pid/MaaPi_{self.objectname}.sens.pid", "w")
         f.write(f"{pid}")
         f.close()
 
@@ -63,10 +63,11 @@ class PFC8591():
     def getTables(self):
         self.pfcTable = self.maapiDB.table("maapi_pfc8591").get()
         self.busOptionsTable = self.maapiDB.table("maaapi_bus_options").get()
-        self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
+        self.maapilogger.log("INFO","Update pfcTable and busOptionsTable from database")
 
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
+        self.maapilogger.log("INFO",f"Reading Values ")
         value = 0
         error = 0
         data  = []
@@ -77,7 +78,6 @@ class PFC8591():
         # 19 - W
         bus_options_addres = int(self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_options'],16)
         bus_options_bus_id = self.busOptionsTable[devices_db[dev_id]['dev_bus_options']]['bus_id']
-        type
         for pfc in self.pfcTable:
             self.maapilogger.log("INFO",f"check dev {dev_id} |  {self.pfcTable[pfc]['pfc_address']} vs {bus_options_addres} and {self.pfcTable[pfc]['pfc_id']} vs {bus_options_bus_id}")
             if self.pfcTable[pfc]['pfc_address'] == bus_options_addres and  self.pfcTable[pfc]['pfc_id'] == bus_options_bus_id:
