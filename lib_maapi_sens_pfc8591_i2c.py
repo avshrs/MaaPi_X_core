@@ -45,7 +45,7 @@ class PFC8591():
         signal.signal(signal.SIGINT, self.service_shutdown)
 
     def service_shutdown(self, signum, frame):
-        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        self.maapilogger.log("DEBUG",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
         self.writePid("")
         #self.socketServer.killServers()
         raise SystemExit
@@ -99,7 +99,7 @@ class PFC8591():
                 elif unit_id == 19:
                     value = (value / toAmper) * to_wats
                 elif unit_id == 20:
-                    vzlie = value * to_volts
+                    value = value * to_volts
 
         return value, error
 
