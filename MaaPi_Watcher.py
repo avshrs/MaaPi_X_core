@@ -33,7 +33,7 @@ class MaapiWatcher():
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = self.objectname
-        self.loopInterval       = 99
+        self.loopInterval       = 5
         self.selectorHost       = self.config.selectorHost
         self.selectorPort       = self.config.selectorPort
         self.watcherHost        = self.config.watcherHost
