@@ -6,7 +6,7 @@
 #
 ##############################################################
 
-import socket, sys, os, signal
+import socket, sys, os, signal, time
 import lib_maapi_main_helpers        as Helpers
 import lib_maapi_main_logger         as MaapiLogger
 import lib_maapi_main_dbORM          as Db_connection
@@ -25,7 +25,7 @@ class SocketServer():
         self.threads            = {}
         self.pid                = os.getpid()
         self.sockTCP            = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+        self.selfkill = False
         self.writePid(self.pid)
 
 
@@ -62,7 +62,9 @@ class SocketServer():
                         elif payload_id == 777 :
                             self.maapilogger.log("INFO",f"Get Slef Kill instruction via Socket")
                             self.sockTCP.close()
+                            self.selfkill= True
                             self.writePid(" ")
+                            time.sleep(0.2)
                             raise SystemExit
 
                         else:
@@ -82,7 +84,10 @@ class SocketServer():
                     break
                 self.maapilogger.log("DEBUG",f"Udp data decoded {data.decode('utf-8')}")
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
-
+                if self.selfkill:
+                     self.sockUDP.close()
+                     time.sleep(0.2)
+                     raise SystemExit
                 if data:
                     if int(payload_id) == 99:
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
