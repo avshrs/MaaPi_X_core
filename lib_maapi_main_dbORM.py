@@ -57,7 +57,7 @@ class MaaPiDBConnection():
 
     def insertRaw(self, where, what):
         string_ = "INSERT INTO {where} VALUES  ({what})".format(where=where, what=",".join(what))
-        self.maapilogger.log("DEBUG",string_)
+        #self.maapilogger.log("DEBUG",string_)
         x = self.conn.cursor()
         x.execute(f"{string_}")
         self.conn.commit()
