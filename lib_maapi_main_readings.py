@@ -10,6 +10,7 @@ import lib_maapi_main_checkDevCond               as CheckDev
 import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_logger                     as MaapiLogger
 import lib_maapi_main_helpers                    as Helpers
+from datetime import datetime as dt
 
 
 class Readings:
@@ -38,9 +39,11 @@ class Readings:
                     self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
 
                     try:
+                        startd = dt.now()
                         value, error = method(nr, dev_id, devices_db, devices_db_rel)
+                        stopd = dt.now()
                         name = devices_db[dev_id]['dev_user_name']
-                        self.maapilogger.log("INFO",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {name:<25} |  Value: {value} ")
+                        self.maapilogger.log("INFO",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {name:<25} |  Value: {value:<15} | inTime: {(stopd-startd).microsecond}")
                         self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
                     except EnvironmentError as e:
                         value = 0
