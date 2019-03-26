@@ -71,6 +71,14 @@ class MaaPiDBConnection():
         self.conn.commit()
 
 
+    def clean_logs(self):
+        string_ = "DELETE FROM maapi_logs WHERE log_timestamp < NOW() - INTERVAL '1 days'"
+        # self.maapilogger.log("DEBUG",string_)
+        x = self.conn.cursor()
+        x.execute(f"{string_}")
+        self.conn.commit()
+
+
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
             # self.maapilogger.log("DEBUG",f"Insert  id: {0:<10} DevID: {device_id:<8} Status:{status:<30} \tValue: {insert_value} ")

@@ -29,7 +29,7 @@ class Logger():
         self.config              = Config.MaapiVars()
         self.maapiLocation      = self.config.maapiLocation
         self.defaultDebugLevel  = 3
-        self.printable          = 0
+        self.printable          = 1
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.name = "logger"
         self.levels={ 0:"OFF", 1:"ERROR", 2:"WARN", 3:"INFO", 4:"DEBUG", 5:"ALL",
@@ -46,10 +46,12 @@ class Logger():
 
     def log(self, level, msg):
         if  self.levels[level] in self.levelsPrior[self.defaultDebugLevel]:
+
             time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
             msg_ = str(msg).replace("'","")
-            #msg = msg_.replace()
+
             self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg_}'", f"'{self.maapiLocation}'"))
+            self.maapiDB.clean_logs()
 
             if self.printable == 1:
                 print(f"MaaPi  |  {self.name:<17}  |  {self.levels[level]:^6}  |  {time:<16}  |  {msg}")

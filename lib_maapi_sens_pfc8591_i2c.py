@@ -63,11 +63,11 @@ class PFC8591():
     def getTables(self):
         self.pfcTable = self.maapiDB.table("maapi_pfc8591").get()
         self.busOptionsTable = self.maapiDB.table("maaapi_bus_options").get()
-        self.maapilogger.log("INFO","Update pfcTable and busOptionsTable from database")
+        self.maapilogger.log("DEBUG","Update pfcTable and busOptionsTable from database")
 
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
-        self.maapilogger.log("INFO",f"Reading Values ")
+        self.maapilogger.log("DEBUG",f"Reading Values ")
         value = 0
         error = 0
         data  = []
