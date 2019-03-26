@@ -88,6 +88,7 @@ class BME280I2C():
 
         bus = I2C_MaaPi(1)  # Rev 2 Pi uses 1
         data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,32)
+        data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,32)
         value = (data[1] + (256 * data[0])) / 1.2
 
         return value, error

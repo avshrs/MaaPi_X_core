@@ -89,9 +89,14 @@ class PFC8591():
                 toAmper = self.pfcTable[pfc]['pfc_to_amper']
                 to_wats = self.pfcTable[pfc]['pfc_to_wats']
                 to_volts = self.pfcTable[pfc]['pfc_to_volts']
+                adjust = self.pfcTable[pfc]['pfc_adjust']
+                max_filter = self.pfcTable[pfc]['pfc_max_filter']
+
+
                 data = self.bus.write_read_i2c_block_data32(address,sens_nr,sens_nr,accuracy)
                 for d in data:
-                    out.append(abs(d - middle))
+                    if d < max_filter:
+                        out.append((abs(d - middle)+adjust))
                 value = (max(out)*(ref_volt/255))
 
                 if unit_id == 21:
