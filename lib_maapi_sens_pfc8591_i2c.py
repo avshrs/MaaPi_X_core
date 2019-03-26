@@ -107,11 +107,15 @@ class PFC8591():
 
     def loop(self):
         while True:
+            if (dt.now() - self.timer_1).seconds >= 10:
+                self.timer_1 = dt.now()
+                self.getTables()
             time.sleep(0.01)
             self.checkQueueForReadings()
 
 if __name__ == "__main__":
     PFC8591_ =  PFC8591(sys.argv[1],sys.argv[2],sys.argv[3])
+    PFC8591_.getTables()
     PFC8591_.loop()
 
 
