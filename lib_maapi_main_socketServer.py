@@ -32,7 +32,7 @@ class SocketServer():
         self.sockTCP            = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.selfkill = False
         self.board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
-        self.board_id = 99
+        self.board_id = 77
         for i in self.board_location:
             if self.board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = self.board_location[i]["id"]
@@ -89,14 +89,13 @@ class SocketServer():
                 self.maapilogger.log("DEBUG",f"Udp data decoded {data.decode('utf-8')}")
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
 
-
                 if data:
                     if int(payload_id) == 99:
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
 
 
     def runTcpServer(self, host, port):
-        self.maapilogger.log("INFO","{0} Run TCP Server".format(self.objectname ))
+        self.maapilogger.log("INFO","{0} Run TCP Server".format(self.objectname))
         self.threads["TCP"] = Thread(target=self.startServerTCP,args=(host, port))
         self.threads["TCP"].start()
 
