@@ -86,7 +86,7 @@ class PFC8591():
 
                 data = self.bus.write_read_i2c_block_data32(bus_options_addres,bus_options_bus_id,bus_options_bus_id,accuracy)
                 data.sort(reverse = True)
-
+                out=[]
                 for d in data[:int(len(data)/3)]:
                     if d < max_filter:
                         dd = (abs(d - middle)+adjust)
