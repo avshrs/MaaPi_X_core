@@ -10,28 +10,39 @@ import socket, sys, os, signal, time
 import lib_maapi_main_helpers        as Helpers
 import lib_maapi_main_logger         as MaapiLogger
 import lib_maapi_main_dbORM          as Db_connection
+import MaaPi_Config                   as Config
+
 from datetime import datetime        as dt
 from threading import Lock, Thread
 
 class SocketServer():
     def __init__(self, objectname, queue, object_id):
         self.objectname         = objectname
+        self.config              = Config.MaapiVars()
         self.helpers            = Helpers.Helpers()
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = f"{self.objectname }Sock."
         self.object_id          = object_id
         self.maapiDB            = Db_connection.MaaPiDBConnection()
+        self.maapiLocation      = self.config.maapiLocation
+
         self.queue              = queue
         self.threads            = {}
         self.pid                = os.getpid()
         self.sockTCP            = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.selfkill = False
+        self.board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
+        self.board_id = 99
+        for i in self.board_location:
+            if self.board_location[i]["ml_location"] == self.maapiLocation:
+                self.board_id = self.board_location[i]["id"]
 
 
     def startServerTCP(self, host, port):
         try:
             self.maapilogger.log("DEBUG",f"Adding {self.objectname} Socket to dataBase - Active Sockets List")
-            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()"))
+            pid = os.getpid()
+            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id}"))
             try:
                 self.sockTCP.bind((host, port))
             except:
@@ -58,6 +69,7 @@ class SocketServer():
                             self.sockTCP.close()
                             self.joining()
                             self.selfkill= True
+
 
                         else:
                             self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")

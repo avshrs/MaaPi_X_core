@@ -56,14 +56,19 @@ class MaapiWatcher():
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
-
-
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        #self.maapiDB.cleanSocketServerList(self.board_id)
+        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").filters_eq(ss_board_id = self.board_id).get()
+        self.maapiDB.cleanSocketServerList(self.board_id)
+
+        payload = self.helpers.pyloadToPicke(777, " ", " ", " ", self.watcherHost,self.watcherPort)
         self.writePid("")
-        time.sleep(1)
+        for i in self.runningSS:
+            self.maapilogger.log("INFO",f"stoping {self.runningSS[i]['ss_host']} {self.runningSS[i]['ss_port']} ")
+            self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
+        self.maapilogger.log("INFO",f'stoping {self.objectname}')
         raise SystemExit
+
 
     def writePid(self, pid):
         f = open(f"pid/MaaPi_{self.objectname}.pid", "w")
@@ -72,22 +77,12 @@ class MaapiWatcher():
 
     def updateBoardLocation(self):
         board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
-
         for i in board_location:
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
-        self.maapiDB.cleanSocketServerList(self.board_id)
 
-    def service_shutdown(self, signum, frame):
-        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
+        #self.maapiDB.cleanSocketServerList(self.board_id)
 
-        payload = self.helpers.pyloadToPicke(777, " ", " ", " ", self.watcherHost,self.watcherPort)
-        self.writePid("")
-        for i in self.runningSS:
-            self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
-        self.maapilogger.log("INFO",f'stoping {self.objectname}')
-        raise SystemExit
 
 
     def getRunnigSocketServers(self):

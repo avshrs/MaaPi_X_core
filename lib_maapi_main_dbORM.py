@@ -23,13 +23,10 @@ class MaaPiDBConnection():
         Maapi_dbUser            =self.config.maapiDbUser
         Maapi_dbHost            =self.config.maapiDbHost
         Maapi_dbPasswd          =self.config.maapiDbpass
-        #self.maapilogger        = MaapiLogger.Logger()
-        # self.maapilogger.name   = "DB Connect."
 
         try:
             self.conn = psycopg2.connect("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
         except (Exception, psycopg2.DatabaseError) as error:
-        #    self.maapilogger.log(1,error)
             pass
 
     def __del__(self):
@@ -58,19 +55,17 @@ class MaaPiDBConnection():
 
     def insertRaw(self, where, what):
         string_ = "INSERT INTO {where} VALUES  ({what})".format(where=where, what=",".join(what))
-        # self.maapilogger.log("DEBUG",string_)
         x = self.conn.cursor()
         x.execute(f"{string_}")
         self.conn.commit()
 
     def cleanSocketServerList(self,board_id):
         string_ = f"DELETE FROM maapi_running_socket_servers WHERE ss_board_id={board_id}"
-        # self.maapilogger.log("DEBUG",string_)
         x = self.conn.cursor()
         x.execute(f"{string_}")
         self.conn.commit()
+
         string_ = f"DELETE FROM maapi_running_py_scripts WHERE py_board_id={board_id}"
-        # self.maapilogger.log("DEBUG",string_)
         x = self.conn.cursor()
         x.execute(f"{string_}")
         self.conn.commit()
@@ -78,7 +73,6 @@ class MaaPiDBConnection():
 
     def clean_logs(self):
         string_ = "DELETE FROM maapi_logs WHERE log_timestamp < NOW() - INTERVAL '1 days'"
-        # self.maapilogger.log("DEBUG",string_)
         x = self.conn.cursor()
         x.execute(f"{string_}")
         self.conn.commit()
@@ -86,9 +80,6 @@ class MaaPiDBConnection():
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
-            # self.maapilogger.log("DEBUG",f"Insert  id: {0:<10} DevID: {device_id:<8} Status:{status:<30} \tValue: {insert_value} ")
-
-            # get values
             x = self.conn.cursor()
             x.execute("SELECT dev_value, dev_rom_id, dev_collect_values_to_db "
                       "FROM devices "
@@ -109,7 +100,6 @@ class MaaPiDBConnection():
                             "SET dev_value={0}, dev_interval_queue = {2}, dev_last_update=NOW(), dev_read_error='ok' "
                             "WHERE dev_id='{1}' and dev_status=True".format((1 if insert_value==True else (0 if insert_value==False else insert_value)),device_id,False))
                 self.conn.commit()
-                # if collcect to db
                 if devices_data[2]:
                     x.execute("INSERT INTO maapi_dev_rom_{0}_values "
                                 "VALUES (default,{1},default,{2})".format(devices_data[1].replace("-", "_"), device_id,(1 if insert_value==True else (0 if insert_value==False else insert_value))))
