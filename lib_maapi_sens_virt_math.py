@@ -16,10 +16,7 @@ import lib_maapi_main_dbORM                      as Db_connection
 import lib_maapi_main_readings                   as Readings
 import time, copy, sys, os, signal
 
-
 from datetime import datetime as dt
-
-import subprocess
 
 
 class MaaPiMath():
@@ -36,6 +33,7 @@ class MaaPiMath():
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.readings           = Readings.Readings(self.objectname,self.host, self.port)
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
+
         self.socketServer.runTcpServer(self.host, self.port)
 
         self.pid                = os.getpid()
@@ -47,7 +45,6 @@ class MaaPiMath():
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
         self.writePid("")
-        #self.socketServer.killServers()
         raise SystemExit
 
 
