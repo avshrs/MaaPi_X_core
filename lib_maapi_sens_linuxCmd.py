@@ -47,7 +47,6 @@ class LinuxCmd():
         raise SystemExit
 
 
-
     def updateCommandLine(self):
         self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()
         self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
