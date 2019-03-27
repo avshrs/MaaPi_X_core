@@ -1,4 +1,13 @@
 maapiWatcher="MaaPi_Watcher.py"
-interpreter="python3.6"
+interpreter="python3.7"
 
-nohup python3.6 MaaPi_Watcher.py > log/Maapi_console.log 2>&1 & echo $! > pid/MaaPi_wacher_sh.pid
+pid=$(cat pid/MaaPi_Watcher.pid)
+
+if ! kill -0 $pid > /dev/null 2>&1; then
+    echo "Starting MaaPi_Watcher"
+    nohup $interpreter $maapiWatcher > log/MaaPi_Watcher.log 2>&1 & echo $!
+    # nohup $interpreter $maapiWatcher > log/MaaPi_Watcher.log 2>&1 & echo $!
+
+else
+    echo "MaaPi_Watcher Running"
+fi

@@ -37,24 +37,17 @@ class UdpServer():
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, id_)
         self.socketServer.runTcpServer(self.host, self.tcpPort)
         self.socketServer.runUdpServer(self.host, self.udpPort )
-
         self.pid                = os.getpid()
-        self.writePid(self.pid)
 
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        self.writePid("")
         #self.socketServer.killServers()
         raise SystemExit
 
 
-    def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.sens.pid", "w")
-        f.write(f"{pid}")
-        f.close()
 
     def checkQueueForReadings(self):
         try:

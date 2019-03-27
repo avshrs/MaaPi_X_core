@@ -33,25 +33,15 @@ class MaaPiMath():
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.readings           = Readings.Readings(self.objectname,self.host, self.port)
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
-
         self.socketServer.runTcpServer(self.host, self.port)
-
         self.pid                = os.getpid()
-        self.writePid(self.pid)
 
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        self.writePid("")
         raise SystemExit
-
-
-    def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.sens.pid", "w")
-        f.write(f"{pid}")
-        f.close()
 
 
     def updateMathTable(self):

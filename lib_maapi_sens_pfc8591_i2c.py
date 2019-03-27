@@ -39,23 +39,16 @@ class PFC8591():
         self.socketServer.runTcpServer(self.host, self.port)
         self.bus                = I2C_MaaPi(1)
         self.pid                = os.getpid()
-        self.writePid(self.pid)
 
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("DEBUG",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        self.writePid("")
         raise SystemExit
 
 
-    def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.sens.pid", "w")
-        f.write(f"{pid}")
-        f.close()
-
-    def checkQueueForReadings(self):
+      def checkQueueForReadings(self):
         self.readings.checkQueueForReadings(self.readValues, self.queue)
 
 

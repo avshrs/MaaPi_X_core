@@ -13,6 +13,7 @@ class Helpers:
             "readFromDev_id" : 10,
             "readFromDev_rom_id" : 11,
             "recive_from_UDP" : 99,
+            "slef_kill" : 777,
         }
 
     def pyloadToPicke(self, message_id, payload, payload2, payload3, fromHost, fromPort):

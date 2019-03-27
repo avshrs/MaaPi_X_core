@@ -51,6 +51,7 @@ class Readings:
                         self.maapilogger.log("ERROR",f"Error while reading values: {e}")
                         self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
 
+
         except EnvironmentError as e :
             self.maapilogger.log("ERROR",f"checkQueueForReadings{e}")
 

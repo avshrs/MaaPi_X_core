@@ -26,13 +26,6 @@ class SocketServer():
         self.pid                = os.getpid()
         self.sockTCP            = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.selfkill = False
-        self.writePid(self.pid)
-
-
-    def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
-        f.write(f"{pid}")
-        f.close()
 
 
     def startServerTCP(self, host, port):
@@ -47,10 +40,10 @@ class SocketServer():
             self.sockTCP.listen(10000)
             self.maapilogger.log("INFO",self.sockTCP)
 
-            while True:
+            while True and not self.selfkill:
                 client, address = self.sockTCP.accept()
                 with client:
-                    while True:
+                    while True and not self.selfkill:
                         data = client.recv(200000)
                         if not data:
                             break
@@ -60,12 +53,11 @@ class SocketServer():
                             client.send(bytes(0xff))
 
                         elif payload_id == 777 :
+                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
                             self.maapilogger.log("INFO",f"Get Slef Kill instruction via Socket")
                             self.sockTCP.close()
+                            self.joining()
                             self.selfkill= True
-                            self.writePid(" ")
-                            time.sleep(0.2)
-                            raise SystemExit
 
                         else:
                             self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
@@ -78,16 +70,14 @@ class SocketServer():
             sockUDP.bind((host, port))
             self.maapilogger.log("INFO",sockUDP)
 
-            while True:
+            while True and not self.selfkill:
                 data, address = sockUDP.recvfrom(4096)
                 if not data:
                     break
                 self.maapilogger.log("DEBUG",f"Udp data decoded {data.decode('utf-8')}")
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
-                if self.selfkill:
-                     self.sockUDP.close()
-                     time.sleep(0.2)
-                     raise SystemExit
+
+
                 if data:
                     if int(payload_id) == 99:
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
@@ -104,3 +94,14 @@ class SocketServer():
         self.threads["UDP"] = Thread(target=self.startServerUDP, args=(host, port))
         self.threads["UDP"].start()
 
+    def joining(self):
+        try:
+            self.threads["TCP"].join()
+            self.maapilogger.log("INFO","socket TCP -  join thread")
+        except:
+            pass
+        try:
+            self.threads["UDP"].join()
+            self.maapilogger.log("INFO","socket UTP -  join thread")
+        except:
+            pass

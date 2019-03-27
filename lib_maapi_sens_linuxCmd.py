@@ -36,22 +36,17 @@ class LinuxCmd():
         self.socketServer.runTcpServer(self.host, self.port)
 
         self.pid                = os.getpid()
-        self.writePid(self.pid)
+
 
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        self.writePid("")
-        #self.socketServer.killServers()
+        time.sleep(1)
         raise SystemExit
 
 
-    def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.sens.pid", "w")
-        f.write(f"{pid}")
-        f.close()
 
     def updateCommandLine(self):
         self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()

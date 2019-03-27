@@ -51,26 +51,16 @@ class MaapiSelector():
         self.maapilogger.log("INFO","Initialising Selector Module ")
         self.skippDev           = []
         self.pid                = os.getpid()
-        self.writePid(self.pid)
 
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
-
     def service_shutdown(self, signum, frame):
-        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi { self.objectname }')
-        # self.socketServer.killServers()
-        time.sleep(1)
-        # for p in self.libraryPID:
-            # self.libraryPID[p]["pid"].kill()
-        self.writePid("")
+        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        #self.socketServer.killServers()
         raise SystemExit
 
 
-    def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.socket.pid", "w")
-        f.write(f"{pid}")
-        f.close()
 
 
     def startAllLibraryDeamon(self):
@@ -114,7 +104,7 @@ class MaapiSelector():
                 lists.append(f"{self.selectorHost}")                                            # host
                 lists.append(f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}")      # port selector port + library unique index
                 lists.append(f"{self.libraryList[lib]['id']}")                                  # library index
-
+                file_=f"{self.libraryList[lib]['device_lib_name']}.py"
                 pid = subprocess.Popen(lists)
                 name = self.libraryList[lib]['device_lib_name']
                 host = self.selectorHost
@@ -128,6 +118,12 @@ class MaapiSelector():
                             "lastResponce":dt.now()
                             }
                 self.maapilogger.log("INFO", f"Lib:{self.libraryPID[lib]['name']} pid:{self.libraryPID[lib]['pid']}")
+                self.maapiDB.insertRaw("maapi_running_py_scripts", ("default",
+                                                                    f"'{name}'",
+                                                                    f"'{file_}'",
+                                                                    "now()",
+                                                                    f"{self.board_id}",
+                                                                    f"{pid.pid}" ))
 
         except Exception as e :
             self.maapilogger.log("ERROR", "Exception: startLibraryDeamon() {exc}".format(exc = e))

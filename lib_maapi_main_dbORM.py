@@ -64,7 +64,12 @@ class MaaPiDBConnection():
         self.conn.commit()
 
     def cleanSocketServerList(self):
-        string_ = "DELETE FROM maapi_running_socket_servers WHERE ss_port>1"
+        string_ = "DELETE FROM maapi_running_socket_servers WHERE ss_port>0"
+        # self.maapilogger.log("DEBUG",string_)
+        x = self.conn.cursor()
+        x.execute(f"{string_}")
+        self.conn.commit()
+        string_ = "DELETE FROM maapi_running_py_scripts WHERE py_pid>0"
         # self.maapilogger.log("DEBUG",string_)
         x = self.conn.cursor()
         x.execute(f"{string_}")
