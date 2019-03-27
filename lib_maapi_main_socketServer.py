@@ -64,13 +64,11 @@ class SocketServer():
                             client.send(bytes(0xff))
 
                         elif payload_id == 777 :
-                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+
                             self.maapilogger.log("INFO",f"Get Slef Kill instruction via Socket")
                             self.sockTCP.close()
                             self.joining()
-                            self.selfkill= True
-
-
+                            self.selfkill = True
                         else:
                             self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
                             self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
