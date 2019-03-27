@@ -48,7 +48,7 @@ class PFC8591():
         raise SystemExit
 
 
-      def checkQueueForReadings(self):
+    def checkQueueForReadings(self):
         self.readings.checkQueueForReadings(self.readValues, self.queue)
 
 
