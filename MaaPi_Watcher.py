@@ -43,7 +43,7 @@ class MaapiWatcher():
         self.maapiLocation      = self.config.maapiLocation
         self.interpreterVer     = f"{sys.executable}"
         self.lastResponce       = dt.now() - timedelta(hours = 1)
-        self.maapiDB.cleanSocketServerList()
+
 
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
         self.runningSS          = []
@@ -56,11 +56,11 @@ class MaapiWatcher():
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
-        signal.signal(signal.SIGSEGV, self.service_shutdown)
 
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        #self.maapiDB.cleanSocketServerList(self.board_id)
         self.writePid("")
         time.sleep(1)
         raise SystemExit
@@ -76,6 +76,7 @@ class MaapiWatcher():
         for i in board_location:
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
+        self.maapiDB.cleanSocketServerList(self.board_id)
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
