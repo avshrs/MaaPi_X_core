@@ -117,7 +117,7 @@ class MaapiSelector():
                             "port" : port,
                             "lastResponce":dt.now()
                             }
-                self.maapilogger.log("INFO", f"Lib:{self.libraryPID[lib]['name']} pid:{self.libraryPID[lib]['pid']}")
+                self.maapilogger.log("INFO", f"Lib:{self.libraryPID[lib]['name']} pid:{self.libraryPID[lib]['pid'].pid}")
                 self.maapiDB.insertRaw("maapi_running_py_scripts", ("default",
                                                                     f"'{name}'",
                                                                     f"'{file_}'",
