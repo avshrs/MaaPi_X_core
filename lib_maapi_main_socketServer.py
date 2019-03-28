@@ -89,8 +89,6 @@ class SocketServer():
                 if not data:
                     break
 
-                self.maapilogger.log("DEBUG",f"Udp data decoded {data.decode('utf-8')}")
-                print( data)
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
                 if data:
                     if int(payload_id) == 99:
