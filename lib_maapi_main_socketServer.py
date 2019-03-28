@@ -90,16 +90,15 @@ class SocketServer():
                     break
 
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
-                if data:
-                    if int(payload_id) == 99:
-                        self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
+                if int(payload_id) == 99:
+                    self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
 
-                    elif int(payload_id) == 777 :
-                        self.maapilogger.log("INFO",f"Get Slef Kill instruction via SocketUDP")
-                        self.sockUDP.close()
-                        self.joiningUDP()
-                    else:
-                        self.maapilogger.log("INFO",f"Get unknown packet via udp")
+                elif int(payload_id) == 777 :
+                    self.maapilogger.log("INFO",f"Get Slef Kill instruction via SocketUDP")
+                    self.sockUDP.close()
+                    self.joiningUDP()
+                else:
+                    self.maapilogger.log("INFO",f"Get unknown packet via udp")
 
         except Exception as e:
             self.maapilogger.log("ERROR", f"Exception in startServerUDP {self.objectname}: {e}")
