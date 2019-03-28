@@ -43,7 +43,7 @@ class MaapiWatcher():
         self.maapiLocation      = self.config.maapiLocation
         self.interpreterVer     = f"{sys.executable}"
         self.lastResponce       = dt.now() - timedelta(hours = 1)
-
+        self.sendingQueryToSocket = 0
 
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
         self.runningSS          = []
@@ -93,7 +93,7 @@ class MaapiWatcher():
             self.maapilogger.log("INFO", f"Killing Selector - {self.selectorPid.pid}")
             self.selectorPid.kill()
         except Exception as e:
-            self.maapilogger.log("ERROR", e)
+            self.maapilogger.log("ERROR", f"startSelectorModule() {e}")
         finally:
             self.selectorPid = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
             self.maapilogger.log("INFO", f"Sterting Selector PID: {self.selectorPid.pid}")
@@ -108,7 +108,10 @@ class MaapiWatcher():
     def checkSelector(self):
         try:
             if (dt.now() - self.lastResponce).seconds > 5:
-                self.maapilogger.log("INFO", f"Sending query to Selector: is ok? {self.selectorHost}, {self.selectorPort}")
+                if self.sendingQueryToSocket > 10:
+                    self.maapilogger.log("INFO", f"Sending query to Selector: is ok? {self.selectorHost}, {self.selectorPort}")
+                    self.sendingQueryToSocket = 0
+                self.sendingQueryToSocket += 1
                 payload = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
                 try:
                     recive =  self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, payload)
@@ -122,7 +125,7 @@ class MaapiWatcher():
                     else:
                         self.startSelectorModule()
         except Exception as e :
-            self.maapilogger.log("ERROR", "error: {exc}".format(exc = e))
+            self.maapilogger.log("ERROR", "checkSelector() error: {exc}".format(exc = e))
 
 
     def loop(self):

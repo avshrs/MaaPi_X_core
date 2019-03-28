@@ -51,7 +51,7 @@ class MaapiSelector():
         self.maapilogger.log("INFO","Initialising Selector Module ")
         self.skippDev           = []
         self.pid                = os.getpid()
-
+        self.sendingQueryToSocket = 0
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
@@ -68,7 +68,7 @@ class MaapiSelector():
             try:
                 self.startLibraryDeamon(lib)
             except Exception as e :
-                self.maapilogger.log("Exception", "Error: startlibraryDeamon() {exc}".format(exc = e))
+                self.maapilogger.log("ERROR", "Error: startlibraryDeamon() {exc}".format(exc = e))
 
 
     def stopLibraryDeamon(self, lib_id):
@@ -80,10 +80,10 @@ class MaapiSelector():
                     del self.libraryPID[lib_id]
 
                 except Exception as e:
-                    self.maapilogger.log("Exception", "Error: stoplibraryDeamon() pid not exist in libraryPID{exc}".format(exc = e))
+                    self.maapilogger.log("ERROR", "Error: stoplibraryDeamon() pid not exist in libraryPID{exc}".format(exc = e))
 
         except Exception as e:
-            self.maapilogger.log("Exception", f"library {lib_id} not exist in library libraryPID ")
+            self.maapilogger.log("ERROR", f"library {lib_id} not exist in library libraryPID ")
 
 
 
@@ -127,7 +127,7 @@ class MaapiSelector():
             self.stopLibraryDeamon(lib_id)
             self.startLibraryDeamon(lib_id)
         except Exception as e:
-            self.maapilogger.log("Exception", "Error: restartLibraryDeamon() {exc}".format(exc = e))
+            self.maapilogger.log("ERROR", "Error: restartLibraryDeamon() {exc}".format(exc = e))
 
     def checkLibraryProcess(self):
         lib_temp = copy.copy(self.libraryPID)
@@ -135,7 +135,8 @@ class MaapiSelector():
             if lib in self.libraryList:
                 try:
                     if (dt.now() - lib_temp[lib]["lastResponce"]).seconds > self.libraryLastResponce:
-                        self.maapilogger.log("DEBUG", f"Sending query to Selector: is ok? {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
+                        if self.sendingQueryToSocket > 10:
+                            self.maapilogger.log("INFO", f"Sending query to Selector: is ok? {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
 
                         payload = self.helpers.pyloadToPicke(00, " ", " ", " ",self.selectorHost,self.selectorPort)
                         try:
@@ -145,10 +146,13 @@ class MaapiSelector():
                         else:
                             if recive == bytes(0xff):
                                 lib_temp[lib]["lastResponce"] = dt.now()
-                                self.maapilogger.log("DEBUG", "Get responce from selector")
+                                if self.sendingQueryToSocket > 10:
+                                    self.maapilogger.log("INFO", "Get responce from selector")
+                                    self.sendingQueryToSocket = 0
                                 self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{lib_temp[lib]['host']}' and ss_port='{lib_temp[lib]['port']}'")
                             else:
                                 self.restartlibraryDeamon(lib)
+                    self.sendingQueryToSocket += 1
                 except Exception as e :
                     self.maapilogger.log("ERROR", "Exception: checkLibraryProcess() {exc}".format(exc = e))
             else:

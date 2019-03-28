@@ -93,7 +93,7 @@ class SocketServer():
 
 
     def runTcpServer(self, host, port):
-        self.maapilogger.log("INFO","{self.objectname} Run TCP Server")
+        self.maapilogger.log("INFO",f"{self.objectname} Run TCP Server")
         self.threads["TCP"] = Thread(target=self.startServerTCP,args=(host, port))
         self.threads["TCP"].start()
 
