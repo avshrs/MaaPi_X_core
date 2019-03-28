@@ -81,6 +81,11 @@ class SocketServer():
             self.maapilogger.log("INFO",sockUDP)
 
             while True and not self.selfkill:
+                if self.selfkill:
+                    self.sockUDP.close()
+                    self.joining()
+                    time.sleep(1)
+                    raise SystemExit
                 data, address = sockUDP.recvfrom(4096)
                 if not data:
                     break
