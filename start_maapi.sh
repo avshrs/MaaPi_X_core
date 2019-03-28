@@ -1,6 +1,9 @@
 maapiWatcher="MaaPi_Watcher.py"
-interpreter="python3.6"
+interpreter="/usr/local/bin/python3.6"
 
+loc="/home/pi/MaaPi_X_core/"
+
+cd $loc
 pid=$(cat pid/MaaPi_Watcher.pid)
 
 if [ "$1" = "start" ]; then
@@ -13,6 +16,7 @@ if [ "$1" = "start" ]; then
         echo "MaaPi_Watcher Running"
     fi
 fi
+
 if [ "$1" = "stop" ]; then
     kill -15 $pid
     sleep 3
