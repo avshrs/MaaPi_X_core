@@ -62,47 +62,52 @@ class PFC8591():
         self.maapilogger.log("DEBUG",f"Reading Values ")
         value = 0
         error = 0
-        unit_id = devices_db[dev_id]['dev_unit_id']
-        # 20 - V
-        # 21 - A
-        # 19 - W
-        bus_options_addres = int(self.busOptionsTable[devices_db[dev_id]['dev_bus_options_id']]['bus_options'],16)
+        try:
+            unit_id = devices_db[dev_id]['dev_unit_id']
+            # 20 - V
+            # 21 - A
+            # 19 - W
+            bus_options_addres = int(self.busOptionsTable[devices_db[dev_id]['dev_bus_options_id']]['bus_options'],16)
 
-        bus_options_bus_id = self.busOptionsTable[devices_db[dev_id]['dev_bus_options_id']]['bus_id']
+            bus_options_bus_id = self.busOptionsTable[devices_db[dev_id]['dev_bus_options_id']]['bus_id']
 
-        for pfc in self.pfcTable:
-            self.maapilogger.log("DEBUG",f"check dev {dev_id} |  {self.pfcTable[pfc]['pfc_address']} vs {bus_options_addres} and {self.pfcTable[pfc]['pfc_id']} vs {bus_options_bus_id}")
+            for pfc in self.pfcTable:
+                self.maapilogger.log("DEBUG",f"check dev {dev_id} |  {self.pfcTable[pfc]['pfc_address']} vs {bus_options_addres} and {self.pfcTable[pfc]['pfc_id']} vs {bus_options_bus_id}")
 
-            if self.pfcTable[pfc]['pfc_address'] == bus_options_addres and  self.pfcTable[pfc]['pfc_id'] == bus_options_bus_id:
+                if self.pfcTable[pfc]['pfc_address'] == bus_options_addres and  self.pfcTable[pfc]['pfc_id'] == bus_options_bus_id:
 
-                ref_volt = self.pfcTable[pfc]['pfc_ref_voltage']
-                middle = self.pfcTable[pfc]['pfc_middle_point']
-                accuracy = self.pfcTable[pfc]['pfc_read_accuracy']
-                toAmper = self.pfcTable[pfc]['pfc_to_amper']
-                to_wats = self.pfcTable[pfc]['pfc_to_wats']
-                to_volts = self.pfcTable[pfc]['pfc_to_volts']
-                adjust = self.pfcTable[pfc]['pfc_adjust']
-                max_filter = self.pfcTable[pfc]['pfc_max_filter']
+                    ref_volt = self.pfcTable[pfc]['pfc_ref_voltage']
+                    middle = self.pfcTable[pfc]['pfc_middle_point']
+                    accuracy = self.pfcTable[pfc]['pfc_read_accuracy']
+                    toAmper = self.pfcTable[pfc]['pfc_to_amper']
+                    to_wats = self.pfcTable[pfc]['pfc_to_wats']
+                    to_volts = self.pfcTable[pfc]['pfc_to_volts']
+                    adjust = self.pfcTable[pfc]['pfc_adjust']
+                    max_filter = self.pfcTable[pfc]['pfc_max_filter']
 
-                data = self.bus.write_read_i2c_block_data32(bus_options_addres,bus_options_bus_id,bus_options_bus_id,accuracy)
-                data.sort(reverse = True)
-                out=[]
-                for d in data[:int(len(data)/3)]:
-                    if d < max_filter:
-                        dd = (abs(d - middle)+adjust)
-                        if dd < 0:
-                            out.append(0)
-                        else:
-                            out.append(dd)
-                value = (out[3]*(ref_volt/255))
+                    data = self.bus.write_read_i2c_block_data32(bus_options_addres,bus_options_bus_id,bus_options_bus_id,accuracy)
+                    data.sort(reverse = True)
+                    out=[]
+                    for d in data[:int(len(data)/3)]:
+                        if d < max_filter:
+                            dd = (abs(d - middle)+adjust)
+                            if dd < 0:
+                                out.append(0)
+                            else:
+                                out.append(dd)
+                    value = (out[3]*(ref_volt/255))
 
-                if unit_id == 21:
-                    value = value / toAmper
-                elif unit_id == 19:
-                    value = (value / toAmper) * to_wats
-                elif unit_id == 20:
-                    value = value * to_volts
-
+                    if unit_id == 21:
+                        value = value / toAmper
+                    elif unit_id == 19:
+                        value = (value / toAmper) * to_wats
+                    elif unit_id == 20:
+                        value = value * to_volts
+        except Exception as e:
+            return value, 1
+            self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
+        else:
+            return value, error
         return value, error
 
 

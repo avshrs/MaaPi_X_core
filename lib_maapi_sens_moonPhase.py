@@ -52,16 +52,21 @@ class LinuxCmd():
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         value, error = 0, 0
-        a = Astral()
-        location = a['Warsaw'] # finaly data from DB conf table
-        timezone = location.timezone
-        moon = location.moon_phase(date=dt.now())
+        try:
+            a = Astral()
+            location = a['Warsaw'] # finaly data from DB conf table
+            timezone = location.timezone
+            moon = location.moon_phase(date=dt.now())
 
-        value = round(float(moon) / 14 * 100,0)+(moon/100)+0.001
-        if value > 100:
-            value = (200 - value)
+            value = round(float(moon) / 14 * 100,0)+(moon/100)+0.001
+            if value > 100:
+                value = (200 - value)
 
-        return value, error
+        except Exception as e:
+            return value, 1
+            self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
+        else:
+            return value, 0
 
     def loop(self):
         while True:
