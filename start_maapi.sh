@@ -1,5 +1,5 @@
 maapiWatcher="MaaPi_Watcher.py"
-interpreter="python3.7"
+interpreter="python3.6"
 
 pid=$(cat pid/MaaPi_Watcher.pid)
 
@@ -14,5 +14,5 @@ if [ "$1" = "start" ]; then
     fi
 fi
 if [ "$1" = "stop" ]; then
-    kill -9 $pid
+    kill -15 $pid
 fi

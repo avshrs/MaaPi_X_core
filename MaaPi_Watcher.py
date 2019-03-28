@@ -81,8 +81,6 @@ class MaapiWatcher():
             if board_location[i]["ml_location"] == self.maapiLocation:
                 self.board_id = board_location[i]["id"]
 
-        #self.maapiDB.cleanSocketServerList(self.board_id)
-
 
 
     def getRunnigSocketServers(self):

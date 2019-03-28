@@ -65,6 +65,23 @@ class MaaPiDBConnection():
         except EnvironmentError() as e:
             print (e)
 
+    def createTable(self, name, list):
+        try:
+            string_ = f"CREATE TABLE {NAME}  ({','.join(what)}) "
+            x = self.conn.cursor()
+            x.execute(f"{string_}")
+            self.conn.commit()
+        except EnvironmentError() as e:
+            print (e)
+
+    def clearTable(self, name):
+        try:
+            string_ = f"truncate table {name} "
+            x = self.conn.cursor()
+            x.execute(f"{string_}")
+            self.conn.commit()
+        except EnvironmentError() as e:
+            print (e)
 
     def updateRaw(self, where, what, when):
         try:
