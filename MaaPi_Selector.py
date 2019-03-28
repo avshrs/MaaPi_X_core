@@ -86,13 +86,6 @@ class MaapiSelector():
             self.maapilogger.log("Exception", f"library {lib_id} not exist in library libraryPID ")
 
 
-    def restartLibraryDeamon(self, lib_id):
-        try:
-            self.stopLibraryDeamon(lib_id)
-            self.startLibraryDeamon(lib_id)
-        except Exception as e:
-            self.maapilogger.log("Exception", "Error: restartLibraryDeamon() {exc}".format(exc = e))
-
 
     def startLibraryDeamon(self, lib):
         try:
@@ -129,6 +122,12 @@ class MaapiSelector():
         except Exception as e :
             self.maapilogger.log("ERROR", "Exception: startLibraryDeamon() {exc}".format(exc = e))
 
+    def restartLibraryDeamon(self, lib_id):
+        try:
+            self.stopLibraryDeamon(lib_id)
+            self.startLibraryDeamon(lib_id)
+        except Exception as e:
+            self.maapilogger.log("Exception", "Error: restartLibraryDeamon() {exc}".format(exc = e))
 
     def checkLibraryProcess(self):
         lib_temp = copy.copy(self.libraryPID)
@@ -142,7 +141,7 @@ class MaapiSelector():
                         try:
                             recive =  self.socketClient.sendStrAndRecv(lib_temp[lib]["host"], lib_temp[lib]["port"], payload)
                         except:
-                            self.restartlibraryDeamon(lib)
+                            self.restartLibraryDeamon(lib)
                         else:
                             if recive == bytes(0xff):
                                 lib_temp[lib]["lastResponce"] = dt.now()
