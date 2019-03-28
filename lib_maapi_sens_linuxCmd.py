@@ -59,6 +59,7 @@ class LinuxCmd():
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         value, error = 0, 0
         try:
+            print (f"{self.maapiCommandLine[{dev_id}]['cmd_command']}")
             value = (subprocess.check_output(self.maapiCommandLine[f"{dev_id}"]['cmd_command'],shell=True,)).decode("utf-8")
         except Exception as e:
             return float(value), 1
