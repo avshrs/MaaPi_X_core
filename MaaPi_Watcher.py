@@ -119,7 +119,8 @@ class MaapiWatcher():
                 else:
                     if recive == bytes(0xff):
                         self.lastResponce = dt.now()
-                        self.maapilogger.log("INFO", "Get responce from selector")
+
+                        self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}'")
                     else:
                         self.startSelectorModule()
         except Exception as e :

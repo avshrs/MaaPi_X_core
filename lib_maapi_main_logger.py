@@ -49,18 +49,21 @@ class Logger():
 
             time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
             msg_ = str(msg).replace("'","")
+            msg__ = str(msg_).replace('\"', '')
 
-            self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg_}'", f"'{self.maapiLocation}'"))
+
+            self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg__}'", f"'{self.maapiLocation}'"))
+
             self.maapiDB.clean_logs()
 
             if self.printable == 1:
-                print(f"MaaPi  |  {self.name:<17}  |  {self.levels[level]:^6}  |  {time:<16}  |  {msg}")
+                print(f"MaaPi  |  {self.name:<17}  |  {self.levels[level]:^6}  |  {time:<16}  |  {msg__}")
 
             if self.levels[level] == "INFO":
-                logging.info( f"\t| {self.name:<16} | {msg}")
+                logging.info( f"\t| {self.name:<16} | {msg__}")
             elif self.levels[level] == "DEBUG":
-                logging.debug(f"\t| {self.name:<16} | {msg}")
+                logging.debug(f"\t| {self.name:<16} | {msg__}")
             elif self.levels[level] == "ERROR":
-                logging.error(f"\t| {self.name:<16} | {msg}")
+                logging.error(f"\t| {self.name:<16} | {msg__}")
             elif self.levels[level] == "EXCEPT":
-                logging.exception(f"\t| {self.name:<16} | {msg}")
+                logging.exception(f"\t| {self.name:<16} | {msg__}")

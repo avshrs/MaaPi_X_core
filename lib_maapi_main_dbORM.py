@@ -27,10 +27,13 @@ class MaaPiDBConnection():
         try:
             self.conn = psycopg2.connect("dbname='{0}' user='{1}' host='{2}' password='{3}'".format(Maapi_dbName,Maapi_dbUser,Maapi_dbHost,Maapi_dbPasswd))
         except (Exception, psycopg2.DatabaseError) as error:
-            pass
+            print (error)
 
     def __del__(self):
-        self.conn.close()
+        try:
+            self.conn.close()
+        except:
+            pass
 
 
     def queue(self,dev_id,status,board_id):
@@ -49,34 +52,55 @@ class MaaPiDBConnection():
                           "AND dev_machine_location_id = {2}".format(status,dev_id,board_id))
                 self.conn.commit()
             x.close()
-        except Exception as e:
+        except EnvironmentError() as e:
             print (e)
 
 
     def insertRaw(self, where, what):
-        string_ = "INSERT INTO {where} VALUES  ({what})".format(where=where, what=",".join(what))
-        x = self.conn.cursor()
-        x.execute(f"{string_}")
-        self.conn.commit()
+        try:
+            string_ = f"INSERT INTO {where} VALUES ({','.join(what)}) "
+            x = self.conn.cursor()
+            x.execute(f"{string_}")
+            self.conn.commit()
+        except EnvironmentError() as e:
+            print (e)
+
+
+    def updateRaw(self, where, what, when):
+        try:
+            string_ = f"UPDATE {where} SET {what} WHERE {when}"
+            print (string_)
+            x = self.conn.cursor()
+            x.execute(f"{string_}")
+            print (string_)
+            self.conn.commit()
+        except EnvironmentError() as e:
+            print (e)
+
+# update maapi_running_py_scripts set py_board_id = 5 where py_pid=4344;
 
     def cleanSocketServerList(self,board_id):
-        string_ = f"DELETE FROM maapi_running_socket_servers WHERE ss_board_id={board_id}"
-        x = self.conn.cursor()
-        x.execute(f"{string_}")
-        self.conn.commit()
+        try:
+            string_ = f"DELETE FROM maapi_running_socket_servers WHERE ss_board_id={board_id}"
+            x = self.conn.cursor()
+            x.execute(f"{string_}")
+            self.conn.commit()
 
-        string_ = f"DELETE FROM maapi_running_py_scripts WHERE py_board_id={board_id}"
-        x = self.conn.cursor()
-        x.execute(f"{string_}")
-        self.conn.commit()
-
+            string_ = f"DELETE FROM maapi_running_py_scripts WHERE py_board_id={board_id}"
+            x = self.conn.cursor()
+            x.execute(f"{string_}")
+            self.conn.commit()
+        except EnvironmentError() as e:
+            print (e)
 
     def clean_logs(self):
-        string_ = "DELETE FROM maapi_logs WHERE log_timestamp < NOW() - INTERVAL '1 days'"
-        x = self.conn.cursor()
-        x.execute(f"{string_}")
-        self.conn.commit()
-
+        try:
+            string_ = "DELETE FROM maapi_logs WHERE log_timestamp < NOW() - INTERVAL '1 days'"
+            x = self.conn.cursor()
+            x.execute(f"{string_}")
+            self.conn.commit()
+        except EnvironmentError() as e:
+            print (e)
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):

@@ -55,12 +55,12 @@ class MaapiSelector():
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
+
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
         #self.socketServer.killServers()
+        self.maapiDB.cleanSocketServerList(self.board_id)
         raise SystemExit
-
-
 
 
     def startAllLibraryDeamon(self):
@@ -118,12 +118,13 @@ class MaapiSelector():
                             "lastResponce":dt.now()
                             }
                 self.maapilogger.log("INFO", f"Lib:{self.libraryPID[lib]['name']} pid:{self.libraryPID[lib]['pid'].pid}")
+
                 self.maapiDB.insertRaw("maapi_running_py_scripts", ("default",
                                                                     f"'{name}'",
                                                                     f"'{file_}'",
                                                                     "now()",
-                                                                    f"{self.board_id}",
-                                                                    f"{pid.pid}" ))
+                                                                    f"{int(self.board_id)}",
+                                                                    f"{int(pid.pid)}" ))
 
         except Exception as e :
             self.maapilogger.log("ERROR", "Exception: startLibraryDeamon() {exc}".format(exc = e))
@@ -146,6 +147,7 @@ class MaapiSelector():
                             if recive == bytes(0xff):
                                 lib_temp[lib]["lastResponce"] = dt.now()
                                 self.maapilogger.log("DEBUG", "Get responce from selector")
+                                self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{lib_temp[lib]['host']}' and ss_port='{lib_temp[lib]['port']}'")
                             else:
                                 self.restartlibraryDeamon(lib)
                 except Exception as e :
