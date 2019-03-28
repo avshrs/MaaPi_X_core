@@ -84,8 +84,9 @@ class SocketServer():
                 if self.selfkill:
                     self.sockUDP.close()
                     self.joining()
-                    time.sleep(1)
-                    raise SystemExit
+
+                    break
+
                 data, address = sockUDP.recvfrom(4096)
                 if not data:
                     break
