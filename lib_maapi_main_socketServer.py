@@ -78,7 +78,7 @@ class SocketServer():
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sockUDP:
             sockUDP.bind((host, port))
             self.maapilogger.log("INFO",sockUDP)
-
+            self.maapilogger.log("INFO",f"self.selfkill ==  {self.selfkill} - UDP")
             while True and not self.selfkill:
                 if self.selfkill:
                     self.maapilogger.log("INFO",f"self.selfkill ==  {self.selfkill} - stopin UDP")
@@ -89,9 +89,9 @@ class SocketServer():
                 data, address = sockUDP.recvfrom(4096)
                 if not data:
                     break
+
                 self.maapilogger.log("DEBUG",f"Udp data decoded {data.decode('utf-8')}")
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
-
                 if data:
                     if int(payload_id) == 99:
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
