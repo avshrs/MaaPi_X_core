@@ -68,7 +68,7 @@ class MaapiWatcher():
             self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
 
         payload_udp = "777_0_0_0"
-        self.socketClient.sendViaUDP(self.config.selectorHost, 60000, payload_udp.encode('utf-8'))
+        self.socketClient.sendViaUDP(self.config.selectorHost, 60000, bytes(payload_udp))
         self.maapilogger.log("INFO",f'stoping {self.objectname}')
         raise SystemExit
 
