@@ -90,10 +90,12 @@ class SocketServer():
                     break
 
                 self.maapilogger.log("DEBUG",f"Udp data decoded {data.decode('utf-8')}")
+                print( data)
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
                 if data:
                     if int(payload_id) == 99:
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
+
                     elif int(payload_id) == 777 :
                         self.maapilogger.log("INFO",f"Get Slef Kill instruction via SocketUDP")
                         self.sockUDP.close()
