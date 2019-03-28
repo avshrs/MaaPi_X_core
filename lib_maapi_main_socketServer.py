@@ -30,6 +30,7 @@ class SocketServer():
         self.threads            = {}
         self.pid                = os.getpid()
         self.sockTCP            = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sockUDP            = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.selfkill = False
         self.board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
         self.board_id = 77
@@ -66,7 +67,7 @@ class SocketServer():
                         elif payload_id == 777 :
                             self.maapilogger.log("INFO",f"Get Slef Kill instruction via Socket")
                             self.sockTCP.close()
-                            self.selfkill = True
+                            self.sockTCP.close()
                             self.joining()
 
                         else:
@@ -76,17 +77,16 @@ class SocketServer():
             self.maapilogger.log("ERROR", f"Exception in startServerTCP {self.objectname}: {e}")
 
     def startServerUDP(self, host, port):
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sockUDP:
-            sockUDP.bind((host, port))
-            self.maapilogger.log("INFO",sockUDP)
+        try:
+            self.sockUDP.bind((host, port))
+            self.maapilogger.log("INFO",self.sockUDP)
             while True and not self.selfkill:
                 if self.selfkill:
                     self.maapilogger.log("INFO",f"self.selfkill ==  {self.selfkill} - stopin UDP")
                     self.sockUDP.close()
                     self.joining()
 
-
-                data, address = sockUDP.recvfrom(4096)
+                data, address = self.sockUDP.recvfrom(4096)
                 if not data:
                     break
 
@@ -95,6 +95,8 @@ class SocketServer():
                 if data:
                     if int(payload_id) == 99:
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
+        except Exception as e:
+            self.maapilogger.log("ERROR", f"Exception in startServerUDP {self.objectname}: {e}")
 
 
     def runTcpServer(self, host, port):
