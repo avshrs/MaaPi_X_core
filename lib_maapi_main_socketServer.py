@@ -65,10 +65,9 @@ class SocketServer():
                             client.send(bytes(0xff))
 
                         elif payload_id == 777 :
-                            self.maapilogger.log("INFO",f"Get Slef Kill instruction via Socket")
+                            self.maapilogger.log("INFO",f"Get Slef Kill instruction via SocketTCP")
                             self.sockTCP.close()
-                            self.sockTCP.close()
-                            self.joining()
+                            self.joiningTCP()
 
                         else:
                             self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
@@ -95,6 +94,13 @@ class SocketServer():
                 if data:
                     if int(payload_id) == 99:
                         self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
+                    elif int(payload_id) == 777 :
+                        self.maapilogger.log("INFO",f"Get Slef Kill instruction via SocketUDP")
+                        self.sockUDP.close()
+                        self.joiningUDP()
+                    else:
+                        self.maapilogger.log("INFO",f"Get unknown packet via udp")
+
         except Exception as e:
             self.maapilogger.log("ERROR", f"Exception in startServerUDP {self.objectname}: {e}")
 
@@ -110,13 +116,14 @@ class SocketServer():
         self.threads["UDP"] = Thread(target=self.startServerUDP, args=(host, port))
         self.threads["UDP"].start()
 
-    def joining(self):
+    def joiningTCP(self):
         self.selfkill = True
         try:
             self.threads["TCP"].join()
             self.maapilogger.log("INFO","socket TCP -  join thread")
         except:
             pass
+    def joiningUDP(self):
         try:
             self.threads["UDP"].join()
             self.maapilogger.log("INFO","socket UTP -  join thread")

@@ -25,3 +25,15 @@ class socketClient():
             s.connect((host, port))
             s.send(payload)
             s.close()
+
+    def sendViaUDP(self,host,port, payload):
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            server_address = (f'{host}', port)
+            s.sendto(payload, server_address)
+
+
+    def sendViaUDPAndRecv(self,host,port, payload):
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            server_address = (f'{host}', port)
+            s.sendto(payload, server_address)
+            data, server = sock.recvfrom(4096)

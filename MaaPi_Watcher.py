@@ -66,6 +66,7 @@ class MaapiWatcher():
         for i in self.runningSS:
             self.maapilogger.log("INFO",f"stoping {self.runningSS[i]['ss_host']} {self.runningSS[i]['ss_port']} ")
             self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
+        self.socketClient.sendViaUDP(self.runningSS[i]["ss_host"], 60000, payload)
         self.maapilogger.log("INFO",f'stoping {self.objectname}')
         raise SystemExit
 
