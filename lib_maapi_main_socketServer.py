@@ -64,7 +64,6 @@ class SocketServer():
                             client.send(bytes(0xff))
 
                         elif payload_id == 777 :
-
                             self.maapilogger.log("INFO",f"Get Slef Kill instruction via Socket")
                             self.sockTCP.close()
                             self.joining()
@@ -82,9 +81,9 @@ class SocketServer():
 
             while True and not self.selfkill:
                 if self.selfkill:
+                    self.maapilogger.log("INFO",f"self.selfkill ==  {self.selfkill} - stopin UDP")
                     self.sockUDP.close()
                     self.joining()
-
                     break
 
                 data, address = sockUDP.recvfrom(4096)
