@@ -86,10 +86,8 @@ class MaaPiDBConnection():
     def updateRaw(self, where, what, when):
         try:
             string_ = f"UPDATE {where} SET {what} WHERE {when}"
-            print (string_)
             x = self.conn.cursor()
             x.execute(f"{string_}")
-            print (string_)
             self.conn.commit()
         except EnvironmentError() as e:
             print (e)

@@ -15,4 +15,16 @@ if [ "$1" = "start" ]; then
 fi
 if [ "$1" = "stop" ]; then
     kill -15 $pid
+    sleep 3
+    ps -aux | grep -i [m]aapi | awk '{print $2}' | while read line ;do  kill -15 $line ; done
+fi
+
+
+if [ "$1" = "restart" ]; then
+    kill -15 $pid
+    sleep 3
+    ps -aux | grep -i [m]aapi | awk '{print $2}' | while read line ;do  kill -15 $line ; done
+    echo "Starting MaaPi_Watcher"
+    nohup $interpreter $maapiWatcher > log/MaaPi_Watcher.log 2>&1 & echo $!
+
 fi
