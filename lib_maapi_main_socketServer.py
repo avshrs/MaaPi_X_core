@@ -79,13 +79,12 @@ class SocketServer():
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sockUDP:
             sockUDP.bind((host, port))
             self.maapilogger.log("INFO",sockUDP)
-            self.maapilogger.log("INFO",f"self.selfkill ==  {self.selfkill} - UDP")
             while True and not self.selfkill:
                 if self.selfkill:
                     self.maapilogger.log("INFO",f"self.selfkill ==  {self.selfkill} - stopin UDP")
                     self.sockUDP.close()
                     self.joining()
-                    break
+
 
                 data, address = sockUDP.recvfrom(4096)
                 if not data:
@@ -110,6 +109,7 @@ class SocketServer():
         self.threads["UDP"].start()
 
     def joining(self):
+        self.selfkill = True
         try:
             self.threads["TCP"].join()
             self.maapilogger.log("INFO","socket TCP -  join thread")
