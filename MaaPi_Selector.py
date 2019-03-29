@@ -65,10 +65,11 @@ class MaapiSelector():
 
     def startAllLibraryDeamon(self):
         for lib in self.libraryList:
-            try:
-                self.startLibraryDeamon(lib)
-            except Exception as e :
-                self.maapilogger.log("ERROR", "Error: startlibraryDeamon() {exc}".format(exc = e))
+            if self.libraryList[lib]["device_location_id"] == self.board_id:
+                try:
+                    self.startLibraryDeamon(lib)
+                except Exception as e :
+                    self.maapilogger.log("ERROR", "Error: startlibraryDeamon() {exc}".format(exc = e))
 
 
     def stopLibraryDeamon(self, lib_id):
@@ -130,17 +131,13 @@ class MaapiSelector():
             self.maapilogger.log("ERROR", "Error: restartLibraryDeamon() {exc}".format(exc = e))
 
     def checkLibraryProcess(self):
-
         lib_temp = copy.copy(self.libraryPID)
-
         for lib in lib_temp:
-
             if lib in self.libraryList:
                 try:
                     if (dt.now() - lib_temp[lib]["lastResponce"]).seconds > self.libraryLastResponce:
                         if self.sendingQueryToSocket > 12:
                             self.maapilogger.log("INFO", f"Sending query to Selector: is ok? {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
-
                         payload = self.helpers.pyloadToPicke(00, " ", " ", " ",self.selectorHost,self.selectorPort)
                         try:
                             recive =  self.socketClient.sendStrAndRecv(lib_temp[lib]["host"], lib_temp[lib]["port"], payload)
@@ -191,7 +188,7 @@ class MaapiSelector():
 
 
     def getLibraryList(self):
-        print (self.board_id)
+
         self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
 
         for ids in self.libraryList:
