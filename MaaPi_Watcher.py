@@ -74,7 +74,7 @@ class MaapiWatcher():
 
     def startSelectorModule(self):
         try:
-            self.maapilogger.log("STOP", f"Killing Selector - {self.selectorPid.pid}")
+            self.maapilogger.log("STOP", f"Killing Selector")
             self.selectorPid.kill()
         except Exception as e:
             self.maapilogger.log("ERROR", f"Can't stop Selector not running - {e}")
