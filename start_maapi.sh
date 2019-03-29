@@ -23,7 +23,6 @@ if [ "$1" = "stop" ]; then
     ps -aux | grep -i [m]aapi | awk '{print $2}' | while read line ;do  kill -15 $line ; done
 fi
 
-
 if [ "$1" = "restart" ]; then
     kill -15 $pid
     sleep 3
