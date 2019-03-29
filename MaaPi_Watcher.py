@@ -93,31 +93,29 @@ class MaapiWatcher():
 
 
     def checkSelector(self):
-        # try:
+        try:
             if (dt.now() - self.lastResponce).seconds > 5:
-                if self.sendingQueryToSocket > 12:
-                    self.maapilogger.log("DEBUG", f"Sending query to Selector: is ok? {self.selectorHost}, {self.selectorPort}")
-                    self.sendingQueryToSocket = 0
-                self.sendingQueryToSocket += 1
-                payload = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
-            # try:
-                recive =  self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, payload)
-            #   except:
-                self.startSelectorModule()
-            #   else:
-                if recive == bytes(0xff):
-                    self.lastResponce = dt.now()
-                    self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}' and ss_board_id={self.board_id}")
-                else:
-                    self.startSelectorModule()
+                self.maapilogger.log("DEBUG", f"Sending query to Selector: is ok? {self.selectorHost}, {self.selectorPort}")
 
-        # except Exception as e :
-        #     self.maapilogger.log("ERROR", f"checkSelector() error: {e}")
+                payload = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
+                try:
+                    recive =  self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, payload)
+                except:
+                    self.startSelectorModule()
+                else:
+                    if recive == bytes(0xff):
+                        self.lastResponce = dt.now()
+                        self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}' and ss_board_id={self.board_id}")
+                    else:
+                        self.startSelectorModule()
+
+        except Exception as e :
+            self.maapilogger.log("ERROR", f"checkSelector() error: {e}")
 
 
     def loop(self):
         while True:
-            time.sleep(0.1)
+            time.sleep(1)
             self.checkSelector()
 
 
