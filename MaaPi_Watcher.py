@@ -65,6 +65,7 @@ class MaapiWatcher():
 
         for i in self.runningSS:
             if self.runningSS[i]['ss_board_id'] ==  self.board_id:
+                print (self.runningSS)
                 if self.runningSS[i]['ss_port'] !=  self.config.udpListenerPort:
                     self.maapilogger.log("STOP",f"stoping {self.runningSS[i]['ss_host']} {self.runningSS[i]['ss_port']}")
                     self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
