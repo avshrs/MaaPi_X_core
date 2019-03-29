@@ -64,6 +64,7 @@ class MaapiSelector():
 
 
     def startAllLibraryDeamon(self):
+        print ( self.libraryList)
         for lib in self.libraryList:
             if self.libraryList[lib]["device_location_id"] == self.board_id:
                 try:
