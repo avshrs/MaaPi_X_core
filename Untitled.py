@@ -115,6 +115,7 @@ class BH1750():
         return self.do_measurement(self.ONE_TIME_HIGH_RES_MODE_2, additional_delay)
 
 
+
 def main():
 
     #bus = smbus.SMBus(0) # Rev 1 Pi uses 0
