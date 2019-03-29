@@ -56,3 +56,10 @@ class Helpers:
         elif unit == 3: _seconds = value * 3600
         else: _seconds = value
         return _seconds
+
+    def updateBoardLocation(self, location,board_location):
+
+        for i in board_location:
+            if board_location[i]["ml_location"] == location:
+                return board_location[i]["id"]
+        return 0

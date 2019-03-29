@@ -28,42 +28,51 @@ class Logger():
     def __init__(self):
         self.config              = Config.MaapiVars()
         self.maapiLocation      = self.config.maapiLocation
-        self.defaultDebugLevel  = 3
+        self.defaultDebugLevel  = 6
         self.printable          = 1
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.name = "logger"
-        self.levels={ 0:"OFF", 1:"ERROR", 2:"WARN", 3:"INFO", 4:"DEBUG", 5:"ALL",
-            "OFF":"OFF", "ERROR":"ERROR", "WARN":"WARN", "INFO":"INFO", "DEBUG":"DEBUG", "ALL":"ALL",
+        self.levels={ 0:"OFF",
+                      1:"ERROR",
+                      2:"START",
+                      3:"STOP",
+                      4:"READ",
+                      5:"WARN",
+                      6:"INFO",
+                      7:"DEBUG",
+                      8:"ALL",
+
+                      "OFF":"OFF",
+                      "START":"START",
+                      "STOP":"STOP",
+                      "READ":"READ",
+                      "ERROR":"ERROR",
+                      "WARN":"WARN",
+                      "INFO":"INFO",
+                      "DEBUG":"DEBUG",
+                      "ALL":"ALL",
        }
 
         self.levelsPrior={ 0:("OFF"),
                            1:("OFF", "ERROR"),
-                           2:("OFF", "ERROR", "WARN"),
-                           3:("OFF", "ERROR", "WARN","INFO"),
-                           4:("OFF", "ERROR", "WARN","INFO","DEBUG"),
-                           5:("OFF", "ERROR", "WARN","INFO","DEBUG","ALL")
+                           2:("OFF", "ERROR", "START"),
+                           3:("OFF", "ERROR", "START", "STOP"),
+                           4:("OFF", "ERROR", "START", "STOP", "READ"),
+                           5:("OFF", "ERROR", "START", "STOP", "READ", "WARN"),
+                           6:("OFF", "ERROR", "START", "STOP", "READ", "WARN","INFO",),
+                           7:("OFF", "ERROR", "START", "STOP", "READ", "WARN","INFO","DEBUG",),
+                           8:("OFF", "ERROR", "START", "STOP", "READ", "WARN","INFO","DEBUG","ALL"),
        }
 
     def log(self, level, msg):
         if  self.levels[level] in self.levelsPrior[self.defaultDebugLevel]:
 
             time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
+
             msg_ = str(msg).replace("'","")
             msg__ = str(msg_).replace('\"', '')
-
+            if self.printable == 1:
+                print(f"MaaPi  |  {self.name:<17}  |  {self.levels[level]:^6}  |  {time:<16}  |  {msg}")
 
             self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg__}'", f"'{self.maapiLocation}'"))
-
             self.maapiDB.clean_logs()
-
-            if self.printable == 1:
-                print(f"MaaPi  |  {self.name:<17}  |  {self.levels[level]:^6}  |  {time:<16}  |  {msg__}")
-
-            if self.levels[level] == "INFO":
-                logging.info( f"\t| {self.name:<16} | {msg__}")
-            elif self.levels[level] == "DEBUG":
-                logging.debug(f"\t| {self.name:<16} | {msg__}")
-            elif self.levels[level] == "ERROR":
-                logging.error(f"\t| {self.name:<16} | {msg__}")
-            elif self.levels[level] == "EXCEPT":
-                logging.exception(f"\t| {self.name:<16} | {msg__}")

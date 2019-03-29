@@ -34,72 +34,56 @@ class MaapiWatcher():
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = self.objectname
         self.loopInterval       = 5
-        self.board_id           = 99
+        print ("startnig wacher")
         self.selectorHost       = self.config.selectorHost
         self.selectorPort       = self.config.selectorPort
         self.watcherHost        = self.config.watcherHost
         self.watcherPort        = self.config.watcherPort
         self.selecorName        = self.config.selectorName
-        self.maapiLocation      = self.config.maapiLocation
+        self.board_id           = self.helpers.updateBoardLocation(self.config.maapiLocation,self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get())
         self.interpreterVer     = f"{sys.executable}"
         self.lastResponce       = dt.now() - timedelta(hours = 1)
         self.sendingQueryToSocket = 0
 
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
+        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, self.board_id)
         self.runningSS          = []
-        self.pid                = os.getpid()
         self.selectorPid        = object()
 
         self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
-        self.writePid(self.pid)
 
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
+
     def service_shutdown(self, signum, frame):
-        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
         self.runningSS = self.maapiDB.table("maapi_running_socket_servers").filters_eq(ss_board_id = self.board_id).get()
         self.maapiDB.cleanSocketServerList(self.board_id)
 
         payload = self.helpers.pyloadToPicke(777, " ", " ", " ", self.watcherHost,self.watcherPort)
-        self.writePid("")
+
+
         for i in self.runningSS:
-            self.maapilogger.log("INFO",f"stoping {self.runningSS[i]['ss_host']} {self.runningSS[i]['ss_port']} ")
-            self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
+            if self.runningSS[i]['ss_port'] !=  self.config.udpListenerPort:
+                self.maapilogger.log("STOP",f"stoping {self.runningSS[i]['ss_host']} {self.runningSS[i]['ss_port']}")
+                self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
+            else:
+                payload_udp = "777_0_0_0"
+                self.socketClient.sendViaUDP(self.config.selectorHost, 60000, bytes(payload_udp.encode()))
+                self.maapilogger.log("STOP",f'stoping {self.objectname}')
 
-        payload_udp = "777_0_0_0"
-        self.socketClient.sendViaUDP(self.config.selectorHost, 60000, bytes(payload_udp.encode()))
-        self.maapilogger.log("INFO",f'stoping {self.objectname}')
         raise SystemExit
-
-
-    def writePid(self, pid):
-        f = open(f"pid/MaaPi_{self.objectname}.pid", "w")
-        f.write(f"{pid}")
-        f.close()
-
-    def updateBoardLocation(self):
-        board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
-        for i in board_location:
-            if board_location[i]["ml_location"] == self.maapiLocation:
-                self.board_id = board_location[i]["id"]
-
-
-
-    def getRunnigSocketServers(self):
-        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
-        self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
 
 
     def startSelectorModule(self):
         try:
-            self.maapilogger.log("INFO", f"Killing Selector - {self.selectorPid.pid}")
+            self.maapilogger.log("STOP", f"Killing Selector - {self.selectorPid.pid}")
             self.selectorPid.kill()
         except Exception as e:
-            self.maapilogger.log("ERROR", f"startSelectorModule() {e}")
+            self.maapilogger.log("ERROR", f"Can't stop Selector not running - {e}")
         finally:
             self.selectorPid = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
-            self.maapilogger.log("INFO", f"Sterting Selector PID: {self.selectorPid.pid}")
+            self.maapilogger.log("START", f"Sterting Selector PID: {self.selectorPid.pid}")
             self.maapiDB.insertRaw("maapi_running_py_scripts", ("default",
                                                                 "'Selector'",
                                                                 "'MaaPi_Selector.py'",
@@ -111,8 +95,8 @@ class MaapiWatcher():
     def checkSelector(self):
         try:
             if (dt.now() - self.lastResponce).seconds > 5:
-                if self.sendingQueryToSocket > 10:
-                    self.maapilogger.log("INFO", f"Sending query to Selector: is ok? {self.selectorHost}, {self.selectorPort}")
+                if self.sendingQueryToSocket > 12:
+                    self.maapilogger.log("DEBUG", f"Sending query to Selector: is ok? {self.selectorHost}, {self.selectorPort}")
                     self.sendingQueryToSocket = 0
                 self.sendingQueryToSocket += 1
                 payload = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
@@ -124,7 +108,7 @@ class MaapiWatcher():
                     if recive == bytes(0xff):
                         self.lastResponce = dt.now()
 
-                        self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}'")
+                        self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}' and ss_board_id={self.board_id}")
                     else:
                         self.startSelectorModule()
         except Exception as e :
@@ -133,12 +117,11 @@ class MaapiWatcher():
 
     def loop(self):
         while True:
-            time.sleep(self.loopInterval)
+            time.sleep(0.1)
             self.checkSelector()
 
 
 if __name__ == "__main__":
     MaapiW =  MaapiWatcher()
-    MaapiW.updateBoardLocation()
     MaapiW.startSelectorModule()
     MaapiW.loop()
