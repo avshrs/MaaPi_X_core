@@ -100,16 +100,16 @@ class MaapiWatcher():
                     self.sendingQueryToSocket = 0
                 self.sendingQueryToSocket += 1
                 payload = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
-                try:
-                    recive =  self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, payload)
-                except:
-                    self.startSelectorModule()
+            # try:
+                recive =  self.socketClient.sendStrAndRecv(self.selectorHost, self.selectorPort, payload)
+            #   except:
+                self.startSelectorModule()
+            #   else:
+                if recive == bytes(0xff):
+                    self.lastResponce = dt.now()
+                    self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}' and ss_board_id={self.board_id}")
                 else:
-                    if recive == bytes(0xff):
-                        self.lastResponce = dt.now()
-                        self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}' and ss_board_id={self.board_id}")
-                    else:
-                        self.startSelectorModule()
+                    self.startSelectorModule()
 
         # except Exception as e :
         #     self.maapilogger.log("ERROR", f"checkSelector() error: {e}")
