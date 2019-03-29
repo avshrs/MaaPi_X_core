@@ -5,6 +5,7 @@
 
 import smbus
 import time
+from lim_maapi_i2c_bus import I2C_MaaPi
 
 class BH1750():
     """ Implement BH1750 communication. """
@@ -117,10 +118,8 @@ class BH1750():
 
 
 def main():
-
-
-    sensor = BH1750(smbus.SMBus(1))
-
+  #  sensor = BH1750(smbus.SMBus(1))
+    sensor = BH1750(I2C_MaaPi(1))
     while True:
         print "Sensitivity: {:d}".format(sensor.mtreg)
         for measurefunc, name in [(sensor.measure_low_res, "Low Res "),
