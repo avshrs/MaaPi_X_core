@@ -11,7 +11,7 @@ echo "old ${pid}"
 if [ "$1" = "start" ]; then
     if ! kill -0 $pid > /dev/null 2>&1; then
         echo "Starting MaaPi_Watcher"
-        nohup $interpreter $maapiWatcher > ${loc}l/og/MaaPi_Watcher.log 2>&1 & echo $! > ${loc}/pid/MaaPi_Watcher.pid
+        nohup $interpreter $maapiWatcher > ${loc}/log/MaaPi_Watcher.log 2>&1 & echo $! > ${loc}/pid/MaaPi_Watcher.pid
     else
         echo "MaaPi_Watcher Running"
     fi
