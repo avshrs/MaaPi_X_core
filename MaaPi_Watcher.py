@@ -83,7 +83,7 @@ class MaapiWatcher():
             self.maapilogger.log("ERROR", f"Can't stop Selector not running - {e}")
         finally:
             self.selectorPid = subprocess.Popen([self.interpreterVer, "MaaPi_Selector.py"])
-            self.maapilogger.log("START", f"Sterting Selector PID: {self.selectorPid.pid}")
+            self.maapilogger.log("START", f"Starting Selector PID: {self.selectorPid.pid}")
             self.maapiDB.insertRaw("maapi_running_py_scripts", ("default",
                                                                 "'Selector'",
                                                                 "'MaaPi_Selector.py'",
@@ -93,7 +93,7 @@ class MaapiWatcher():
 
 
     def checkSelector(self):
-        try:
+        # try:
             if (dt.now() - self.lastResponce).seconds > 5:
                 if self.sendingQueryToSocket > 12:
                     self.maapilogger.log("DEBUG", f"Sending query to Selector: is ok? {self.selectorHost}, {self.selectorPort}")
@@ -107,12 +107,12 @@ class MaapiWatcher():
                 else:
                     if recive == bytes(0xff):
                         self.lastResponce = dt.now()
-
                         self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}' and ss_board_id={self.board_id}")
                     else:
                         self.startSelectorModule()
-        except Exception as e :
-            self.maapilogger.log("ERROR", "checkSelector() error: {exc}".format(exc = e))
+
+        # except Exception as e :
+        #     self.maapilogger.log("ERROR", f"checkSelector() error: {e}")
 
 
     def loop(self):
