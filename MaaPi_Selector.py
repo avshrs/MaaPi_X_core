@@ -191,6 +191,7 @@ class MaapiSelector():
 
 
     def getLibraryList(self):
+        print (self.board_id)
         self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
 
         for ids in self.libraryList:
