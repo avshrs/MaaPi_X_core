@@ -5,7 +5,7 @@
 
 import smbus
 import time
-from lim_maapi_i2c_bus import I2C_MaaPi
+
 class BH1750():
     """ Implement BH1750 communication. """
     # Define some constants from the datasheet
@@ -28,12 +28,12 @@ class BH1750():
     # Device is automatically set to Power Down after measurement.
     ONE_TIME_LOW_RES_MODE = 0x23
 
-    def __init__(self):
-        #self.bus = 1
-        self.addr = 0x23
+    def __init__(self, bus, addr=0x23):
+        self.bus = bus
+        self.addr = addr
         self.power_down()
         self.set_sensitivity()
-        self.bus                = I2C_MaaPi(1)
+
     def _set_mode(self, mode):
         self.mode = mode
         self.bus.write_byte(self.addr, self.mode)
