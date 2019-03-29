@@ -32,7 +32,8 @@ class MaapiSelector():
         self.maapilogger.name   = self.objectname
         self.interpreterVer       =f"{sys.executable}"
         # vars
-        self.board_id           = 99
+        self.board_id           = self.helpers.updateBoardLocation(self.config.maapiLocation,self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get())
+        print (self.board_id)
         self.maapiLocation      = self.config.maapiLocation
         self.selectorPort       = self.config.selectorPort
         self.selectorHost       = self.config.selectorHost
@@ -64,8 +65,7 @@ class MaapiSelector():
 
 
     def startAllLibraryDeamon(self):
-        print ( self.libraryList)
-        for lib in self.libraryList:
+          for lib in self.libraryList:
             if self.libraryList[lib]["device_location_id"] == self.board_id:
                 try:
                     self.startLibraryDeamon(lib)
@@ -198,12 +198,6 @@ class MaapiSelector():
         self.maapilogger.log("DEBUG","Devices library list updated")
 
 
-    def updateBoardLocation(self):
-        board_location = self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
-
-        for i in board_location:
-            if board_location[i]["ml_location"] == self.maapiLocation:
-                self.board_id = board_location[i]["id"]
 
 
     def getDeviceList(self):
@@ -278,7 +272,6 @@ class MaapiSelector():
 
     def startConf(self):
         self.maapilogger.log("INFO","Preparing to start Selector module")
-        self.updateBoardLocation()
         self.getDeviceList()
         self.getLibraryList()
 
