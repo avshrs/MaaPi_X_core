@@ -137,7 +137,7 @@ class MaaPiDBConnection():
             if status is True:
                 x.execute("UPDATE devices "
                             f"SET dev_value={(1 if insert_value==True else (0 if insert_value==False else insert_value))}, "
-                            "dev_interval_queue = {False}, "
+                            f"dev_interval_queue = {False}, "
                             "dev_last_update=NOW(), "
                             "dev_read_error='ok' "
                             f"WHERE dev_id='{device_id}' and dev_status=True")
