@@ -83,26 +83,7 @@ class BME280I2C():
             data = bus.read_i2c_block_data(DEVICE, CONTINUOUS_HIGH_RES_MODE_1,32)
             value = (data[1] + (256 * data[0])) / 1.2
 
-        def power_down(self):
-            self._set_mode(self.POWER_DOWN)
 
-        def power_on(self):
-            self._set_mode(self.POWER_ON)
-
-        def set_sensitivity(self, sensitivity=69):
-            """ Set the sensor sensitivity.
-                Valid values are 31 (lowest) to 254 (highest), default is 69.
-            """
-            if sensitivity < 31:
-                self.mtreg = 31
-            elif sensitivity > 254:
-                self.mtreg = 254
-            else:
-                self.mtreg = sensitivity
-            self.power_on()
-            self._set_mode(0x40 | (self.mtreg >> 5))
-            self._set_mode(0x60 | (self.mtreg & 0x1f))
-            self.power_down()
 
         except Exception as e:
             return value, 1

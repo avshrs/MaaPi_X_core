@@ -43,6 +43,7 @@ class SocketServer():
             try:
                 self.sockTCP.bind((host, port))
             except:
+                # add loop with increasing port until its find free slot
                 self.sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 self.sockTCP.bind((host, port))
             self.sockTCP.listen(10000)
