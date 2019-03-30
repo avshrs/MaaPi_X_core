@@ -129,7 +129,7 @@ class MaaPiDBConnection():
                 x.execute("UPDATE devices "
                           f"SET dev_value_old={devices_data[0]} "
                           f"WHERE dev_id='{device_id}' "
-                          "AND dev_status=True"
+                          "AND dev_status=True")
                 self.conn.commit()
             except Exception as e:
                 print(e)
