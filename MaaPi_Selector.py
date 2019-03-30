@@ -104,8 +104,7 @@ class MaapiSelector():
                 name = self.libraryList[lib]['device_lib_name']
                 host = self.selectorHost
                 port = int(self.selectorPort)+int(self.libraryList[lib]['id'])
-                self.libraryPID[lib] = {
-                            "id"   : lib,
+                self.libraryPID[lib] = {"id"   : lib,
                             "name" : name,
                             "pid"  : pid,
                             "host" : host,
@@ -165,10 +164,9 @@ class MaapiSelector():
             c_dev = self.deviceList[dev]
             tosec = self.helpers.to_sec(c_dev["dev_interval"], c_dev["dev_interval_unit_id"])
 
-            if (dt.now() - c_dev["dev_last_update"]).seconds >= tosec and dev not in self.skippDev:
+            if (dt.now() - c_dev["dev_last_update"]).seconds >= (tosec-(tosec*0.015)) and dev not in self.skippDev:
                 try:
                     self.localQueue[dev]
-
                 except:
                     self.localQueue[dev]=c_dev["dev_last_update"]
                     self.maapilogger.log("DEBUG",f"self.localQueue[dev] not exist - adding new{dev}")
@@ -177,11 +175,9 @@ class MaapiSelector():
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost,self.selectorPort)
                     self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']}")
-
                     try:
                         pid = self.libraryPID[self.deviceList[dev]['dev_type_id']]
                         self.socketClient.sendStr(pid["host"], pid["port"], payload)
-
                     except Exception as e:
                         self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist in database for this location/board")
                         self.skippDev.append(dev)

@@ -122,26 +122,30 @@ class MaaPiDBConnection():
             x = self.conn.cursor()
             x.execute("SELECT dev_value, dev_rom_id, dev_collect_values_to_db "
                       "FROM devices "
-                      "WHERE dev_id='{0}' "
-                      "AND dev_status = True".format(device_id))
+                      f"WHERE dev_id='{device_id}' "
+                      "AND dev_status = True")
             devices_data = x.fetchone()
             try:
                 x.execute("UPDATE devices "
-                          "SET dev_value_old={0} "
-                          "WHERE dev_id='{1}' "
-                          "AND dev_status=True".format(devices_data[0],device_id))
+                          f"SET dev_value_old={devices_data[0]} "
+                          f"WHERE dev_id='{device_id}' "
+                          "AND dev_status=True"
                 self.conn.commit()
             except Exception as e:
                 print(e)
 
             if status is True:
                 x.execute("UPDATE devices "
-                            "SET dev_value={0}, dev_interval_queue = {2}, dev_last_update=NOW(), dev_read_error='ok' "
-                            "WHERE dev_id='{1}' and dev_status=True".format((1 if insert_value==True else (0 if insert_value==False else insert_value)),device_id,False))
+                            f"SET dev_value={(1 if insert_value==True else (0 if insert_value==False else insert_value))}, "
+                            "dev_interval_queue = {False}, "
+                            "dev_last_update=NOW(), "
+                            "dev_read_error='ok' "
+                            f"WHERE dev_id='{device_id}' and dev_status=True")
                 self.conn.commit()
                 if devices_data[2]:
-                    x.execute("INSERT INTO maapi_dev_rom_{0}_values "
-                                "VALUES (default,{1},default,{2})".format(devices_data[1].replace("-", "_"), device_id,(1 if insert_value==True else (0 if insert_value==False else insert_value))))
+                    x.execute(f"INSERT INTO maapi_dev_rom_{devices_data[1].replace('-', '_')}_values "
+                                f"VALUES (default,{device_id}, default, "
+                                f"{(1 if insert_value==True else (0 if insert_value==False else insert_value))})")
                     self.conn.commit()
             else:
                 x.execute("UPDATE devices "
