@@ -58,14 +58,14 @@ class MaapiWatcher():
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").filters_eq(ss_board_id = self.board_id).get()
+        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
         self.maapiDB.cleanSocketServerList(self.board_id)
         payload = self.helpers.pyloadToPicke(777, " ", " ", " ", self.watcherHost,self.watcherPort)
         for i in self.runningSS:
-            if self.runningSS[i]['ss_port'] !=  self.config.udpListenerPort:
+            if self.runningSS[i]['ss_port'] !=  self.config.udpListenerPort and self.runningSS[i]['ss_board_id'] ==  self.board_id:
                 self.maapilogger.log("STOP",f"stoping {self.runningSS[i]['ss_host']} {self.runningSS[i]['ss_port']}")
                 self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
-            else:
+            if self.runningSS[i]['ss_port'] ==  self.config.udpListenerPort and self.runningSS[i]['ss_board_id'] ==  self.board_id:
                 payload_udp = "777_0_0_0"
                 self.socketClient.sendViaUDP(self.config.selectorHost, 60000, bytes(payload_udp.encode()))
                 self.maapilogger.log("STOP",f'stoping {self.objectname}')
