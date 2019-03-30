@@ -43,7 +43,7 @@ class PFC8591():
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
-        def service_shutdown(self, signum, frame):
+    def service_shutdown(self, signum, frame):
         self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
         #self.socketServer.killServers()
         time.sleep(1)

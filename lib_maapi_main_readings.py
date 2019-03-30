@@ -42,8 +42,9 @@ class Readings:
                         startd = dt.now()
                         value, error = method(nr, dev_id, devices_db, devices_db_rel)
                         stopd = dt.now()
-                        self.maapilogger.log("READ",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {name:<25} |  Value: {round(value,4):<15} | inTime: {(stopd-startd)}")
-                        self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
+                        val = round(float(value),3)
+                        self.maapilogger.log("READ",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {name:<25} |  Value: {val:<15} | inTime: {(stopd-startd)}")
+                        self.insertReadingsToDB(nr ,float(value), dev_id, devices_db, devices_db_rel, error)
 
                     except Exception as e:
                         value = 0
