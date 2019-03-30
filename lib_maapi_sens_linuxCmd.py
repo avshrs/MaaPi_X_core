@@ -59,7 +59,7 @@ class LinuxCmd():
         try:
             value = (subprocess.check_output(self.maapiCommandLine[f"{dev_id}"]['cmd_command'],shell=True,)).decode("utf-8")
         except Exception as e:
-            return value, 1
+            return float(value), 1
             self.maapilogger.log("ERROR", f"Exception while read values from  LINUX cmd {self.objectname} - {e} \n {self.maapiCommandLine[dev_id]['cmd_command']}")
         else:
             return float(value), 0
