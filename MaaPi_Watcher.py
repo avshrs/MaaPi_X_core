@@ -41,6 +41,7 @@ class MaapiWatcher():
         self.watcherPort        = self.config.watcherPort
         self.selecorName        = self.config.selectorName
         self.board_id           = self.helpers.updateBoardLocation(self.config.maapiLocation,self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get())
+        print ("self.board_id= ",self.board_id)
         self.interpreterVer     = f"{sys.executable}"
         self.lastResponce       = dt.now() - timedelta(hours = 1)
         self.sendingQueryToSocket = 0
