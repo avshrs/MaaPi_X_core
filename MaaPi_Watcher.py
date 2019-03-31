@@ -26,6 +26,7 @@ import MaaPi_Config                 as Config
 class MaapiWatcher():
     def __init__(self):
         self.objectname         = "Watcher"
+        self.queue              = Queue.Queue()
         self.helpers            = Helpers.Helpers()
         self.config              = Config.MaapiVars()
         self.socketClient       = SocketClient.socketClient()
