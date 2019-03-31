@@ -121,13 +121,16 @@ class MaapiWatcher():
 
 
     def responceFromSelector(self):
-        if self.queue.getSocketRadingsLen() > 0:
-            queueTmp  = self.queue.getSocketRadings()
+        if self.queue.getSocketStatusLen() > 0:
+            queueTmp  = self.queue.getSocketStatus()
             queue_ = queueTmp[self.objectname][self.selectorHost][self.selectorPort]
             for nr in queue_:
                 if queue_[nr][0] == 0xff:
                     self.maapilogger.log("STATUS", f"Get Responce from Selector")
                     self.SelectorResponce = dt.now()
+                if queue_[nr][0] == 777:
+                    self.service_shutdown()
+
 
 
     def checkSelectorResponceTime(self):
@@ -148,5 +151,5 @@ class MaapiWatcher():
 
 if __name__ == "__main__":
     MaapiW =  MaapiWatcher()
-    MaapiW.startSelectorService()     
+    MaapiW.startSelectorService()
     MaapiW.loop()

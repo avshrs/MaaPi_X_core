@@ -58,8 +58,15 @@ class SocketServer():
                             break
 
                         payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
-                        self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+
+                        if payload_id == 10:
+                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+
+                        if payload_id == 0:
+                            self.queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+
                         if payload_id == 777 :
+                            self.queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
                             self.maapilogger.log("STOP",f"Get Slef Kill instruction via SocketTCP")
                             time.sleep(1)
                             self.sockTCP.close()

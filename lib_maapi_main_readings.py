@@ -28,34 +28,35 @@ class Readings:
     def checkQueueForReadings(self, method, queue):
         dev = 0
         try:
-            queueTmp  = queue.getSocketRadings()
-            queue_ = queueTmp[self.owner][self.host][self.port]
-            value, error = 0, 0
-            for nr in queue_:
-                dev_id              = queue_[nr][1]
-                dev                 = queue_[nr][1]
-                devices_db          = queue_[nr][2]
-                devices_db_rel      = queue_[nr][3]
-                name = devices_db[dev_id]['dev_user_name']
+            if queue.getSocketRadingsLen() > 0:
+                queueTmp  = queue.getSocketRadings()
+                queue_ = queueTmp[self.owner][self.host][self.port]
+                value, error = 0, 0
+                for nr in queue_:
+                    dev_id              = queue_[nr][1]
+                    dev                 = queue_[nr][1]
+                    devices_db          = queue_[nr][2]
+                    devices_db_rel      = queue_[nr][3]
+                    name = devices_db[dev_id]['dev_user_name']
 
-                if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
-                    self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
+                    if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
+                        self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
 
-                    try:
-                        startd = dt.now()
-                        value, error = method(nr, dev_id, devices_db, devices_db_rel)
-                        stopd = dt.now()
-                        val = round(float(value),3)
-                        self.maapilogger.log("READ",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {name:<25} |  Value: {val:<15} | inTime: {(stopd-startd)}")
-                        self.insertReadingsToDB(nr ,float(value), dev_id, devices_db, devices_db_rel, error)
+                        try:
+                            startd = dt.now()
+                            value, error = method(nr, dev_id, devices_db, devices_db_rel)
+                            stopd = dt.now()
+                            val = round(float(value),3)
+                            self.maapilogger.log("READ",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {name:<25} |  Value: {val:<15} | inTime: {(stopd-startd)}")
+                            self.insertReadingsToDB(nr ,float(value), dev_id, devices_db, devices_db_rel, error)
 
-                    except Exception as e:
-                        value = 0
-                        error = 2
-                        self.maapilogger.log("ERROR",f"Error while reading values from {dev_id} - {name}: {e}")
-                        self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
-                elif queue_[nr][0] == self.helpers.instructions["slef_kill"]:
-                    raise SystemExit
+                        except Exception as e:
+                            value = 0
+                            error = 2
+                            self.maapilogger.log("ERROR",f"Error while reading values from {dev_id} - {name}: {e}")
+                            self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
+                    elif queue_[nr][0] == self.helpers.instructions["slef_kill"]:
+                        raise SystemExit
 
 
         except Exception as e :
