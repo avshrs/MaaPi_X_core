@@ -58,7 +58,7 @@ class SocketServer():
                             break
                         payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
                         self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
-                        elif payload_id == 777 :
+                        if payload_id == 777 :
                             self.maapilogger.log("STOP",f"Get Slef Kill instruction via SocketTCP")
                             time.sleep(1)
                             self.sockTCP.close()
