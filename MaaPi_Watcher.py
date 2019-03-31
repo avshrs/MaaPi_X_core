@@ -72,11 +72,11 @@ class MaapiWatcher():
         for srv in self.runningSockSrv:
             if self.runningSockSrv[srv]['ss_board_id'] == self.board_id:
                 if self.runningSockSrv[srv]['ss_type'] == "TCP":
-                    self.socketClient.sendStr(self.runningSockSrv[srv]["ss_host"], self.runningSockSrv[srv]["ss_port"], self.payload_StopTCP)
-                    self.maapilogger.log("STOP",f"Sending Stop message to TCP Service {self.runningSockSrv[srv]["ss_host"]} {self.runningSockSrv[srv]['ss_port']}")
+                    self.socketClient.sendStr(self.runningSockSrv[srv]['ss_host'], self.runningSockSrv[srv]['ss_port'], self.payload_StopTCP)
+                    self.maapilogger.log("STOP",f"Sending Stop message to TCP Service {self.runningSockSrv[srv]['ss_host']} {self.runningSockSrv[srv]['ss_port']}")
                 if self.runningSockSrv[srv]['ss_type'] == "UDP":
                     self.socketClient.sendViaUDP(self.config.selectorHost, 60000, bytes(self.payload_StopUDP.encode()))
-                    self.maapilogger.log("STOP",f"Sending Stop message to UDP Service {self.runningSockSrv[srv]["ss_host"]} {self.runningSockSrv[srv]['ss_port']}")
+                    self.maapilogger.log("STOP",f"Sending Stop message to UDP Service {self.runningSockSrv[srv]['ss_host']} {self.runningSockSrv[srv]['ss_port']}")
 
 
     def startSelectorService(self):
@@ -95,7 +95,7 @@ class MaapiWatcher():
             self.maapilogger.log("STOP", f"Try to kill not responding Selector Service")
             try:
                 self.maapilogger.log("STOP", f"Try to stop Selector Service - Socket Server")
-                self.socketClient.sendStr(self.runningSS[i]["ss_host"], self.runningSS[i]["ss_port"], payload)
+                self.socketClient.sendStr(self.runningSS[i]['ss_host'], self.runningSS[i]['ss_port'], payload)
             except:
                 self.maapilogger.log("STOP", f"Selector Service - Socket Server not running")
             self.selectorPid.kill()
