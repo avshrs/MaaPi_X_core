@@ -56,6 +56,7 @@ class SocketServer():
                         data = client.recv(200000)
                         if not data:
                             break
+
                         payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
                         self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
                         if payload_id == 777 :
