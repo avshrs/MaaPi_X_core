@@ -80,10 +80,8 @@ class MaapiSelector():
                 self.libraryPID[lib_id]["pid"].kill()
                 try:
                     del self.libraryPID[lib_id]
-
                 except Exception as e:
                     self.maapilogger.log("ERROR", "Error: stoplibraryDeamon() pid not exist in libraryPID{exc}".format(exc = e))
-
         except Exception as e:
             self.maapilogger.log("ERROR", f"library {lib_id} not exist in library libraryPID ")
 
