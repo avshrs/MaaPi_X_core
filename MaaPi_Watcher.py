@@ -117,7 +117,7 @@ class MaapiWatcher():
                 self.socketClient.sendStr(self.selectorHost, self.selectorPort, self.payload_Status)
             except:
                 self.maapilogger.log("STATUS", f"ERROR - Socket Server is not avalible {self.selectorHost}, {self.selectorPort} | Restarting")
-                self.restartSelectorService()
+                # self.restartSelectorService()
 
 
     def responceFromSelector(self):
@@ -136,7 +136,7 @@ class MaapiWatcher():
     def checkSelectorResponceTime(self):
         if (dt.now() - self.SelectorResponce).seconds > 65:
             self.maapilogger.log("STATUS", f"Selector Service - not responding | restarting")
-            self.restartSelectorService()
+            # self.restartSelectorService()
             self.lastCheck = dt.now()
             self.SelectorResponce = dt.now()
 
