@@ -87,6 +87,7 @@ class MaapiWatcher():
             self.maapilogger.log("START", f"Selector Service started at PID: {self.selectorPid.pid}")
             self.maapiDB.insertRaw("maapi_running_py_scripts", ("default", "'Selector'", "'MaaPi_Selector.py'", "now()", f"{self.board_id}", f"{self.selectorPid.pid }" ))
             self.maapilogger.log("START", f"Selector Service added to running service table in database.")
+            self.lastCheck = dt.now()
         except Exception as e:
             self.maapilogger.log("ERROR", f"startSelectorService() | {e}")
 
@@ -137,5 +138,5 @@ class MaapiWatcher():
 
 if __name__ == "__main__":
     MaapiW =  MaapiWatcher()
-    MaapiW.startSelectorModule()
+    MaapiW.startSelectorService()
     MaapiW.loop()
