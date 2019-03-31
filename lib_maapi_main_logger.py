@@ -28,7 +28,7 @@ class Logger():
     def __init__(self):
         self.config              = Config.MaapiVars()
         self.maapiLocation      = self.config.maapiLocation
-        self.defaultDebugLevel  = 6
+        self.defaultDebugLevel  = 7
         self.printable          = 1
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.name = "logger"
@@ -37,15 +37,17 @@ class Logger():
                       2:"START",
                       3:"STOP",
                       4:"READ",
-                      5:"WARN",
-                      6:"INFO",
-                      7:"DEBUG",
-                      8:"ALL",
+                      5:"STATUS",
+                      6:"WARN",
+                      7:"INFO",
+                      8:"DEBUG",
+                      9:"ALL",
 
                       "OFF":"OFF",
                       "START":"START",
                       "STOP":"STOP",
                       "READ":"READ",
+                      "STATUS":"STATUS",
                       "ERROR":"ERROR",
                       "WARN":"WARN",
                       "INFO":"INFO",
@@ -58,10 +60,11 @@ class Logger():
                            2:("OFF", "ERROR", "START"),
                            3:("OFF", "ERROR", "START", "STOP"),
                            4:("OFF", "ERROR", "START", "STOP", "READ"),
-                           5:("OFF", "ERROR", "START", "STOP", "READ", "WARN"),
-                           6:("OFF", "ERROR", "START", "STOP", "READ", "WARN","INFO",),
-                           7:("OFF", "ERROR", "START", "STOP", "READ", "WARN","INFO","DEBUG",),
-                           8:("OFF", "ERROR", "START", "STOP", "READ", "WARN","INFO","DEBUG","ALL"),
+                           5:("OFF", "ERROR", "START", "STOP", "READ", "STATUS"),
+                           6:("OFF", "ERROR", "START", "STOP", "READ", "STATUS", "WARN"),
+                           7:("OFF", "ERROR", "START", "STOP", "READ", "STATUS", "WARN","INFO",),
+                           8:("OFF", "ERROR", "START", "STOP", "READ", "STATUS", "WARN","INFO","DEBUG",),
+                           9:("OFF", "ERROR", "START", "STOP", "READ", "STATUS", "WARN","INFO","DEBUG","ALL"),
        }
 
     def log(self, level, msg):

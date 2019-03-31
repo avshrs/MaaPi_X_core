@@ -39,7 +39,7 @@ class SocketServer():
         try:
             self.maapilogger.log("START",f"Adding {self.objectname} Socket to dataBase - Active Sockets List")
             pid = os.getpid()
-            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id}"))
+            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id},'TCP'"))
             try:
                 self.sockTCP.bind((host, port))
             except:
@@ -57,23 +57,18 @@ class SocketServer():
                         if not data:
                             break
                         payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
-
-                        if payload_id == 0 :
-                            client.send(bytes(0xff))
-
+                        self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
                         elif payload_id == 777 :
                             self.maapilogger.log("STOP",f"Get Slef Kill instruction via SocketTCP")
+                            time.sleep(1)
                             self.sockTCP.close()
                             self.joiningTCP()
-
-                        else:
-                            self.maapilogger.log("DEBUG",f"Get message from {fromHost_} {fromPort_} payload {payload_} payload {payload2_}")
-                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
         except Exception() as e:
             self.maapilogger.log("ERROR", f"Exception in startServerTCP {self.objectname}: {e}")
 
     def startServerUDP(self, host, port):
         try:
+            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id},'UDP'"))
             self.sockUDP.bind((host, port))
             self.maapilogger.log("INFO",self.sockUDP)
             while True and not self.selfkill:

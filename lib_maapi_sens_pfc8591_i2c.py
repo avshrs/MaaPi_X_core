@@ -40,13 +40,24 @@ class PFC8591():
         self.bus                = I2C_MaaPi(1)
         self.pid                = os.getpid()
 
+        self.selfkill           = False
+        self.selfkillTime       = dt.now()
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
+
+
     def service_shutdown(self, signum, frame):
-        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        time.sleep(1)
-        raise SystemExit
+        if not self.selfkill:
+            self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+            self.selfkill = True
+            self.selfkillTime = dt.now()
+
+    def selfkilling(self):
+        if self.selfkill and (dt.now() - self.selfkillTime).seconds >2:
+            self.maapilogger.log("STOP",f'Reading modules Not Raise self term. - SocketServer not running self killing')
+            raise SystemExit
+
 
 
     def checkQueueForReadings(self):
@@ -119,7 +130,7 @@ class PFC8591():
                 self.getTables()
             time.sleep(0.01)
             self.checkQueueForReadings()
-
+            self.selfkilling()
 if __name__ == "__main__":
     PFC8591_ =  PFC8591(sys.argv[1],sys.argv[2],sys.argv[3])
     PFC8591_.getTables()

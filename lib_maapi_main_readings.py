@@ -35,6 +35,7 @@ class Readings:
                 devices_db          = queue_[nr][2]
                 devices_db_rel      = queue_[nr][3]
                 name = devices_db[dev_id]['dev_user_name']
+
                 if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
                     self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
 
@@ -51,6 +52,8 @@ class Readings:
                         error = 2
                         self.maapilogger.log("ERROR",f"Error while reading values from {dev_id} - {name}: {e}")
                         self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
+                elif queue_[nr][0] == self.helpers.instructions["slef_kill"]:
+                    raise SystemExit
 
 
         except Exception as e :

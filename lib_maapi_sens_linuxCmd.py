@@ -35,14 +35,24 @@ class LinuxCmd():
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
         self.socketServer.runTcpServer(self.host, self.port)
 
+        self.selfkill           = False
+        self.selfkillTime       = dt.now()
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
+
+
     def service_shutdown(self, signum, frame):
-        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        #self.socketServer.killServers()
-        time.sleep(1)
-        raise SystemExit
+        if not self.selfkill:
+            self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+            self.selfkill = True
+            self.selfkillTime = dt.now()
+
+    def selfkilling(self):
+        if self.selfkill and (dt.now() - self.selfkillTime).seconds >2:
+            self.maapilogger.log("STOP",f'Reading modules Not Raise self term. - SocketServer not running self killing')
+            raise SystemExit
+
 
 
     def updateCommandLine(self):
@@ -71,7 +81,7 @@ class LinuxCmd():
                 self.updateCommandLine()
             time.sleep(0.01)
             self.checkQueueForReadings()
-
+            self.selfkilling()
 
 if __name__ == "__main__":
     LinuxCmd_ =  LinuxCmd(sys.argv[1],sys.argv[2],sys.argv[3] )
