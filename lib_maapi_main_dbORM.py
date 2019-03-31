@@ -83,6 +83,17 @@ class MaaPiDBConnection():
         except EnvironmentError() as e:
             print (e)
 
+
+
+    def reindexTable(self, name):
+        try:
+            string_ = f"reindex table {name} "
+            x = self.conn.cursor()
+            x.execute(f"{string_}")
+            self.conn.commit()
+        except EnvironmentError() as e:
+            print (e)
+
     def updateRaw(self, where, what, when):
         try:
             string_ = f"UPDATE {where} SET {what} WHERE {when}"

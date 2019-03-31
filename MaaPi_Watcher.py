@@ -144,9 +144,9 @@ class MaapiWatcher():
     def loop(self):
         while True:
             time.sleep(1)
-            self.checkSelectorStatus()
-            self.responceFromSelector()
-            self.checkSelectorResponceTime()
+           # self.checkSelectorStatus()
+            #self.responceFromSelector()
+           # self.checkSelectorResponceTime()
 
 
 if __name__ == "__main__":
