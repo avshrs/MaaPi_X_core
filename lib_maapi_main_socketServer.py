@@ -39,7 +39,7 @@ class SocketServer():
         try:
             self.maapilogger.log("START",f"Adding {self.objectname} Socket to dataBase - Active Sockets List")
             pid = os.getpid()
-            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id}","'TCP'"))
+            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id}","now()","'TCP'"))
             try:
                 self.sockTCP.bind((host, port))
             except:
@@ -69,7 +69,7 @@ class SocketServer():
 
     def startServerUDP(self, host, port):
         try:
-            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id}","'UDP'"))
+            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id}", "now()", "'UDP'"))
             self.sockUDP.bind((host, port))
             self.maapilogger.log("INFO",self.sockUDP)
             while True and not self.selfkill:
