@@ -45,13 +45,10 @@ class MaapiWatcher():
         self.payload_StopTCP    = self.helpers.pyloadToPicke(777, " ", " ", " ", self.watcherHost,self.watcherPort)
         self.payload_Status     = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
         self.payload_StopUDP    = "777_0_0_0"
-
         self.interpreterVer     = f"{sys.executable}"
-        self.lastCheck          = dt.now() - timedelta(hours = 1)
-
-        self.SelectorResponce   = dt.now() - timedelta(hours = 1)
+        self.lastCheck          = dt.now()
+        self.SelectorResponce   = dt.now()
         self.sendingQueryToSocket = 0
-
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, self.board_id)
         self.runningSS          = []
         self.selectorPid        = object()
