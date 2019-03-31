@@ -44,6 +44,8 @@ class Queue():
     def getSocketRadings(self):
         return self.socketReadings.get()
 
+    def getSocketRadingsLen(self):
+        return len(self.socketReadings)
 
     def getQueueDevList(self):
         return self.queueDevList

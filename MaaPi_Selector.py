@@ -33,7 +33,6 @@ class MaapiSelector():
         self.interpreterVer       =f"{sys.executable}"
         # vars
         self.board_id           = self.helpers.updateBoardLocation(self.config.maapiLocation,self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get())
-        print (self.board_id)
         self.maapiLocation      = self.config.maapiLocation
         self.selectorPort       = self.config.selectorPort
         self.selectorHost       = self.config.selectorHost
@@ -85,6 +84,19 @@ class MaapiSelector():
         except Exception as e:
             self.maapilogger.log("ERROR", f"library {lib_id} not exist in library libraryPID ")
 
+    def responceToWatcher(self):
+        if queue.getSocketRadingsLen() > 0:
+            queueTmp  = queue.getSocketRadings()
+            queue_ = queueTmp[self.objectname][self.selectorHost][self.selectorPort]
+            for nr in queue_:
+                if queue_[nr][0] == 0:
+                    self.maapilogger.log("STATUS", f"Get Query from Watcher")
+                    payload_Status  = self.helpers.pyloadToPicke(0xff, " ", " ", " ", self.selectorHost,self.selectorPort)
+                    try:
+                        self.maapilogger.log("STATUS", f"Sending responce to Wacher")
+                        self.socketClient.sendStr(queue_[nr][4], queue_[nr][5], payload_Status)
+                    except Exception as e:
+                        self.maapilogger.log("ERROR", f"Watcher Socket Server Not exist")
 
 
     def startLibraryDeamon(self, lib):
@@ -260,8 +272,9 @@ class MaapiSelector():
 
                 self.timer_3 = dt.now()
 
-            time.sleep(0.1)
+            time.sleep(0.01)
             self.checkDbForOldreadings()
+            self.responceToWatcher()
 
 
     def startConf(self):

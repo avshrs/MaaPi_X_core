@@ -48,7 +48,8 @@ class MaapiWatcher():
 
         self.interpreterVer     = f"{sys.executable}"
         self.lastCheck          = dt.now() - timedelta(hours = 1)
-        self.querySended        = True
+
+        self.SelectorResponce   = dt.now() - timedelta(hours = 1)
         self.sendingQueryToSocket = 0
 
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, self.board_id)
@@ -61,8 +62,6 @@ class MaapiWatcher():
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        self.runningSS = self.maapiDB.table("maapi_running_socket_servers").get()
-        payload = self.helpers.pyloadToPicke(777, " ", " ", " ", self.watcherHost,self.watcherPort)
         self.sendStopMessageToSocketServers()
         time.sleep(2)
         raise SystemExit
@@ -107,33 +106,47 @@ class MaapiWatcher():
             self.maapilogger.log("STOP", f"Selector Service - Process Killed")
 
 
-    def checkSelector(self):
-            if (dt.now() - self.lastCheck).seconds > 10 and self.querySended:
-                try:
-                    self.maapilogger.log("STATUS", f"Sending Query to {self.selectorHost}, {self.selectorPort} for status")
-                    self.socketClient.sendStr(self.selectorHost, self.selectorPort, payload)
-                except:
-                    self.maapilogger.log("STATUS", f"ERROR - Socket Server is not avalible {self.selectorHost}, {self.selectorPort}")
-                    self.stopSelectorService()
-                    self.startSelectorService()
-                    self.querySended = False
-                else:
-                    self.querySended = False
-                    self.lastCheck = dt.now()
-                    self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}' and ss_board_id={self.board_id}")
-                    self.startSelectorService()
-            elif (dt.now() - self.lastCheck).seconds > 10 and not self.querySended:
-                self.maapilogger.log("STATUS", f"ERROR -  Selector Service - Not Responce {self.selectorHost}, {self.selectorPort}")
-                self.stopSelectorService()
-                self.startSelectorService()
-                self.lastCheck = dt.now()
-                self.querySended = True
+    def restartSelectorService(self):
+        self.maapilogger.log("STATUS", f"Restrting Selector Service")
+        self.stopSelectorService()
+        self.startSelectorService()
+
+
+    def checkSelectorStatus(self):
+        if (dt.now() - self.lastCheck).seconds > 60:
+            self.maapilogger.log("STATUS", f"Checking Selector status")
+            try:
+                self.maapilogger.log("STATUS", f"Sending Query to {self.selectorHost}, {self.selectorPort} for status")
+                self.socketClient.sendStr(self.selectorHost, self.selectorPort, self.payload_Status)
+            except:
+                self.maapilogger.log("STATUS", f"ERROR - Socket Server is not avalible {self.selectorHost}, {self.selectorPort} | Restarting")
+                self.restartSelectorService()
+
+
+    def responceFromSelector(self):
+        if queue.getSocketRadingsLen() > 0:
+            queueTmp  = queue.getSocketRadings()
+            queue_ = queueTmp[self.objectname][self.selectorHost][self.selectorPort]
+            for nr in queue_:
+                if queue_[nr][0] == 0xff:
+                    self.maapilogger.log("STATUS", f"Get Responce from Selector")
+                    self.SelectorResponce = dt.now()
+
+
+    def checkSelectorResponceTime(self):
+        if (dt.now() - self.SelectorResponce).seconds > 60:
+            self.maapilogger.log("STATUS", f"Selector Service - not responding | restarting")
+            self.restartSelectorService()
+            self.lastCheck = dt.now()
+            self.SelectorResponce = dt.now()
 
 
     def loop(self):
         while True:
             time.sleep(1)
-            self.checkSelector()
+            self.checkSelectorStatus()
+            self.responceFromSelector()
+            self.checkSelectorResponceTime()
 
 
 if __name__ == "__main__":
