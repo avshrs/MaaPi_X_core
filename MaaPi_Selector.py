@@ -85,8 +85,8 @@ class MaapiSelector():
             self.maapilogger.log("ERROR", f"library {lib_id} not exist in library libraryPID ")
 
     def responceToWatcher(self):
-        if queue.getSocketRadingsLen() > 0:
-            queueTmp  = queue.getSocketRadings()
+        if self.queue.getSocketRadingsLen() > 0:
+            queueTmp  = self.queue.getSocketRadings()
             queue_ = queueTmp[self.objectname][self.selectorHost][self.selectorPort]
             for nr in queue_:
                 if queue_[nr][0] == 0:
