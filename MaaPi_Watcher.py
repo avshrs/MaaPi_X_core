@@ -148,5 +148,5 @@ class MaapiWatcher():
 
 if __name__ == "__main__":
     MaapiW =  MaapiWatcher()
-    MaapiW.startSelectorService()
+    MaapiW.startSelectorService()     
     MaapiW.loop()

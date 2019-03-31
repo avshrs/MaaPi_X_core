@@ -26,12 +26,14 @@ class Readings:
 
 
     def checkQueueForReadings(self, method, queue):
+        dev = 0
         try:
             queueTmp  = queue.getSocketRadings()
             queue_ = queueTmp[self.owner][self.host][self.port]
             value, error = 0, 0
             for nr in queue_:
                 dev_id              = queue_[nr][1]
+                dev                 = queue_[nr][1]
                 devices_db          = queue_[nr][2]
                 devices_db_rel      = queue_[nr][3]
                 name = devices_db[dev_id]['dev_user_name']
@@ -57,7 +59,7 @@ class Readings:
 
 
         except Exception as e :
-            self.maapilogger.log("ERROR",f"checkQueueForReadings{e}")
+            self.maapilogger.log("ERROR",f"checkQueueForReadings | {dev} | {e}")
 
     def insertReadingsToDB(self, nr, readed_value, dev_id, devices_db, devices_db_rel,  error_code):
         try:
