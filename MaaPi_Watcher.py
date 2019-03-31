@@ -120,7 +120,7 @@ class MaapiWatcher():
                     self.querySended = False
                     self.lastCheck = dt.now()
                     self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{self.selectorHost}' and   ss_port='{self.selectorPort}' and ss_board_id={self.board_id}")
-                    self.startSelectorModule()
+                    self.startSelectorService()
             elif (dt.now() - self.lastCheck).seconds > 10 and not self.querySended:
                 self.maapilogger.log("STATUS", f"ERROR -  Selector Service - Not Responce {self.selectorHost}, {self.selectorPort}")
                 self.stopSelectorService()
