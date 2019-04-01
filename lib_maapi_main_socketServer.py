@@ -62,10 +62,11 @@ class SocketServer():
                         if payload_id == 10:
                             self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
 
-                        if payload_id == 0:
+                        elif payload_id == 0 or payload_id == 0xff:
                             self.queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
 
-                        if payload_id == 777 :
+
+                        elif payload_id == 777 :
                             self.queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
                             self.maapilogger.log("STOP",f"Get Slef Kill instruction via SocketTCP")
                             time.sleep(1)

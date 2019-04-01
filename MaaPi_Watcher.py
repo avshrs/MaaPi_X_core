@@ -128,7 +128,7 @@ class MaapiWatcher():
 
 
     def responceFromSelector(self):
-        self.maapilogger.log("STATUS", f"responceFromSelector()")
+        self.maapilogger.log("DEBUG", f"responceFromSelector()")
         if self.queue.getSocketStatusLen() > 0:
             self.maapilogger.log("STATUS", f"responceFromSelector() queue not empty")
             queueTmp  = self.queue.getSocketStatus()
