@@ -92,7 +92,7 @@ class MaapiSelector():
                     self.maapilogger.log("STATUS", f"Get Query from Watcher")
                     payload_Status  = self.helpers.pyloadToPicke(0xff, " ", " ", " ", self.selectorHost,self.selectorPort)
                     try:
-                        self.maapilogger.log("STATUS", f"Sending responce to Wacher")
+                        self.maapilogger.log("STATUS", f"Sending responce to Wacher {queue_[nr][4} {queue_[nr][5}")
                         self.socketClient.sendStr(queue_[nr][4], queue_[nr][5], payload_Status)
                     except Exception as e:
                         self.maapilogger.log("ERROR", f"Watcher Socket Server Not exist")
