@@ -122,19 +122,17 @@ class MaapiWatcher():
                 self.checkSended = True
                 self.responceS == False
                 self.SelectorResponce= dt.now()
+                self.lastCheck= dt.now()
             except:
                 self.maapilogger.log("STATUS", f"ERROR - Socket Server is not avalible {self.selectorHost}, {self.selectorPort} | Restarting")
                 # self.restartSelectorService()
 
 
     def responceFromSelector(self):
-        self.maapilogger.log("DEBUG", f"responceFromSelector()")
         if self.queue.getSocketStatusLen() > 0:
-            self.maapilogger.log("STATUS", f"responceFromSelector() queue not empty")
             queueTmp  = self.queue.getSocketStatus()
             queue_ = queueTmp[self.objectname][self.watcherHost][self.watcherPort]
             for nr in queue_:
-                self.maapilogger.log("STATUS", f"responceFromSelector() infor")
                 if queue_[nr][0] == 0xff:
                     self.maapilogger.log("STATUS", f"Get Responce from Selector")
                     self.checkSended = False
