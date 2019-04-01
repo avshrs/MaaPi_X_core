@@ -58,7 +58,7 @@ class SocketServer():
                             break
 
                         payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
-
+                        self.maapilogger.log("INFO",f"GET mesage id={payload_id}")
                         if payload_id == 10:
                             self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
 
