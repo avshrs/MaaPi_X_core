@@ -134,7 +134,7 @@ class MaapiWatcher():
 
 
     def checkSelectorResponceTime(self):
-        if (dt.now() - self.SelectorResponce).seconds > 65:
+        if (dt.now() - self.SelectorResponce).seconds > 70:
             self.maapilogger.log("STATUS", f"Selector Service - not responding | restarting")
             # self.restartSelectorService()
             self.lastCheck = dt.now()
