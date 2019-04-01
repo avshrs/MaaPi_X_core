@@ -46,9 +46,12 @@ class MaapiWatcher():
         self.payload_Status     = self.helpers.pyloadToPicke(00, " ", " ", " ", self.watcherHost,self.watcherPort)
         self.payload_StopUDP    = "777_0_0_0"
         self.interpreterVer     = f"{sys.executable}"
+
         self.lastCheck          = dt.now()
+        self.checkSended         = False
         self.SelectorResponce   = dt.now()
         self.sendingQueryToSocket = 0
+
         self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, self.board_id)
         self.runningSS          = []
         self.selectorPid        = object()
@@ -110,11 +113,12 @@ class MaapiWatcher():
 
 
     def checkSelectorStatus(self):
-        if (dt.now() - self.lastCheck).seconds > 60:
+        if (dt.now() - self.lastCheck).seconds > 60 and not self.checkSended:
             self.maapilogger.log("STATUS", f"Checking Selector status")
             try:
                 self.maapilogger.log("STATUS", f"Sending Query to {self.selectorHost}, {self.selectorPort} for status")
                 self.socketClient.sendStr(self.selectorHost, self.selectorPort, self.payload_Status)
+                self.checkSended = True
             except:
                 self.maapilogger.log("STATUS", f"ERROR - Socket Server is not avalible {self.selectorHost}, {self.selectorPort} | Restarting")
                 # self.restartSelectorService()
@@ -128,6 +132,7 @@ class MaapiWatcher():
                 if queue_[nr][0] == 0xff:
                     self.maapilogger.log("STATUS", f"Get Responce from Selector")
                     self.SelectorResponce = dt.now()
+                    self.checkSended = False
                 if queue_[nr][0] == 777:
                     self.service_shutdown()
 
