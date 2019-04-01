@@ -132,7 +132,7 @@ class MaapiWatcher():
         if self.queue.getSocketStatusLen() > 0:
             self.maapilogger.log("STATUS", f"responceFromSelector() queue not empty")
             queueTmp  = self.queue.getSocketStatus()
-            queue_ = queueTmp[self.objectname][self.selectorHost][self.selectorPort]
+            queue_ = queueTmp[self.objectname][self.watcherHost][self.watcherPort]
             for nr in queue_:
                 self.maapilogger.log("STATUS", f"responceFromSelector() infor")
                 if queue_[nr][0] == 0xff:
