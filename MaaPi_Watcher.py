@@ -132,17 +132,15 @@ class MaapiWatcher():
             for nr in queue_:
                 if queue_[nr][0] == 0xff:
                     self.maapilogger.log("STATUS", f"Get Responce from Selector")
-                    self.SelectorResponce = dt.now()
                     self.checkSended = False
                 if queue_[nr][0] == 777:
                     self.service_shutdown()
 
 
     def checkSelectorResponceTime(self):
-        if (dt.now() - self.SelectorResponce).seconds > 20 adm:
+        if (dt.now() - self.SelectorResponce).seconds > 20 and self.checkSended :
             self.maapilogger.log("STATUS", f"Selector Service - not responding | restarting")
-             self.restartSelectorService()
-
+            self.restartSelectorService()
             self.SelectorResponce = dt.now()
 
 
