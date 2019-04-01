@@ -31,7 +31,6 @@ class MaapiSelector():
         self.maapilogger        = MaapiLogger.Logger()
         self.maapilogger.name   = self.objectname
         self.interpreterVer       =f"{sys.executable}"
-        # vars
         self.board_id           = self.helpers.updateBoardLocation(self.config.maapiLocation,self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get())
         self.maapiLocation      = self.config.maapiLocation
         self.selectorPort       = self.config.selectorPort
@@ -276,7 +275,7 @@ class MaapiSelector():
 
             time.sleep(0.01)
             self.checkDbForOldreadings()
-            # self.responceToWatcher()
+            self.responceToWatcher()
 
 
     def startConf(self):
