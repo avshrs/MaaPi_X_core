@@ -175,7 +175,7 @@ class MaapiSelector():
             c_dev = self.deviceList[dev]
             tosec = self.helpers.to_sec(c_dev["dev_interval"], c_dev["dev_interval_unit_id"])
 
-            if (dt.now() - c_dev["dev_last_update"]).seconds >= (tosec-(tosec*0.015)) and dev not in self.skippDev:
+            if (dt.now() - c_dev["dev_last_update"]).seconds >= tosec and dev not in self.skippDev:
                 try:
                     self.localQueue[dev]
                 except:
@@ -264,7 +264,7 @@ class MaapiSelector():
 
             if (dt.now() - self.timer_3).seconds >= 60:
                 self.skippDev = []
-
+                # self.checkLibraryProcess()
                 self.timer_3 = dt.now()
 
             time.sleep(0.01)
