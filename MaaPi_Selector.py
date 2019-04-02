@@ -262,12 +262,6 @@ class MaapiSelector():
                 self.timer_1 = dt.now()
                 self.getDeviceList()
 
-            # if (dt.now() - self.timer_2).seconds >= 10:
-            #     self.getLibraryList()
-            #     self.startAllLibraryDeamon()
-            #     self.checkLibraryProcess()
-            #     self.timer_2 = dt.now()
-
             if (dt.now() - self.timer_3).seconds >= 60:
                 self.skippDev = []
 

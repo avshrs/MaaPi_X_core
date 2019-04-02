@@ -25,7 +25,7 @@ class SocketServer():
         self.object_id          = object_id
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.maapiLocation      = self.config.maapiLocation
-
+        self.pid                = os.getpid()
         self.queue              = queue
         self.threads            = {}
         self.pid                = os.getpid()
