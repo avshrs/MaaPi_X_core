@@ -36,24 +36,15 @@ class MaaPiMath():
         self.socketServer.runTcpServer(self.host, self.port)
         self.pid                = os.getpid()
 
-        self.selfkill           = False
-        self.selfkillTime       = dt.now()
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
 
-
     def service_shutdown(self, signum, frame):
-        if not self.selfkill:
-            self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-            self.selfkill = True
-            self.selfkillTime = dt.now()
-
-    def selfkilling(self):
-        if self.selfkill and (dt.now() - self.selfkillTime).seconds >2:
-            self.maapilogger.log("STOP",f'Reading modules Not Raise self term. - SocketServer not running self killing')
-            raise SystemExit
-
+        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        time.sleep(0.5)
+        self.maapilogger.log("STOP",f'Self killing - NOW!')
+        raise SystemExit()
 
 
     def updateMathTable(self):

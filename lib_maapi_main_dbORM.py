@@ -52,7 +52,7 @@ class MaaPiDBConnection():
                           "AND dev_machine_location_id = {2}".format(status,dev_id,board_id))
                 self.conn.commit()
             x.close()
-        except EnvironmentError() as e:
+        except Exception() as e:
             print (e)
 
 
@@ -62,7 +62,7 @@ class MaaPiDBConnection():
             x = self.conn.cursor()
             x.execute(f"{string_}")
             self.conn.commit()
-        except EnvironmentError() as e:
+        except Exception() as e:
             print (e)
 
     def createTable(self, name, list):
@@ -71,7 +71,7 @@ class MaaPiDBConnection():
             x = self.conn.cursor()
             x.execute(f"{string_}")
             self.conn.commit()
-        except EnvironmentError() as e:
+        except Exception() as e:
             print (e)
 
     def clearTable(self, name):
@@ -80,7 +80,7 @@ class MaaPiDBConnection():
             x = self.conn.cursor()
             x.execute(f"{string_}")
             self.conn.commit()
-        except EnvironmentError() as e:
+        except Exception() as e:
             print (e)
 
 
@@ -91,7 +91,7 @@ class MaaPiDBConnection():
             x = self.conn.cursor()
             x.execute(f"{string_}")
             self.conn.commit()
-        except EnvironmentError() as e:
+        except Exception() as e:
             print (e)
 
     def updateRaw(self, where, what, when):
@@ -100,7 +100,7 @@ class MaaPiDBConnection():
             x = self.conn.cursor()
             x.execute(f"{string_}")
             self.conn.commit()
-        except EnvironmentError() as e:
+        except Exception() as e:
             print (e)
 
 # update maapi_running_py_scripts set py_board_id = 5 where py_pid=4344;
@@ -116,7 +116,7 @@ class MaaPiDBConnection():
             x = self.conn.cursor()
             x.execute(f"{string_}")
             self.conn.commit()
-        except EnvironmentError() as e:
+        except Exception() as e:
             print (e)
 
     def clean_logs(self):
@@ -130,6 +130,7 @@ class MaaPiDBConnection():
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
+        try:
             x = self.conn.cursor()
             x.execute("SELECT dev_value, dev_rom_id, dev_collect_values_to_db "
                       "FROM devices "
@@ -163,6 +164,8 @@ class MaaPiDBConnection():
                           "SET dev_interval_queue = {2}, dev_value={0}, dev_read_error='Error' "
                           "WHERE dev_id='{1}' and dev_status=True".format(9999,device_id,False))
                 self.conn.commit()
+        except Exception() as e:
+            print (e)
 
 
     def select_last_nr_of_values(self,dev_id,range_nr):

@@ -125,7 +125,7 @@ class MaapiWatcher():
                 self.lastCheck= dt.now()
             except:
                 self.maapilogger.log("STATUS", f"ERROR - Socket Server is not avalible {self.selectorHost}, {self.selectorPort} | Restarting")
-                # self.restartSelectorService()
+                self.restartSelectorService()
 
 
     def responceFromSelector(self):

@@ -21,7 +21,7 @@ class SocketServer():
         self.config              = Config.MaapiVars()
         self.helpers            = Helpers.Helpers()
         self.maapilogger        = MaapiLogger.Logger()
-        self.maapilogger.name   = f"{self.objectname }Sock."
+        self.maapilogger.name   = f"Socket {self.objectname }"
         self.object_id          = object_id
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.maapiLocation      = self.config.maapiLocation
