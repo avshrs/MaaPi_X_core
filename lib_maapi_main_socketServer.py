@@ -69,8 +69,8 @@ class SocketServer():
                         elif payload_id == 777 :
                             self.queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
                             self.maapilogger.log("STOP",f"Get Slef Kill instruction via SocketTCP")
-                            time.sleep(1)
                             self.sockTCP.close()
+                            time.sleep(0.2)
                             self.joiningTCP()
         except Exception() as e:
             self.maapilogger.log("ERROR", f"Exception in startServerTCP {self.objectname}: {e}")

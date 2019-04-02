@@ -64,7 +64,7 @@ class MaapiWatcher():
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
         self.sendStopMessageToSocketServers()
-        time.sleep(2)
+        time.sleep(1)
         raise SystemExit
 
 
@@ -150,7 +150,7 @@ class MaapiWatcher():
 
     def loop(self):
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             self.checkSelectorStatus()
             self.responceFromSelector()
             self.checkSelectorResponceTime()

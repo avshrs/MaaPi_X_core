@@ -282,5 +282,5 @@ if __name__ == "__main__":
     MaapiSel =  MaapiSelector()
     MaapiSel.startConf()
     MaapiSel.startAllLibraryDeamon()
-    time.sleep(1)
+    time.sleep(2)
     MaapiSel.loop()
