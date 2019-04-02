@@ -70,14 +70,14 @@ class MaapiWatcher():
 
     def sendStopMessageToSocketServers(self):
         self.runningSocketService = self.maapiDB.table("maapi_running_socket_servers").get()
-        for srv in self.runningSockSrv:
-            if self.runningSockSrv[srv]['ss_board_id'] == self.board_id:
-                if self.runningSockSrv[srv]['ss_type'] == "TCP":
-                    self.socketClient.sendStr(self.runningSockSrv[srv]['ss_host'], self.runningSockSrv[srv]['ss_port'], self.payload_StopTCP)
-                    self.maapilogger.log("STOP",f"Sending Stop message to TCP Service {self.runningSockSrv[srv]['ss_host']} {self.runningSockSrv[srv]['ss_port']}")
-                if self.runningSockSrv[srv]['ss_type'] == "UDP":
+        for srv in self.runningSocketService:
+            if self.runningSocketService[srv]['ss_board_id'] == self.board_id:
+                if self.runningSocketService[srv]['ss_type'] == "TCP":
+                    self.socketClient.sendStr(self.runningSocketService[srv]['ss_host'], self.runningSocketService[srv]['ss_port'], self.payload_StopTCP)
+                    self.maapilogger.log("STOP",f"Sending Stop message to TCP Service {self.runningSocketService[srv]['ss_host']} {self.runningSocketService[srv]['ss_port']}")
+                if self.runningSocketService[srv]['ss_type'] == "UDP":
                     self.socketClient.sendViaUDP(self.config.selectorHost, 60000, bytes(self.payload_StopUDP.encode()))
-                    self.maapilogger.log("STOP",f"Sending Stop message to UDP Service {self.runningSockSrv[srv]['ss_host']} {self.runningSockSrv[srv]['ss_port']}")
+                    self.maapilogger.log("STOP",f"Sending Stop message to UDP Service {self.runningSocketService[srv]['ss_host']} {self.runningSocketService[srv]['ss_port']}")
 
 
     def startSelectorService(self):
