@@ -61,11 +61,11 @@ class MaapiWatcher(serviceClass):
         self.running = False
         self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
         self.stopServiceViaTCP(self.selectorHost, self.selectorPort)
-
+        self.maapiDB.cleanSocketServerList(self.board_id)
         for process in self.libraryPID:
             self.stopServiceViaTCP(self.libraryPID[process]["host"],self.libraryPID[process]["port"])
         self.stopServiceViaTCP(self.watcherHost, self.watcherPort)
-        self.maapiDB.cleanSocketServerList(self.board_id)
+
         time.sleep(1)
         raise SystemExit
 
