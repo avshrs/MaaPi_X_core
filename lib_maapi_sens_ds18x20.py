@@ -62,7 +62,7 @@ class DS18X20(SensProto):
             if (dt.now() - self.timer_2).seconds >= 10:
                 self.timer_2 = dt.now()
                 self.updateCommandLine()
-            time.sleep(0.01)
+            time.sleep(0.1)
             self.checkQueueForReadings()
 
 
