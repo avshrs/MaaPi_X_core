@@ -51,6 +51,7 @@ class MaapiWatcher(serviceClass):
         self.sendingQueryToSocket = 0
         self.running            = True
         self.runningSS          = []
+        self.maapiDB.cleanSocketServerList(self.board_id)
         self.selectorPid        = object()
         self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
         signal.signal(signal.SIGTERM, self.service_shutdown)
