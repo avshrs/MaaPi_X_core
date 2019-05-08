@@ -43,6 +43,8 @@ class MoonPhase(SensProto):
         while True:
             time.sleep(0.1)
             self.checkQueueForReadings()
+            self.responceToWatcher()
+
 
 if __name__ == "__main__":
     MoonPhase_ =  MoonPhase(sys.argv[1],sys.argv[2],sys.argv[3] )
