@@ -36,7 +36,7 @@ class MaapiSelector():
         self.board_id           = self.helpers.updateBoardLocation(self.config.maapiLocation,self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get())
         self.payload_Status     = self.helpers.pyloadToPicke(0xff, " ", " ", " ", self.selectorHost,self.selectorPort)
         self.maapiLocation      = self.config.maapiLocation
-
+        self.timeToRead         = 0.05 # 0.05 = 5%  interval - time to read
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
         self.timer_3            = dt.now()
@@ -51,6 +51,7 @@ class MaapiSelector():
         self.socketServer.runTcpServer(self.selectorHost, self.selectorPort)
         self.maapilogger.log("INFO","Initialising Selector Module ")
         self.skippDev           = []
+        self.skippDevlib        = {}
         self.pid                = os.getpid()
         self.sendingQueryToSocket = 0
         signal.signal(signal.SIGTERM, self.service_shutdown)
@@ -75,38 +76,27 @@ class MaapiSelector():
                 elif queue_[nr][0] == 777:
                     self.service_shutdown()
 
+
     def checkDbForOldreadings(self):
         for dev in self.deviceList:
-            c_dev = self.deviceList[dev]
-            tosec = self.helpers.to_sec(c_dev["dev_interval"], c_dev["dev_interval_unit_id"])
-            if (dt.now() - c_dev["dev_last_update"]).seconds >= tosec and dev not in self.skippDev:
-                try:
-                    self.localQueue[dev]
-                except:
-                    self.localQueue[dev]=c_dev["dev_last_update"]
-                    self.maapilogger.log("DEBUG",f"self.localQueue[dev] not exist - adding new{dev}")
-                if (dt.now() - self.localQueue[dev]).seconds >= (tosec/2):
+            tosec = self.helpers.to_sec(self.deviceList[dev]["dev_interval"], self.deviceList[dev]["dev_interval_unit_id"])
+            try:
+                if ((dt.now() - self.deviceList[dev]["dev_last_update"]).seconds >= int((tosec - (tosec * self.timeToRead)))) and ((dt.now() - self.localQueue[dev]).seconds >= (tosec/2)):
+                    print (dev,(dt.now() - self.deviceList[dev]["dev_last_update"]).seconds, int((tosec - (tosec * self.timeToRead))))
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost, self.selectorPort)
-                    try:
-                        for serv in self.runningServices:
-                            if self.runningServices[serv]["ss_device_table_id"] == self.deviceList[dev]['dev_type_id']:
-
+                    for serv in self.runningServices:
+                        if self.runningServices[serv]["ss_device_table_id"] == self.deviceList[dev]['dev_type_id']:
+                            try:
                                 self.socketClient.sendStr(self.runningServices[serv]["ss_host"], self.runningServices[serv]["ss_port"], payload)
-
-                                self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']}")
-                                self.maapilogger.log("DEBUG",f"to {self.runningServices[serv]['ss_host']}:{self.runningServices[serv]['ss_port']}")
-
-                    except Exception as e:
-                        self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist in database for this location/board")
-                        self.skippDev.append(dev)
-                        self.localQueue[dev]=c_dev["dev_last_update"]
+                                self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']} to {self.runningServices[serv]['ss_port']}")
+                            except Exception as e:
+                                self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist in database for this location/board")
+            except:
+                 self.localQueue[dev] = dt.now() - timedelta(hours = 1)
 
 
-
-    def getDeviceList(self):
-        gdstart = dt.now()
-
+    def getData(self):
         self.deviceList = self.maapiDB.table("devices").columns(
                 "dev_id",
                 "dev_type_id",
@@ -143,8 +133,9 @@ class MaapiSelector():
                 ).order_by('dev_id').filters_eq(
                 dev_status = True).get()
 
-        gdstop = dt.now()
-        self.maapilogger.log("DEBUG","Devices list updated in time: {tim}".format(tim=(gdstop-gdstart)))
+        self.runningServices = self.maapiDB.table("maapi_running_socket_servers"
+                ).filters_eq(ss_board_id=self.board_id).get()
+
 
     def sendDataToServer(self,host,port,data):
         try:
@@ -152,33 +143,20 @@ class MaapiSelector():
         except Exception as e:
             self.maapilogger.log("ERROR","Exception - SendDataToServer {Ex}".format(Ex=e))
 
-    def getRunningServices(self):
-        """
-        ss_device_table_id
-        dodac do bazy danych pole id w maapi_running_socket_servers pole id !!!!!!!!!!
-
-        """
-        self.runningServices = self.maapiDB.table("maapi_running_socket_servers").get()
-
 
     def loop(self):
         while True:
-
-            if (dt.now() - self.timer_3).seconds >= 60:
-                self.skippDev = []
-                self.getRunningServices()
-                self.getDeviceList()
-                self.timer_3 = dt.now()
-
+            if (dt.now() - self.timer_2).seconds >= 10:
+                self.getData()
+                self.timer_2 = dt.now()
             time.sleep(0.01)
             self.checkDbForOldreadings()
             self.responceToWatcher()
 
 
     def startConf(self):
-        self.getRunningServices()
         self.maapilogger.log("INFO","Preparing to start Selector module")
-        self.getDeviceList()
+        self.getData()
 
 
 
