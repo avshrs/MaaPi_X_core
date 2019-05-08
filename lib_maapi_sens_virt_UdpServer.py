@@ -18,7 +18,6 @@ class UdpServer(SensProto):
         self.tcpPort            = int(port)
         self.udpPort            = 60000
         self.maapiCommandLine   = []
-        self.helpers            = Helpers.Helpers()
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
         super().__init__()
