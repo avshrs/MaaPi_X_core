@@ -19,6 +19,7 @@ class DS18X20(SensProto):
         self.maapiCommandLine   = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
+        super().__init__()
 
     def updateCommandLine(self):
         self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()

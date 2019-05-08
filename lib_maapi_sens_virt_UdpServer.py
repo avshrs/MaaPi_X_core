@@ -5,17 +5,8 @@
 #                          MAAPI X
 #
 ##############################################################
-
-import lib_maapi_main_checkDevCond               as CheckDev
-import lib_maapi_main_queue                      as Queue
-import lib_maapi_main_logger                     as MaapiLogger
-import lib_maapi_main_socketClient               as SocketClient
-import lib_maapi_main_socketServer               as SocketServer
-import lib_maapi_main_helpers                    as Helpers
-import lib_maapi_main_dbORM                      as Db_connection
-import lib_maapi_main_readings                   as Readings
+from lib_maapi_sens_proto import SensProto
 import time, copy, sys, os, signal
-
 from datetime import datetime as dt
 import subprocess
 
@@ -30,6 +21,7 @@ class UdpServer(SensProto):
         self.helpers            = Helpers.Helpers()
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
+        super().__init__()
         self.socketServer.runUdpServer(self.host, self.udpPort)
 
 

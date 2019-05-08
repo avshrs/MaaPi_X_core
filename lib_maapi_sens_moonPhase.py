@@ -19,7 +19,8 @@ class MoonPhase(SensProto):
         self.host               = host
         self.port               = int(port)
         self.maapiCommandLine   = []
-   
+        super().__init__()
+
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         value, error = 0, 0
         try:
