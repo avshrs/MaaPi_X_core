@@ -5,52 +5,24 @@
 #                          MAAPI X
 #
 ##############################################################
-import lib_maapi_main_checkDevCond               as CheckDev
-import lib_maapi_main_queue                      as Queue
-import lib_maapi_main_logger                     as MaapiLogger
-import lib_maapi_main_socketClient               as SocketClient
-import lib_maapi_main_socketServer               as SocketServer
-import lib_maapi_main_helpers                    as Helpers
-import lib_maapi_main_dbORM                      as Db_connection
-import lib_maapi_main_readings                   as Readings
-import time, copy, sys, smbus, os, signal
+from lib_maapi_sens_proto import SensProto
 from lim_maapi_i2c_bus import I2C_MaaPi
+import time, copy, sys, os, signal
 from statistics import median, stdev, mean
-
 from datetime import datetime as dt
-import subprocess
 
-class PFC8591():
+class PFC8591(SensProto):
     def __init__(self,host,port,id_):
-        self.queue              = Queue.Queue()
+        self.id_                = id_
         self.objectname         = "PFC8591"
         self.host               = host
         self.port               = int(port)
-        self.maapiCommandLine   = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
-        self.maapilogger        = MaapiLogger.Logger()
-        self.maapilogger.name   = self.objectname
         self.pfcTable           = []
         self.busOptionsTable    = []
-        self.readings           = Readings.Readings(self.objectname,self.host, self.port)
-        self.maapiDB            = Db_connection.MaaPiDBConnection()
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue,1)
-        self.socketServer.runTcpServer(self.host, self.port)
         self.bus                = I2C_MaaPi(1)
-
-        signal.signal(signal.SIGTERM, self.service_shutdown)
-        signal.signal(signal.SIGINT, self.service_shutdown)
-
-    def service_shutdown(self, signum, frame):
-        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        time.sleep(0.5)
-        self.maapilogger.log("STOP",f'Self killing - NOW!')
-        raise SystemExit()
-
-
-    def checkQueueForReadings(self):
-        self.readings.checkQueueForReadings(self.readValues, self.queue)
+        super().__init__()
 
 
     def getTables(self):
@@ -111,6 +83,9 @@ class PFC8591():
             return value, error
         return value, error
 
+    def service_startup(self):
+        self.getTables()
+
 
     def loop(self):
         while True:
@@ -124,7 +99,7 @@ class PFC8591():
 
 if __name__ == "__main__":
     PFC8591_ =  PFC8591(sys.argv[1],sys.argv[2],sys.argv[3])
-    PFC8591_.getTables()
+    PFC8591_.service_startup()
     PFC8591_.loop()
 
 

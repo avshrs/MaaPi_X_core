@@ -19,9 +19,9 @@ import time, copy, sys, os, signal
 from datetime import datetime as dt
 import subprocess
 
-class UdpServer():
+class UdpServer(SensProto):
     def __init__(self,host,port,id_):
-        self.queue              = Queue.Queue()
+        self.id_                = id_
         self.objectname         = "UdpServer"
         self.host               = host
         self.tcpPort            = int(port)
@@ -30,27 +30,7 @@ class UdpServer():
         self.helpers            = Helpers.Helpers()
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
-        self.maapilogger        = MaapiLogger.Logger()
-        self.maapilogger.name   = self.objectname
-        self.readings           = Readings.Readings(self.objectname,self.host,self.udpPort)
-        self.maapiDB            = Db_connection.MaaPiDBConnection()
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, id_)
-        self.socketServer.runTcpServer(self.host, self.tcpPort)
-        self.socketServer.runUdpServer(self.host, self.udpPort )
-        self.pid                = os.getpid()
-
-        self.selfkill           = False
-        self.selfkillTime       = dt.now()
-        signal.signal(signal.SIGTERM, self.service_shutdown)
-        signal.signal(signal.SIGINT, self.service_shutdown)
-
-
-    def service_shutdown(self, signum, frame):
-        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        time.sleep(0.5)
-        self.maapilogger.log("STOP",f'Self killing - NOW!')
-        raise SystemExit()
-
+        self.socketServer.runUdpServer(self.host, self.udpPort)
 
 
     def checkQueueForReadings(self):

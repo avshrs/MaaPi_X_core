@@ -6,46 +6,21 @@
 #
 ##############################################################
 
-import lib_maapi_main_checkDevCond               as CheckDev
-import lib_maapi_main_queue                      as Queue
-import lib_maapi_main_logger                     as MaapiLogger
-import lib_maapi_main_socketClient               as SocketClient
-import lib_maapi_main_socketServer               as SocketServer
-import lib_maapi_main_helpers                    as Helpers
-import lib_maapi_main_dbORM                      as Db_connection
-import lib_maapi_main_readings                   as Readings
+from lib_maapi_sens_proto import SensProto
 import time, copy, sys, os, signal
 
 from datetime import datetime as dt
 
 
-class MaaPiMath():
+class MaaPiMath(SensProto):
     def __init__(self,host,port,id_):
-        self.queue              = Queue.Queue()
         self.objectname         = "MaaPiMath"
+        self.id_                = id_
         self.host               = host
         self.port               = int(port)
         self.maapiMathTable     = []
         self.timer_1            = dt.now()
-        self.timer_2            = dt.now()
-        self.maapilogger        = MaapiLogger.Logger()
-        self.maapilogger.name   = self.objectname
-        self.maapiDB            = Db_connection.MaaPiDBConnection()
-        self.readings           = Readings.Readings(self.objectname,self.host, self.port)
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, 1)
-        self.socketServer.runTcpServer(self.host, self.port)
-        self.pid                = os.getpid()
-
-        signal.signal(signal.SIGTERM, self.service_shutdown)
-        signal.signal(signal.SIGINT, self.service_shutdown)
-
-
-    def service_shutdown(self, signum, frame):
-        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        time.sleep(0.5)
-        self.maapilogger.log("STOP",f'Self killing - NOW!')
-        raise SystemExit()
-
+        super().__init__()
 
     def updateMathTable(self):
         self.maapiMathTable = self.maapiDB.table("maapi_math").columns( 'id',
@@ -61,10 +36,6 @@ class MaaPiMath():
                                                                         'math_enabled',
                                                                         ).get()
         self.maapilogger.log("DEBUG","Update maapiMathTable from database")
-
-
-    def checkQueueForReadings(self):
-        self.readings.checkQueueForReadings(self.readValues, self.queue)
 
 
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
@@ -102,17 +73,21 @@ class MaaPiMath():
         else:
             return value, error
 
+    def service_startup(self):
+        self.updateMathTable()
+
 
     def loop(self):
         while True:
-            if (dt.now() - self.timer_2).seconds >= 10:
-                self.timer_2 = dt.now()
+            if (dt.now() - self.timer_1).seconds >= 10:
+                self.timer_1 = dt.now()
                 self.updateMathTable()
             time.sleep(0.01)
+            self.responceToWatcher()
             self.checkQueueForReadings()
 
 
 if __name__ == "__main__":
     MaaPiMath_ =  MaaPiMath(sys.argv[1], sys.argv[2], sys.argv[3])
-    MaaPiMath_.updateMathTable()
+    MaaPiMath_.service_startup()
     MaaPiMath_.loop()

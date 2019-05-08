@@ -186,6 +186,27 @@ class MaaPiDBConnection():
         except Exception() as e:
             print (e)
 
+
+    def deleteRow(self, table, condition):
+        try:
+            try:
+                conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
+            except (Exception, psycopg2.DatabaseError) as error:
+                print (error)
+            else:
+                string_ = f"DELETE FROM {table} WHERE {condition}"
+                x = conn.cursor()
+                x.execute(f"{string_}")
+                conn.commit()
+            finally:
+                try:
+                    conn.close()
+                except:
+                    pass
+        except Exception() as e:
+            print (e)
+
+
     def clean_logs(self):
         try:
             try:

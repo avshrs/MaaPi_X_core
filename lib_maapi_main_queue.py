@@ -25,7 +25,7 @@ class Queue():
         self.queueDevList       = {}
         self.maapilogger        = MaapiLogger.Logger()
         self.add                = 0
-
+        self.selfkill           = False
 
     def addSocketRadings(self, owner, fomHost, onPort, payload_id, payload, payload2, payload3, reciveToHost = " ", reciveToPort = " ", dateTime=dt.now()):
         self.maapilogger.name   = f"Queue {owner}"
@@ -70,6 +70,14 @@ class Queue():
 
     def getSocketStatusLen(self):
         return self.socketStatus.qsize()
+
+    def getSelfKill(self):
+        self.maapilogger.log("STOP",f"get selfKill {self.selfkill}")
+        return self.selfkill
+
+    def setSelfKill(self):
+        self.maapilogger.log("STOP",f"SelfKill set to true")
+        self.selfkill = True
 
 
 

@@ -31,85 +31,88 @@ class SocketServer():
         self.pid                = os.getpid()
         self.sockTCP            = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sockUDP            = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.selfkill = False
+        self.selfkill           = False
         self.board_id           = self.helpers.updateBoardLocation(self.config.maapiLocation,self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get())
 
 
-    def startServerTCP(self, host, port):
+    def startServerTCP(self, host, port, queue):
         try:
             self.maapilogger.log("START",f"Adding {self.objectname} Socket to dataBase - Active Sockets List")
             pid = os.getpid()
-            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id}","now()","'TCP'"))
+            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{self.pid}",f"{self.board_id}","now()","'TCP'",f"{self.object_id}"))
             try:
                 self.sockTCP.bind((host, port))
             except:
-                # add loop with increasing port until its find free slot
                 self.sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 self.sockTCP.bind((host, port))
             self.sockTCP.listen(10000)
             self.maapilogger.log("START",self.sockTCP)
-
-            while True and not self.selfkill:
+            while True:
+                if self.selfkill:
+                    self.maapilogger.log("STOP",f"Get self kill order.")
+                    break
                 client, address = self.sockTCP.accept()
                 with client:
-                    while True and not self.selfkill:
+                    while True:
                         data = client.recv(200000)
+                        if self.selfkill:
+                            self.maapilogger.log("STOP",f"Get self kill order.")
+                            break
                         if not data:
                             break
-
                         payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
                         self.maapilogger.log("DEBUG",f"GET mesage id={payload_id}")
+
                         if payload_id == 10:
-                            self.queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+                            queue.addSocketRadings(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
 
                         elif payload_id == 0 or payload_id == 0xff:
-                            self.queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
-
+                            queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
 
                         elif payload_id == 777 :
-                            self.queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
+                            queue.addSocketStatus(self.objectname, host, port, payload_id, payload_, payload2_, payload3_ ,fromHost_, fromPort_)
                             self.maapilogger.log("STOP",f"Get Slef Kill instruction via SocketTCP")
-                            self.sockTCP.close()
-                            time.sleep(0.2)
-                            self.joiningTCP()
+                            self.selfkill = True
+                            break
+                        else:
+                            self.maapilogger.log("INFO",f"Get unknown packet via tcp")
+
+
+            self.joiningTCP()
         except Exception() as e:
             self.maapilogger.log("ERROR", f"Exception in startServerTCP {self.objectname}: {e}")
 
     def startServerUDP(self, host, port):
         try:
-            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{pid}",f"{self.board_id}", "now()", "'UDP'"))
+            self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{self.pid}",f"{self.board_id}", "now()", "'UDP'"))
             self.sockUDP.bind((host, port))
             self.maapilogger.log("INFO",self.sockUDP)
-            while True and not self.selfkill:
+            while True:
                 if self.selfkill:
-                    self.maapilogger.log("INFO",f"self.selfkill ==  {self.selfkill} - stopin UDP")
-                    self.sockUDP.close()
-                    self.joining()
-
+                    break
                 data, address = self.sockUDP.recvfrom(4096)
                 if not data:
                     break
-
                 payload_id, dev_id, value, name  = data.decode("utf-8").split("_")
                 if int(payload_id) == 99:
                     self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
 
                 elif int(payload_id) == 777 :
+                    self.queue.addSocketRadings(self.objectname, host, port, str(payload_id), int(dev_id), float(value), str(name) )
                     self.maapilogger.log("STOP",f"Get Slef Kill instruction via SocketUDP")
-                    self.sockUDP.close()
-                    self.joiningUDP()
+                    self.selfkill = True
+                    break
                 else:
                     self.maapilogger.log("INFO",f"Get unknown packet via udp")
-
+            self.sockUDP.close()
+            self.joiningUDP()
         except Exception as e:
             self.maapilogger.log("ERROR", f"Exception in startServerUDP {self.objectname}: {e}")
 
-
     def runTcpServer(self, host, port):
         self.maapilogger.log("START",f"{self.objectname} Run TCP Server")
-        self.threads["TCP"] = Thread(target=self.startServerTCP,args=(host, port))
+        self.threads["TCP"] = Thread(target=self.startServerTCP,args=(host, port, self.queue))
         self.threads["TCP"].start()
-
 
     def runUdpServer(self, host, port):
         self.maapilogger.log("START","{0} Run UDP Server".format(self.objectname ))
@@ -117,12 +120,13 @@ class SocketServer():
         self.threads["UDP"].start()
 
     def joiningTCP(self):
-        self.selfkill = True
+        self.sockTCP.close()
         try:
             self.maapilogger.log("STOP","socket TCP -  join thread")
             self.threads["TCP"].join()
         except:
             pass
+
     def joiningUDP(self):
         try:
             self.maapilogger.log("STOP","socket UTP -  join thread")

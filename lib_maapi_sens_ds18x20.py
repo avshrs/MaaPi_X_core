@@ -6,55 +6,23 @@
 #
 ##############################################################
 
-import lib_maapi_main_checkDevCond               as CheckDev
-import lib_maapi_main_queue                      as Queue
-import lib_maapi_main_logger                     as MaapiLogger
-import lib_maapi_main_socketClient               as SocketClient
-import lib_maapi_main_socketServer               as SocketServer
-import lib_maapi_main_helpers                    as Helpers
-import lib_maapi_main_dbORM                      as Db_connection
-import lib_maapi_main_readings                   as Readings
+from lib_maapi_sens_proto import SensProto
 import time, copy, sys, os, signal
-
 from datetime import datetime as dt
-import subprocess
 
-class DS18X20():
+class DS18X20(SensProto):
     def __init__(self,host,port,id_):
-        self.queue              = Queue.Queue()
+        self.id_                = id_
         self.objectname         = "DS18X20"
         self.host               = host
         self.port               = int(port)
         self.maapiCommandLine   = []
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
-        self.maapilogger        = MaapiLogger.Logger()
-        self.maapilogger.name   = self.objectname
-        self.readings           = Readings.Readings(self.objectname,self.host, self.port)
-        self.maapiDB            = Db_connection.MaaPiDBConnection()
-        self.socketServer       = SocketServer.SocketServer(self.objectname, self.queue, id_)
-        self.socketServer.runTcpServer( self.host, self.port)
-
-        self.pid                = os.getpid()
-
-
-        signal.signal(signal.SIGTERM, self.service_shutdown)
-        signal.signal(signal.SIGINT, self.service_shutdown)
-
-    def service_shutdown(self, signum, frame):
-        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        time.sleep(0.5)
-        self.maapilogger.log("STOP",f'Self killing - NOW!')
-        raise SystemExit()
-
 
     def updateCommandLine(self):
         self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()
         self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
-
-    def checkQueueForReadings(self):
-        self.readings.checkQueueForReadings(self.readValues, self.queue)
-
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         error = 0
@@ -85,6 +53,9 @@ class DS18X20():
         else:
             return value, error
 
+    def service_startup(self):
+        self.updateCommandLine()
+
     def loop(self):
         while True:
             if (dt.now() - self.timer_2).seconds >= 10:
@@ -96,5 +67,5 @@ class DS18X20():
 
 if __name__ == "__main__":
     DS18X20_ =  DS18X20(sys.argv[1],sys.argv[2],sys.argv[3] )
-    DS18X20_.updateCommandLine()
+    DS18X20_.service_startup()
     DS18X20_.loop()
