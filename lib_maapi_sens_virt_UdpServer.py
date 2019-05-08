@@ -52,7 +52,7 @@ class UdpServer(SensProto):
         while True:
             time.sleep(0.01)
             self.checkQueueForReadings()
-
+            self.responceToWatcher()
 
 if __name__ == "__main__":
     UdpServer =  UdpServer(sys.argv[1],sys.argv[2],sys.argv[3])
