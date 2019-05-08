@@ -185,5 +185,4 @@ class MaapiSelector():
 if __name__ == "__main__":
     MaapiSel =  MaapiSelector()
     MaapiSel.startConf()
-    time.sleep(2)
     MaapiSel.loop()

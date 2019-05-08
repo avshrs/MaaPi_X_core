@@ -94,6 +94,7 @@ class PFC8591(SensProto):
                 self.getTables()
             time.sleep(0.1)
             self.checkQueueForReadings()
+            self.responceToWatcher()
 
 
 

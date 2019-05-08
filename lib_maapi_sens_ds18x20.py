@@ -64,6 +64,7 @@ class DS18X20(SensProto):
                 self.updateCommandLine()
             time.sleep(0.1)
             self.checkQueueForReadings()
+            self.responceToWatcher()
 
 
 if __name__ == "__main__":

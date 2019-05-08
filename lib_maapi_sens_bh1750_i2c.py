@@ -68,6 +68,7 @@ class BME280I2C(SensProto):
         while True:
             time.sleep(0.1)
             self.checkQueueForReadings()
+            self.responceToWatcher()
 
 if __name__ == "__main__":
     BME280I2C_ =  BME280I2C(sys.argv[1],sys.argv[2],sys.argv[3])
