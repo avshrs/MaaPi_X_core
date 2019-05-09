@@ -81,6 +81,12 @@ class serviceClass():
         try:
             self.maapilogger.log("STOP", f"Killing library deamon {lib_id}")
             if self.libraryPID[lib_id]:
+                try:
+                    self.socketClient.sendStr(self.libraryPID[lib_id]["host"],self.libraryPID[lib_id]["port"], payload_StopTCP)
+                    self.maapilogger.log("STOP", f"ServiceClass | Kill message sended {self.libraryPID[lib_id]['host']}:{self.libraryPID[lib_id]['port']}")
+                except:
+                    self.maapilogger.log("STOP", f"ServiceClass | Selector Service - Socket Server not running")
+                time.sleep(1)
                 self.libraryPID[lib_id]["pid"].kill()
                 try:
                     del self.libraryPID[lib_id]
@@ -162,4 +168,3 @@ class serviceClass():
                         self.libraryPID[lib]["lastResponce"] = dt.now()
                         self.maapilogger.log("STATUS", f"Get Responce from {queue_[nr][4]} {queue_[nr][5]}")
                         self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{lib_temp[lib]['host']}' and ss_port='{lib_temp[lib]['port']}'")
-                    
