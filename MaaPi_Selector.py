@@ -81,8 +81,8 @@ class MaapiSelector():
         for dev in self.deviceList:
             tosec = self.helpers.to_sec(self.deviceList[dev]["dev_interval"], self.deviceList[dev]["dev_interval_unit_id"])
             try:
-                if ((dt.now() - self.deviceList[dev]["dev_last_update"]).seconds >= int((tosec - (tosec * self.timeToRead)))) and ((dt.now() - self.localQueue[dev]).seconds >= (tosec/2)):
-                    print (dev,(dt.now() - self.deviceList[dev]["dev_last_update"]).seconds, int((tosec - (tosec * self.timeToRead))))
+                if ((dt.now() - self.deviceList[dev]["dev_last_update"]).seconds >= (tosec - (tosec * self.timeToRead))) and ((dt.now() - self.localQueue[dev]).seconds >= (tosec/2)):
+                    print (dev,(dt.now() - self.deviceList[dev]["dev_last_update"]).seconds, (tosec - (tosec * self.timeToRead)))
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost, self.selectorPort)
                     for serv in self.runningServices:
@@ -91,7 +91,7 @@ class MaapiSelector():
                                 self.socketClient.sendStr(self.runningServices[serv]["ss_host"], self.runningServices[serv]["ss_port"], payload)
                                 self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']} to {self.runningServices[serv]['ss_port']}")
                             except Exception as e:
-                                self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist in database for this location/board error:{e}")
+                                self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist in database for this location/board{e}")
             except Exception as e:
                 self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings error: {e}")
                 self.localQueue[dev] = dt.now() - timedelta(hours = 1)
