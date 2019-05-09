@@ -29,34 +29,27 @@ class Readings:
         dev = 0
         try:
             if queue.getSocketRadingsLen() > 0:
-                queueTmp  = queue.getSocketRadings()
-                queue_ = queueTmp[self.owner][self.host][self.port]
+                queue_  = (queue.getSocketRadings())[self.owner][self.host][self.port]
                 value, error = 0, 0
                 for nr in queue_:
                     dev_id              = queue_[nr][1]
                     dev                 = queue_[nr][1]
                     devices_db          = queue_[nr][2]
                     devices_db_rel      = queue_[nr][3]
-                    name = devices_db[dev_id]['dev_user_name']
-
                     if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
                         self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
-
                         try:
                             startd = dt.now()
                             value, error = method(nr, dev_id, devices_db, devices_db_rel)
                             stopd = dt.now()
                             val = round(float(value),3)
-                            self.maapilogger.log("READ",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {name:<25} |  Value: {val:<15} | inTime: {(stopd-startd)}")
+                            self.maapilogger.log("READ",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {devices_db[dev_id]['dev_user_name']:<25} |  Value: {val:<15} | inTime: {(stopd-startd)}")
                             self.insertReadingsToDB(nr ,float(value), dev_id, devices_db, devices_db_rel, error)
-
                         except Exception as e:
                             value = 0
                             error = 2
-                            self.maapilogger.log("ERROR",f"Error while reading values from {dev_id} - {name}: {e}")
+                            self.maapilogger.log("ERROR",f"Error while reading values from {dev_id} - {devices_db[dev_id]['dev_user_name']}: {e}")
                             self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
-                    elif queue_[nr][0] == self.helpers.instructions["slef_kill"]:
-                        raise SystemExit
 
 
         except Exception as e :
@@ -68,14 +61,13 @@ class Readings:
                 #9999.0 reading ok
                 #9999.1 device not exist
                 #9999.2 error while reading
-                self.maapilogger.log("ERROR","Error while reading ")
+                self.maapilogger.log("ERROR",f"Error in reading method - error code: {error_code}")
                 self.maapiDB.insert_readings(dev_id,float(f"9999.{error_code}")," ",False)
-
             else:
                 value, boolean = self.checkDev.checkDevCond( devices_db, devices_db_rel, dev_id, readed_value)
                 self.maapilogger.log("DEBUG","Insert readings to DataBase")
                 self.maapiDB.insert_readings(dev_id,value," ",boolean)
 
         except Exception as e:
-            self.maapilogger.log("ERROR",f"Error reading data from CMD: {e}")
+            self.maapilogger.log("ERROR",f"Error inserting data from CMD: {e}")
             self.maapiDB.insert_readings(dev_id,0," ",False)

@@ -25,7 +25,7 @@ class serviceClass():
         self.servicePids        = {}
         self.libraryPID         = {}
         self.libraryList        = []
-        self.libraryLastResponce= 120 # seconds
+        self.libraryLastResponce= 600 # seconds
         self.sendingQueryToSocket = 0
 
 
@@ -137,20 +137,20 @@ class serviceClass():
         for lib in lib_temp:
             if lib in self.libraryList:
                 try:
-                    if (dt.now() - lib_temp[lib]["lastResponce"]).seconds > self.libraryLastResponce and self.libraryPID[lib]["sendedQuery"] < 3:
+                    if (dt.now() - lib_temp[lib]["lastResponce"]).seconds > self.libraryLastResponce and self.libraryPID[lib]["sendedQuery"] < 5:
                         self.maapilogger.log("STATUS", f"Sending query to Selector: is ok? {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
                         payload = self.helpers.pyloadToPicke(00, " ", " ", " ",self.watcherHost,self.watcherPort)
                         try:
-                            self.socketClient.sendStr(lib_temp[lib]["host"], lib_temp[lib]["port"], payload)
                             self.maapilogger.log("DEBUG", f"Query sended to {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
                             self.libraryPID[lib]["sendedQuery"] += 1
                             self.libraryPID[lib]["lastResponce"] = dt.now()
-                        except:
-                            self.maapilogger.log("STATUS", f"Service not responce - RESTARTING  {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
+                            self.socketClient.sendStr(lib_temp[lib]["host"], lib_temp[lib]["port"], payload)
+                        except Exception as e :
+                            self.maapilogger.log("STATUS", f"Service not responce - RESTARTING  {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']} | error:{e}")
                             self.restartLibraryDeamon(lib)
-                    elif self.libraryPID[lib]["sendedQuery"] >= 3:
+                    if self.libraryPID[lib]["sendedQuery"] >= 5:
                         self.libraryPID[lib]["lastResponce"] = dt.now()
-                        self.maapilogger.log("STATUS", f"Service not responce - RESTARTING  {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
+                        self.maapilogger.log("STATUS", f"Service not responce - 5 attempts - RESTARTING  {lib_temp[lib]['name']} {lib_temp[lib]['host']}, {lib_temp[lib]['port']}")
                         self.restartLibraryDeamon(lib)
                 except Exception as e :
                     self.maapilogger.log("ERROR", "Exception: checkLibraryProcess() {exc}".format(exc = e))
