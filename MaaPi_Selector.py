@@ -82,7 +82,7 @@ class MaapiSelector():
             tosec = self.helpers.to_sec(self.deviceList[dev]["dev_interval"], self.deviceList[dev]["dev_interval_unit_id"])
             try:
                 if ((dt.now() - self.deviceList[dev]["dev_last_update"]).seconds >= (tosec - (tosec * self.timeToRead))) and ((dt.now() - self.localQueue[dev]).seconds >= tosec):
-                    print (dev,(dt.now() - self.deviceList[dev]["dev_last_update"]).seconds, (tosec - (tosec * self.timeToRead)))
+                    #print (dev,(dt.now() - self.deviceList[dev]["dev_last_update"]).seconds, (tosec - (tosec * self.timeToRead)))
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost, self.selectorPort)
                     for serv in self.runningServices:
