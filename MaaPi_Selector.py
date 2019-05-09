@@ -81,7 +81,7 @@ class MaapiSelector():
         for dev in self.deviceList:
             tosec = self.helpers.to_sec(self.deviceList[dev]["dev_interval"], self.deviceList[dev]["dev_interval_unit_id"])
             try:
-                if ((dt.now() - self.deviceList[dev]["dev_last_update"]).seconds >= (tosec - (tosec * self.timeToRead))) and ((dt.now() - self.localQueue[dev]).seconds >= (tosec/2)):
+                if ((dt.now() - self.deviceList[dev]["dev_last_update"]).seconds >= (tosec - (tosec * self.timeToRead))) and ((dt.now() - self.localQueue[dev]).seconds >= tosec):
                     print (dev,(dt.now() - self.deviceList[dev]["dev_last_update"]).seconds, (tosec - (tosec * self.timeToRead)))
                     self.localQueue[dev]=dt.now()
                     payload = self.helpers.pyloadToPicke(10, dev, self.deviceList, self.deviceListForRelated, self.selectorHost, self.selectorPort)
@@ -93,7 +93,7 @@ class MaapiSelector():
                             except Exception as e:
                                 self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist in database for this location/board{e}")
             except Exception as e:
-                self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings error: {e}")
+                self.maapilogger.log("DEBUG",f"Exception checkDbForOldreadings error: {e}")
                 self.localQueue[dev] = dt.now() - timedelta(hours = 1)
 
 
