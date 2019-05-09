@@ -89,6 +89,7 @@ class SocketServer():
             self.maapilogger.log("INFO",self.sockUDP)
             while True:
                 if self.selfkill:
+                    self.maapilogger.log("STOP",f"Get self kill order.")
                     break
                 data, address = self.sockUDP.recvfrom(4096)
                 if not data:
@@ -104,7 +105,6 @@ class SocketServer():
                     break
                 else:
                     self.maapilogger.log("INFO",f"Get unknown packet via udp")
-            self.sockUDP.close()
             self.joiningUDP()
         except Exception as e:
             self.maapilogger.log("ERROR", f"Exception in startServerUDP {self.objectname}: {e}")
