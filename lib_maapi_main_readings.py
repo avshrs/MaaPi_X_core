@@ -70,4 +70,7 @@ class Readings:
 
         except Exception as e:
             self.maapilogger.log("ERROR",f"Error inserting data from CMD: {e}")
-            self.maapiDB.insert_readings(dev_id,0," ",False)
+            try:
+                self.maapiDB.insert_readings(dev_id,0," ",False)
+            except:
+                pass

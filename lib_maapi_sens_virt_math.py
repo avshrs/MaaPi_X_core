@@ -23,20 +23,22 @@ class MaaPiMath(SensProto):
         super().__init__()
 
     def updateMathTable(self):
-        self.maapiMathTable = self.maapiDB.table("maapi_math").columns( 'id',
-                                                                        'math_user_id',
-                                                                        'math_name',
-                                                                        'math_update_rom_id',
-                                                                        'math_data_from_1_id',
-                                                                        'math_data_from_2_id',
-                                                                        'math_data_from_3_id',
-                                                                        'math_data_from_4_id',
-                                                                        'math_math',
-                                                                        'math_descript',
-                                                                        'math_enabled',
-                                                                        ).get()
-        self.maapilogger.log("DEBUG","Update maapiMathTable from database")
-
+        try:
+            self.maapiMathTable = self.maapiDB.table("maapi_math").columns( 'id',
+                                                                            'math_user_id',
+                                                                            'math_name',
+                                                                            'math_update_rom_id',
+                                                                            'math_data_from_1_id',
+                                                                            'math_data_from_2_id',
+                                                                            'math_data_from_3_id',
+                                                                            'math_data_from_4_id',
+                                                                            'math_math',
+                                                                            'math_descript',
+                                                                            'math_enabled',
+                                                                            ).get()
+            self.maapilogger.log("DEBUG","Update maapiMathTable from database")
+        except:
+            pass
 
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
         value = 0

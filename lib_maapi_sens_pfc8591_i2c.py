@@ -26,10 +26,12 @@ class PFC8591(SensProto):
 
 
     def getTables(self):
-        self.pfcTable = self.maapiDB.table("maapi_pfc8591").get()
-        self.busOptionsTable = self.maapiDB.table("maaapi_bus_options").get()
-        self.maapilogger.log("DEBUG","Update pfcTable and busOptionsTable from database")
-
+        try:
+            self.pfcTable = self.maapiDB.table("maapi_pfc8591").get()
+            self.busOptionsTable = self.maapiDB.table("maaapi_bus_options").get()
+            self.maapilogger.log("DEBUG","Update pfcTable and busOptionsTable from database")
+        except:
+            pass
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         self.maapilogger.log("DEBUG",f"Reading Values ")

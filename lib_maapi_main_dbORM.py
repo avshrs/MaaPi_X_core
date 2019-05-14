@@ -31,7 +31,7 @@ class MaaPiDBConnection():
 
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 x = conn.cursor()
                 if dev_id == '*':
@@ -53,7 +53,7 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
 
     def insertRaw(self, where, what):
@@ -62,7 +62,7 @@ class MaaPiDBConnection():
 
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 string_ = f"INSERT INTO {where} VALUES ({','.join(what)}) "
                 x = conn.cursor()
@@ -75,14 +75,14 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
     def createTable(self, name, list):
         try:
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 string_ = f"CREATE TABLE {NAME}  ({','.join(what)}) "
                 x = conn.cursor()
@@ -95,14 +95,14 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
     def clearTable(self, name, where):
         try:
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 string_ = f"truncate table {name} where {where}"
                 x = conn.cursor()
@@ -115,7 +115,7 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
 
 
@@ -124,7 +124,7 @@ class MaaPiDBConnection():
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 string_ = f"reindex table {name} "
                 x = conn.cursor()
@@ -137,14 +137,14 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
     def updateRaw(self, where, what, when):
         try:
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 string_ = f"UPDATE {where} SET {what} WHERE {when}"
                 x = conn.cursor()
@@ -157,7 +157,7 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
 # update maapi_running_py_scripts set py_board_id = 5 where py_pid=4344;
 
@@ -166,7 +166,7 @@ class MaaPiDBConnection():
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 string_ = f"DELETE FROM maapi_running_socket_servers WHERE ss_board_id={board_id}"
                 x = conn.cursor()
@@ -184,7 +184,7 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
 
     def deleteRow(self, table, condition):
@@ -192,7 +192,7 @@ class MaaPiDBConnection():
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 string_ = f"DELETE FROM {table} WHERE {condition}"
                 x = conn.cursor()
@@ -204,7 +204,7 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
 
     def clean_logs(self):
@@ -212,7 +212,7 @@ class MaaPiDBConnection():
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 string_ = "DELETE FROM maapi_logs WHERE log_timestamp < NOW() - INTERVAL '1 days'"
                 x = conn.cursor()
@@ -225,7 +225,7 @@ class MaaPiDBConnection():
                 except:
                     pass
         except EnvironmentError() as e:
-            print (e)
+            pass
 
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
@@ -233,7 +233,7 @@ class MaaPiDBConnection():
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 x = conn.cursor()
                 x.execute("SELECT dev_value, dev_rom_id, dev_collect_values_to_db "
@@ -275,14 +275,14 @@ class MaaPiDBConnection():
                 except:
                     pass
         except Exception() as e:
-            print (e)
+            pass
 
 
     def select_last_nr_of_values(self,dev_id,range_nr):
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 x = conn.cursor()
                 x.execute("SELECT dev_rom_id "
@@ -402,13 +402,13 @@ class MaaPiDBConnection():
             try:
                 conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
             except (Exception, psycopg2.DatabaseError) as error:
-                print (error)
+                pass
             else:
                 x = conn.cursor()
                 try:
                     x.execute(query)
                 except Exception as e:
-                    print (e)
+                    pass
 
                 table_data = x.fetchall()
 
@@ -460,7 +460,7 @@ class MaaPiDBConnection():
                     pass
 
         except Exception as error:
-           print (error)
+           pass
         return table_data_dict
 
 

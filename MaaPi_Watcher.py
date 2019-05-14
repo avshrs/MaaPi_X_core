@@ -69,9 +69,6 @@ class MaapiWatcher(serviceClass):
         time.sleep(1)
         raise SystemExit
 
-    def getLibraryList(self):
-        self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
-        self.maapilogger.log("DEBUG","Devices library list updated")
 
     def setUp(self):
         self.maapilogger.log("INFO","Running Set UP ")
@@ -84,9 +81,12 @@ class MaapiWatcher(serviceClass):
             if (dt.now() - self.timer_1).seconds >= 1:
                 if self.running:
                     self.checkLibraryProcess()
-
                     self.checkLibraryResponce()
                 self.timer_1 = dt.now()
+
+            if (dt.now() - self.timer_2).seconds >= 5:
+                self.timer_2 = dt.now()
+                self.getLibraryList()
             time.sleep(0.01)
 
 
