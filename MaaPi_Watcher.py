@@ -42,6 +42,7 @@ class MaapiWatcher(serviceClass):
         self.payload_StopUDP    = "777_0_0_0"
 
         self.timer_1            = dt.now()
+        self.timer_2            = dt.now()
         self.interpreterVer     = f"{sys.executable}"
         self.libraryList        = []
         self.lastCheck          = dt.now()

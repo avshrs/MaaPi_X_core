@@ -62,11 +62,13 @@ class serviceClass():
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     def getLibraryList(self):
-        self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
-        for ids in self.libraryList:
-            self.queue.prepareQueueDevList(ids)
-        self.maapilogger.log("DEBUG","Devices library list updated")
-
+        try:
+            self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
+            for ids in self.libraryList:
+                self.queue.prepareQueueDevList(ids)
+            self.maapilogger.log("DEBUG","Devices library list updated")
+        except:
+            pass
 
     def startAllLibraryDeamon(self):
           for lib in self.libraryList:
@@ -158,13 +160,16 @@ class serviceClass():
                 self.stopLibraryDeamon(lib)
 
     def checkLibraryResponce(self):
-        lib_temp = copy.copy(self.libraryPID)
-        if self.queue.getSocketStatusLen() > 0:
-            queue_ = (self.queue.getSocketStatus())[self.objectname][self.watcherHost][self.watcherPort]
-            for nr in queue_:
-                for lib in lib_temp:
-                    if int(queue_[nr][5]) == int(lib_temp[lib]['port']):
-                        self.libraryPID[lib]["sendedQuery"] = 0
-                        self.libraryPID[lib]["lastResponce"] = dt.now()
-                        self.maapilogger.log("STATUS", f"Get Responce from {queue_[nr][4]} {queue_[nr][5]}")
-                        self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{lib_temp[lib]['host']}' and ss_port='{lib_temp[lib]['port']}'")
+        try:
+            lib_temp = copy.copy(self.libraryPID)
+            if self.queue.getSocketStatusLen() > 0:
+                queue_ = (self.queue.getSocketStatus())[self.objectname][self.watcherHost][self.watcherPort]
+                for nr in queue_:
+                    for lib in lib_temp:
+                        if int(queue_[nr][5]) == int(lib_temp[lib]['port']):
+                            self.libraryPID[lib]["sendedQuery"] = 0
+                            self.libraryPID[lib]["lastResponce"] = dt.now()
+                            self.maapilogger.log("STATUS", f"Get Responce from {queue_[nr][4]} {queue_[nr][5]}")
+                            self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{lib_temp[lib]['host']}' and ss_port='{lib_temp[lib]['port']}'")
+        except:
+            pass
