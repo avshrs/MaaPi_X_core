@@ -43,7 +43,7 @@ class LinuxCmd(SensProto):
             if (dt.now() - self.timer_1).seconds >= 10:
                 self.timer_1 = dt.now()
                 self.updateCommandLine()
-            time.sleep(0.1)
+            time.sleep(0.01)
             self.responceToWatcher()
             self.checkQueueForReadings()
 

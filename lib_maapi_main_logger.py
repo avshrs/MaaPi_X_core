@@ -67,7 +67,22 @@ class Logger():
                            9:("OFF", "ERROR", "START", "STOP", "READ", "STATUS", "WARN","INFO","DEBUG","ALL"),
        }
 
+
     def log(self, level, msg):
+        try:
+            if  self.levels[level] in self.levelsPrior[self.defaultDebugLevel]:
+                time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
+                msg_ = str(msg).replace("'","")
+                msg__ = str(msg_).replace('\"', '')
+                if self.printable == 1:
+                    print(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
+
+                self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg__}'", f"'{self.maapiLocation}'"))
+                #self.maapiDB.clean_logs()
+        except:
+            pass
+
+    def logPrintOnly(self, level, msg):
         try:
             if  self.levels[level] in self.levelsPrior[self.defaultDebugLevel]:
 
@@ -78,7 +93,5 @@ class Logger():
                 if self.printable == 1:
                     print(f"MaaPi  |  {self.name:<17}  |  {self.levels[level]:^6}  |  {time:<16}  |  {msg}")
 
-                self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg__}'", f"'{self.maapiLocation}'"))
-                self.maapiDB.clean_logs()
         except:
             pass

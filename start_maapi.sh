@@ -1,9 +1,9 @@
 maapiWatcher="MaaPi_Watcher.py"
 interpreter="/usr/bin/python3.6"
 
-loc="/home/serv/MaaPi_X_core"
+loc=$(pwd)
 
-cd $loc
+#cd $loc
 
 pid=$(cat ${loc}/pid/MaaPi_Watcher.pid)
 

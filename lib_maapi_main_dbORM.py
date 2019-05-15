@@ -6,48 +6,49 @@
 #
 ##############################################################
 import psycopg2
+import logging, os
 from datetime import datetime as dt, timedelta
 import MaaPi_Config as Config
-#import lib_maapi_main_logger          as MaapiLogger
+
+
+pwd =os.getcwd()
+logging.basicConfig(
+    filename=f'{pwd}/log/Maapi_logger.log',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%m/%d/%Y %H:%M:%S')
+
 
 class MaaPiDBConnection():
-
     def __init__(self):
+        self.objectname         = "Database"
         self.filters_           = {}
         self.orders_            = {}
         self.columns_           = {}
         self.columns_var        = {}
         self.table_             = {}
-        self.config              = Config.MaapiVars()
-        self.Maapi_dbName            =self.config.maapiDbName
-        self.Maapi_dbUser            =self.config.maapiDbUser
-        self.Maapi_dbHost            =self.config.maapiDbHost
-        self.Maapi_dbPasswd          =self.config.maapiDbpass
+
+
+        self.config             = Config.MaapiVars()
+        self.Maapi_dbName       =self.config.maapiDbName
+        self.Maapi_dbUser       =self.config.maapiDbUser
+        self.Maapi_dbHost       =self.config.maapiDbHost
+        self.Maapi_dbPasswd     =self.config.maapiDbpass
+
         try:
             self.conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
         except (Exception, psycopg2.DatabaseError) as error:
-            pass
+            self.logPrintOnly("ERROR",f'Connection error {error}')
 
-    def queue(self,dev_id,status,board_id):
+    def logPrintOnly(self, level, msg):
         try:
-            x = self.conn.cursor()
-            if dev_id == '*':
-                x.execute("UPDATE devices "
-                        "SET dev_interval_queue={0} "
-                        "WHERE dev_status=TRUE "
-                        "AND dev_machine_location_id = {1}".format(status,board_id))
-                self.conn.commit()
-            else:
-                x.execute("UPDATE devices "
-                        "SET dev_interval_queue={0} "
-                        "WHERE dev_id={1} "
-                        "AND dev_machine_location_id = {2}".format(status,dev_id,board_id))
-                self.conn.commit()
-            x.close()
+            time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
 
-        except Exception() as e:
+            msg_ = str(msg).replace("'","")
+            msg__ = str(msg_).replace('\"', '')
+            print(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
+        except:
             pass
-
 
     def insertRaw(self, where, what):
         try:
@@ -57,7 +58,7 @@ class MaaPiDBConnection():
             self.conn.commit()
             x.close()
         except Exception() as e:
-            pass
+            self.logPrintOnly("ERROR",f'Insert RAW error: {error}')
 
     def createTable(self, name, list):
         try:
@@ -67,7 +68,7 @@ class MaaPiDBConnection():
             self.conn.commit()
             x.close()
         except Exception() as e:
-            pass
+            self.logPrintOnly("ERROR",f'CREATE TABLE ERROR {error}')
 
     def clearTable(self, name, where):
         try:
@@ -77,9 +78,7 @@ class MaaPiDBConnection():
             self.conn.commit()
             x.close()
         except Exception() as e:
-            pass
-
-
+            self.logPrintOnly("ERROR",f'CLEAR TABLE ERROR {error}')
 
     def reindexTable(self, name):
         try:
@@ -89,7 +88,7 @@ class MaaPiDBConnection():
             self.conn.commit()
             x.close()
         except Exception() as e:
-            pass
+            self.logPrintOnly("ERROR",f'REINDEX TABLE ERROR {error}')
 
     def updateRaw(self, where, what, when):
         try:
@@ -99,9 +98,7 @@ class MaaPiDBConnection():
             self.conn.commit()
             x.close()
         except Exception() as e:
-            pass
-
-# update maapi_running_py_scripts set py_board_id = 5 where py_pid=4344;
+            self.logPrintOnly("ERROR",f'UPDATE RAW ERRROR {error}')
 
     def cleanSocketServerList(self,board_id):
         try:
@@ -116,8 +113,7 @@ class MaaPiDBConnection():
             self.conn.commit()
             x.close()
         except Exception() as e:
-            pass
-
+            self.logPrintOnly("ERROR",f'CLEAN SOCKET SERVER LIST {error}')
 
     def deleteRow(self, table, condition):
         try:
@@ -127,8 +123,7 @@ class MaaPiDBConnection():
             self.conn.commit()
             x.close()
         except Exception() as e:
-            pass
-
+            self.logPrintOnly("ERROR",f'DELETE RAW ERROR {error}')
 
     def clean_logs(self):
         try:
@@ -138,8 +133,7 @@ class MaaPiDBConnection():
             self.conn.commit()
             x.close()
         except EnvironmentError() as e:
-            pass
-
+            self.logPrintOnly("ERROR",f'CLEAN LOGS ERROR {error}')
 
     def insert_readings(self,device_id,insert_value,sensor_type,status):
         try:
@@ -156,7 +150,7 @@ class MaaPiDBConnection():
                         "AND dev_status=True")
                 self.conn.commit()
             except Exception as e:
-                print(e)
+                self.logPrintOnly("ERROR",f'insert readings - update device {error}')
 
             if status is True:
                 x.execute("UPDATE devices "
@@ -178,8 +172,7 @@ class MaaPiDBConnection():
                 self.conn.commit()
             x.close()
         except Exception() as e:
-            pass
-
+            self.logPrintOnly("ERROR",f'insert readings {error}')
 
     def select_last_nr_of_values(self,dev_id,range_nr):
             try:
@@ -206,7 +199,7 @@ class MaaPiDBConnection():
                 return  values_history
                 x.close()
             except:
-                pass
+                self.logPrintOnly("ERROR",f'select last nr of values {error}')
 
     def columns(self, *args):
         self.columns_ = args
@@ -250,9 +243,7 @@ class MaaPiDBConnection():
         else:
             columns = "*"
             self.columns_var = "*"
-
         query = "SELECT {0} FROM {1} ".format(columns, self.table_)
-
         if self.filters_:
             f_len = len(self.filters_)
             f_i = 1
@@ -295,22 +286,18 @@ class MaaPiDBConnection():
     def exec_query_select(self, query, name):
         table_data_dict = {}
         try:
-
             x = self.conn.cursor()
             try:
                 x.execute(query)
             except Exception as e:
                 pass
-
             table_data = x.fetchall()
-
 
             if self.columns_var == '*':
                 x.execute("SELECT column_name "
-                        "FROM information_schema.columns "
-                        "WHERE table_name='{0}' ".format(name))
+                          "FROM information_schema.columns "
+                          "WHERE table_name='{0}' ".format(name))
                 table_names = x.fetchall()
-
 
                 for row_s in range(len(table_data)):
                     sensor_rows = {}
@@ -319,7 +306,6 @@ class MaaPiDBConnection():
                         sensor_rows[table_names[i][0]] = r_s
                         i += 1
                     table_data_dict[table_data[row_s][0]] = sensor_rows
-
             else:
                 if self.columns_[1]== "*":
                     self.columns_=list(self.columns_)
@@ -345,9 +331,11 @@ class MaaPiDBConnection():
                     table_data_dict[table_data[row_s][0]] = sensor_rows
             self.conn.commit()
             x.close()
+            return table_data_dict
         except Exception as error:
-           pass
-        return table_data_dict
+           select_last_nr_of_values
+
+
 
 
 

@@ -26,7 +26,7 @@ class serviceClass():
         self.libraryPID         = {}
         self.libraryList        = []
         self.libraryLastResponce= 600 # seconds
-        self.sendingQueryToSocket = 0
+
 
 
 
@@ -56,7 +56,7 @@ class serviceClass():
             self.maapilogger.log("START", f"Selector Service started at PID: {self.selectorPid.pid}")
             self.maapiDB.insertRaw("maapi_running_py_scripts", ("default", f"'{name}'", f"'{name}.py'", "now()", f"{self.board_id}", f"{self.selectorPid.pid }" ))
             self.maapilogger.log("START", f"Selector Service added to running service table in database.")
-            self.lastCheck = dt.now()
+
         except Exception as e:
             self.maapilogger.log("ERROR", f"startSelectorService() | {e}")
 
@@ -76,7 +76,7 @@ class serviceClass():
                 try:
                     self.startLibraryDeamon(lib)
                 except Exception as e :
-                    self.maapilogger.log("ERROR", "Error: startlibraryDeamon() {exc}".format(exc = e))
+                    self.maapilogger.log("ERROR", f"Error: startlibraryDeamon() {e}")
 
 
     def stopLibraryDeamon(self, lib_id):
@@ -88,7 +88,7 @@ class serviceClass():
                     self.maapilogger.log("STOP", f"ServiceClass | Kill message sended {self.libraryPID[lib_id]['host']}:{self.libraryPID[lib_id]['port']}")
                 except:
                     self.maapilogger.log("STOP", f"ServiceClass | Selector Service - Socket Server not running")
-                time.sleep(1)
+
                 self.libraryPID[lib_id]["pid"].kill()
                 try:
                     del self.libraryPID[lib_id]

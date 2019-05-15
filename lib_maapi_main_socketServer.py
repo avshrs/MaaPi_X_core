@@ -45,19 +45,14 @@ class SocketServer():
             except:
                 self.sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 self.sockTCP.bind((host, port))
+
             self.sockTCP.listen(10000)
             self.maapilogger.log("START",self.sockTCP)
-            while True:
-                if self.selfkill:
-                    self.maapilogger.log("STOP",f"Get self kill order.")
-                    break
+            while not self.selfkill:
                 client, address = self.sockTCP.accept()
                 with client:
-                    while True:
+                    while not self.selfkill:
                         data = client.recv(200000)
-                        if self.selfkill:
-                            self.maapilogger.log("STOP",f"Get self kill order.")
-                            break
                         if not data:
                             break
                         payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
@@ -76,10 +71,8 @@ class SocketServer():
                             break
                         else:
                             self.maapilogger.log("INFO",f"Get unknown packet via tcp")
-
-
             self.joiningTCP()
-        except Exception() as e:
+        except Exception as e:
             self.maapilogger.log("ERROR", f"Exception in startServerTCP {self.objectname}: {e}")
 
     def startServerUDP(self, host, port):
@@ -87,10 +80,8 @@ class SocketServer():
             self.maapiDB.insertRaw("maapi_running_socket_servers", ("default",f"'{self.objectname}'",f"'{host}'",f"{port}","now()", f"{self.pid}",f"{self.board_id}", "now()", "'UDP'"))
             self.sockUDP.bind((host, port))
             self.maapilogger.log("INFO",self.sockUDP)
-            while True:
-                if self.selfkill:
-                    self.maapilogger.log("STOP",f"Get self kill order.")
-                    break
+            while not self.selfkill:
+
                 data, address = self.sockUDP.recvfrom(4096)
                 if not data:
                     break

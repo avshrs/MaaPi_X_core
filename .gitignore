@@ -1,0 +1,5 @@
+log
+pid
+*.pyc
+*.log
+MaaPi_Config.py

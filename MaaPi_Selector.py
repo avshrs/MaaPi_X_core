@@ -58,9 +58,12 @@ class MaapiSelector():
         signal.signal(signal.SIGINT, self.service_shutdown)
 
 
-    def service_shutdown(self, signum, frame):
-        self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        raise SystemExit
+    def service_shutdown(self, signum=None, frame=None):
+        try:
+            self.maapilogger.log("INFO",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        finally:
+
+            raise SystemExit
 
     def responceToWatcher(self):
         if self.queue.getSocketStatusLen() > 0:

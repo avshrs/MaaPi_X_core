@@ -21,9 +21,6 @@ class DS18X20(SensProto):
         self.timer_2            = dt.now()
         super().__init__()
 
-    def updateCommandLine(self):
-        self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()
-        self.maapilogger.log("DEBUG","Update maapiCommandLine from database")
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         error = 0
@@ -55,14 +52,11 @@ class DS18X20(SensProto):
             return value, error
 
     def service_startup(self):
-        self.updateCommandLine()
+        pass
 
     def loop(self):
-        while True:
-            if (dt.now() - self.timer_2).seconds >= 10:
-                self.timer_2 = dt.now()
-                self.updateCommandLine()
-            time.sleep(0.1)
+        while self.isRunning:
+            time.sleep(0.01)
             self.checkQueueForReadings()
             self.responceToWatcher()
 
