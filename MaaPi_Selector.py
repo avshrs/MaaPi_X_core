@@ -92,7 +92,7 @@ class MaapiSelector():
                         if self.runningServices[serv]["ss_device_table_id"] == self.deviceList[dev]['dev_type_id']:
                             try:
                                 self.socketClient.sendStr(self.runningServices[serv]["ss_host"], self.runningServices[serv]["ss_port"], payload)
-                                self.maapilogger.log("READ",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']} to {self.runningServices[serv]['ss_port']}")
+                                self.maapilogger.log("DEBUG",f"Devices sended to checkout readings {dev} | {self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | {self.deviceList[dev]['dev_rom_id']} to {self.runningServices[serv]['ss_port']}")
                             except Exception as e:
                                 self.maapilogger.log("ERROR",f"Exception checkDbForOldreadings - Send dev_id: {dev} to lib: {self.deviceList[dev]['dev_type_id']} library for dev not exist in database for this location/board{e}")
             except Exception as e:
