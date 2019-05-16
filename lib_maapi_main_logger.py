@@ -14,12 +14,12 @@ import MaaPi_Config                          as Config
 
 import os
 
-pwd =os.getcwd()
+pwd = os.getcwd()
 
 logging.basicConfig(
-    filename=f'{pwd}/log/Maapi_logger.log',
+    filename=f'{pwd}/log/MaaPi_logger.log',
     level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(message)s',
     datefmt='%m/%d/%Y %H:%M:%S')
 
 
@@ -29,7 +29,7 @@ class Logger():
         self.config              = Config.MaapiVars()
         self.maapiLocation      = self.config.maapiLocation
         self.defaultDebugLevel  = 7
-        self.printable          = 1
+        self.printable          = self.config.debug
         self.maapiDB            = Db_connection.MaaPiDBConnection()
         self.name = "logger"
         self.levels={ 0:"OFF",
@@ -74,9 +74,9 @@ class Logger():
                 time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
                 msg_ = str(msg).replace("'","")
                 msg__ = str(msg_).replace('\"', '')
-                if self.printable == 1:
+                if self.printable:
                     print(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
-
+                logging.info(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
                 self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg__}'", f"'{self.maapiLocation}'"))
                 #self.maapiDB.clean_logs()
         except:
