@@ -17,5 +17,9 @@ if [ "$1" = "stop" ]; then
         echo "MaaPi_Watcher Not Running"
     else
         kill -2 $(ps -aux | grep "[M]aaPi_Watcher.py" | awk '{print $2}')
+        sleep 1
+        if ! kill -0 $(ps -aux | grep "[M]aaPi_Watcher.py" | awk '{print $2}') > /dev/null 2>&1; then
+            echo "MaaPi_Watcher killed"
+        fi
     fi
 fi
