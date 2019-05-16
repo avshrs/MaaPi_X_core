@@ -42,10 +42,10 @@ class MaapiWatcher(serviceClass):
         self.libraryList        = []
         self.running            = True
         self.selectorPid        = object()
-
+        self.pid                = os.getpid()
         self.maapiDB.cleanSocketServerList(self.board_id)
         self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
-
+        self.maapiDB.insertRaw("maapi_running_py_scripts", ("default", f"'{self.objectname}'", f"'MaaPi_{self.objectname}.py'", "now()", f"{self.board_id}", f"{self.pid}" ))
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
