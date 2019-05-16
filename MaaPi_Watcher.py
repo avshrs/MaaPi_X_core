@@ -19,7 +19,7 @@ import lib_maapi_main_queue         as Queue
 import psutil
 import lib_maapi_main_socketServer  as SocketServer
 import MaaPi_Config                 as Config
-
+from threading import Lock, Thread
 
 class MaapiWatcher(serviceClass):
     def __init__(self):
@@ -72,16 +72,16 @@ class MaapiWatcher(serviceClass):
     def checkPIDs(self):
         # selector
         self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_mem_usage={round(psutil.Process(self.selectorPid.pid).memory_info()[0]/1000000,3)}", f"py_pid={self.selectorPid.pid}")
-        self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_cpu_usage={round(psutil.Process(self.selectorPid.pid).cpu_percent(interval=0.3),3)}", f"py_pid={self.selectorPid.pid}")
+        self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_cpu_usage={round(psutil.Process(self.selectorPid.pid).cpu_percent(interval=1),3)}", f"py_pid={self.selectorPid.pid}")
         # watcher
         self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_mem_usage={round(psutil.Process(self.pid).memory_info()[0]/1000000,3)}", f"py_pid={self.pid}")
-        self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_cpu_usage={round(psutil.Process(self.pid).cpu_percent(interval=0.3),3)}", f"py_pid={self.pid}")
+        self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_cpu_usage={round(psutil.Process(self.pid).cpu_percent(interval=1),3)}", f"py_pid={self.pid}")
         for process in self.libraryPID:
             pider = self.libraryPID[process]["pid"].pid
             try:
                 pider = self.libraryPID[process]["pid"].pid
                 self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_mem_usage={round(psutil.Process(pider).memory_info()[0]/1000000,3)}", f"py_pid={pider}")
-                self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_cpu_usage={round(psutil.Process(pider).cpu_percent(interval=0.3),3)}", f"py_pid={pider}")
+                self.maapiDB.updateRaw("maapi_running_py_scripts",f"py_cpu_usage={round(psutil.Process(pider).cpu_percent(interval=1),3)}", f"py_pid={pider}")
             except Exception as e:
                 self.maapilogger.log("ERROR",f'error at updateing pid {pider} stats ')
 
@@ -91,14 +91,15 @@ class MaapiWatcher(serviceClass):
             if (dt.now() - self.timer_1).seconds >= 1:
                 if self.running:
                     self.checkLibraryProcess()
-                    self.checkLibraryResponce()
 
                 self.timer_1 = dt.now()
 
             if (dt.now() - self.timer_2).seconds >= 5:
                 self.timer_2 = dt.now()
                 self.getLibraryList()
-                self.checkPIDs()
+                thread = Thread(target= self.checkPIDs())
+                thread.start()
+
 
             self.checkLibraryResponce()
             time.sleep(0.01)
