@@ -38,6 +38,7 @@ class MaapiWatcher(serviceClass):
         self.payload_StopUDP    = "777_0_0_0"
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
+        self.timer_3            = dt.now()
         self.interpreterVer     = f"{sys.executable}"
         self.libraryList        = []
         self.running            = True
@@ -97,6 +98,10 @@ class MaapiWatcher(serviceClass):
             if (dt.now() - self.timer_2).seconds >= 5:
                 self.timer_2 = dt.now()
                 self.getLibraryList()
+
+            if (dt.now() - self.timer_3).seconds >= 60:
+                self.timer_3 = dt.now()
+
                 thread = Thread(target= self.checkPIDs())
                 thread.start()
 
