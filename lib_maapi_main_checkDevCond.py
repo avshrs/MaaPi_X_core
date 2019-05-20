@@ -19,21 +19,23 @@ class CheckDevCond:
     def conditionDeviceReferenceDev(self,devices_db, devices_db_rel, dev_id, value, minmax):
         collectValuesCond_bool      = devices_db[dev_id][f'dev_collect_values_if_cond_{minmax}_e']
         collectValuesRef_value      = devices_db_rel[devices_db[dev_id]['dev_collect_values_if_cond_from_dev_id']]['dev_value']
-
+        collectValuesCond_value     = devices_db[dev_id][f'dev_collect_values_if_cond_{minmax}']
         if collectValuesCond_bool:
-            self.maapilogger.log("INFO",f"Checking dev {dev_id} with value {value} - collectValuesCond_bool = {collectValuesCond_bool}")
+
             if minmax =="min":
-                if value <= collectValuesRef_value:
+
+                if collectValuesRef_value <= collectValuesCond_value:
                     condition = 1
                 else:
                     condition = 0
             if minmax =="max":
-                if value >= collectValuesRef_value:
+                if collectValuesRef_value >= collectValuesCond_value:
+
                     condition = 1
                 else:
                     condition = 0
         else:
-            self.maapilogger.log("INFO",f"Checking dev {dev_id} with value {value} - collectValuesCond_bool = {collectValuesCond_bool}")
+
             condition = -1
         return condition
 
@@ -115,5 +117,3 @@ class CheckDevCond:
             boolean = False
 
         return value_, boolean
-
-

@@ -39,6 +39,7 @@ class MaapiWatcher(serviceClass):
         self.timer_1            = dt.now()
         self.timer_2            = dt.now()
         self.timer_3            = dt.now()
+        self.timer_4            = dt.now()
         self.interpreterVer     = f"{sys.executable}"
         self.libraryList        = []
         self.running            = True
@@ -104,6 +105,11 @@ class MaapiWatcher(serviceClass):
 
                 thread = Thread(target= self.checkPIDs())
                 thread.start()
+
+            if (dt.now() - self.timer_4).seconds >= 10000:
+                self.timer_4 = dt.now()
+                self.maapiDB.clean_logs()
+
 
 
             self.checkLibraryResponce()
