@@ -14,29 +14,31 @@ from datetime import datetime as dt
 
 class MaaPiMath(SensProto):
     def __init__(self,host,port,id_):
-        self.objectname         = "MaaPiMath"
-        self.id_                = id_
-        self.host               = host
-        self.port               = int(port)
-        self.maapiMathTable     = []
-        self.timer_1            = dt.now()
+        self.objectname = "MaaPiMath"
+        self.id_ = id_
+        self.host = host
+        self.port = int(port)
+        self.maapiMathTable = []
+        self.timer_1 = dt.now()
         super().__init__()
 
     def updateMathTable(self):
         try:
-            self.maapiMathTable = self.maapiDB.table("maapi_math").columns( 'id',
-                                                                            'math_user_id',
-                                                                            'math_name',
-                                                                            'math_update_rom_id',
-                                                                            'math_data_from_1_id',
-                                                                            'math_data_from_2_id',
-                                                                            'math_data_from_3_id',
-                                                                            'math_data_from_4_id',
-                                                                            'math_math',
-                                                                            'math_descript',
-                                                                            'math_enabled',
-                                                                            ).get()
-            self.maapilogger.log("DEBUG","Update maapiMathTable from database")
+            self.maapiMathTable = self.maapiDB.table(
+                "maapi_math").columns(
+                    'id',
+                    'math_user_id',
+                    'math_name',
+                    'math_update_rom_id',
+                    'math_data_from_1_id',
+                    'math_data_from_2_id',
+                    'math_data_from_3_id',
+                    'math_data_from_4_id',
+                    'math_math',
+                    'math_descript',
+                    'math_enabled',
+                    ).get()
+            self.maapilogger.log("DEBUG", "Update maapiMathTable from database")
         except:
             pass
 

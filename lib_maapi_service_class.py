@@ -1,12 +1,11 @@
 
 import copy
-import lib_maapi_main_helpers        as Helpers
-import MaaPi_Config                   as Config
-import lib_maapi_main_dbORM          as Db_connection
-import lib_maapi_main_socketClient  as SocketClient
-import lib_maapi_main_socketServer  as SocketServer
-import lib_maapi_main_logger        as MaapiLogger
-import lib_maapi_main_queue         as Queue
+import lib_maapi_main_helpers as Helpers
+import MaaPi_Config as Config
+import lib_maapi_main_dbconn as Db_connection
+import lib_maapi_main_socketClient as SocketClient
+import lib_maapi_main_logger as MaapiLogger
+import lib_maapi_main_queue as Queue
 import subprocess
 from datetime import datetime as dt
 
@@ -14,27 +13,38 @@ from datetime import datetime as dt
 class serviceClass():
     def __init__(self):
 
-        self.queue              = Queue.Queue()
-        self.helpers            = Helpers.Helpers()
-        self.maapiDB            = Db_connection.MaaPiDBConnection()
-        self.config              = Config.MaapiVars()
-        self.board_id           = self.helpers.updateBoardLocation(self.config.maapiLocation,self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get())
-        self.socketClient       = SocketClient.socketClient()
-        self.maapilogger        = MaapiLogger.Logger()
-        self.maapilogger.name   = self.objectname
-        self.servicePids        = {}
-        self.libraryPID         = {}
-        self.libraryList        = []
-        self.libraryLastResponce= 600 # seconds
+        self.queue = Queue.Queue()
+        self.helpers = Helpers.Helpers()
+        self.maapiDB = Db_connection.MaaPiDBConnection()
+        self.config = Config.MaapiVars()
+        self.board_id = self.helpers.updateBoardLocation(
+            self.config.maapiLocation,
+            self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
+            )
+        self.socketClient = SocketClient.socketClient()
+        self.maapilogger = MaapiLogger.Logger()
+        self.maapilogger.name = self.objectname
+        self.servicePids = {}
+        self.libraryPID = {}
+        self.libraryList = []
+        self.libraryLastResponce = 600 # seconds
 
-
-
-
-    def stopServiceViaTCP(self,service_host,service_port):
+    def stopServiceViaTCP(self, service_host, service_port):
         self.maapilogger.log("STOP", f"ServiceClass | Killing service via TCP Message {service_host}:{service_port}")
-        payload_StopTCP = self.helpers.pyloadToPicke(777, " ", " ", " ", service_host ,service_port)
+        payload_StopTCP = self.helpers.pyloadToPicke(
+            777,
+            " ",
+            " ",
+            " ",
+            service_host,
+            service_port
+            )
         try:
-            self.socketClient.sendStr(service_host,service_port, payload_StopTCP)
+            self.socketClient.sendStr(
+                service_host,
+                service_port,
+                payload_StopTCP
+                )
             self.maapilogger.log("STOP", f"ServiceClass | Kill message sended {service_host}:{service_port}")
         except:
             self.maapilogger.log("STOP", f"ServiceClass | Selector Service - Socket Server not running")
@@ -54,24 +64,38 @@ class serviceClass():
             self.maapilogger.log("START", f"Starting Selector Service at host:{host}, port:{port}")
             self.selectorPid = subprocess.Popen([self.interpreterVer, f"{name}.py"])
             self.maapilogger.log("START", f"Selector Service started at PID: {self.selectorPid.pid}")
-            self.maapiDB.insertRaw("maapi_running_py_scripts", ("default", f"'{name}'", f"'{name}.py'", "now()", f"{self.board_id}", f"{self.selectorPid.pid }" ))
+
+            self.maapiDB.insertRaw(
+                "maapi_running_py_scripts",(
+                    "default",
+                    f"'{name}'",
+                    f"'{name}.py'",
+                    "now()",
+                    f"{self.board_id}",
+                    f"{self.selectorPid.pid }"
+                    )
+                )
             self.maapilogger.log("START", f"Selector Service added to running service table in database.")
 
         except Exception as e:
             self.maapilogger.log("ERROR", f"startSelectorService() | {e}")
 
-# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     def getLibraryList(self):
         try:
-            self.libraryList = self.maapiDB.table("maapi_device_list").filters_eq(device_enabled = True, device_location_id = self.board_id).get()
+            self.libraryList = self.maapiDB.table(
+                "maapi_device_list"
+                ).filters_eq(
+                    device_enabled=True,
+                    device_location_id=self.board_id
+                ).get()
             for ids in self.libraryList:
                 self.queue.prepareQueueDevList(ids)
-            self.maapilogger.log("DEBUG","Devices library list updated")
+            self.maapilogger.log("DEBUG", "Devices library list updated")
         except:
             pass
 
     def startAllLibraryDeamon(self):
-          for lib in self.libraryList:
+        for lib in self.libraryList:
             if self.libraryList[lib]["device_location_id"] == self.board_id:
                 try:
                     self.startLibraryDeamon(lib)
@@ -84,7 +108,11 @@ class serviceClass():
             self.maapilogger.log("STOP", f"Killing library deamon {lib_id}")
             if self.libraryPID[lib_id]:
                 try:
-                    self.socketClient.sendStr(self.libraryPID[lib_id]["host"],self.libraryPID[lib_id]["port"], payload_StopTCP)
+                    self.socketClient.sendStr(
+                        self.libraryPID[lib_id]["host"],
+                        self.libraryPID[lib_id]["port"],
+                        self.payload_StopTCP
+                        )
                     self.maapilogger.log("STOP", f"ServiceClass | Kill message sended {self.libraryPID[lib_id]['host']}:{self.libraryPID[lib_id]['port']}")
                 except:
                     self.maapilogger.log("STOP", f"ServiceClass | Selector Service - Socket Server not running")

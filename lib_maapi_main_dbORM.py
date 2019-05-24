@@ -5,13 +5,14 @@
 #                          MAAPI X
 #
 ##############################################################
+import logging
+import os
 import psycopg2
-import logging, os
-from datetime import datetime as dt, timedelta
 import MaaPi_Config as Config
+from datetime import datetime as dt
 
 
-pwd =os.getcwd()
+pwd = os.getcwd()
 logging.basicConfig(
     filename=f'{pwd}/log/Maapi_logger.log',
     level=logging.DEBUG,
@@ -21,185 +22,210 @@ logging.basicConfig(
 
 class MaaPiDBConnection():
     def __init__(self):
-        self.objectname         = "Database"
-        self.filters_           = {}
-        self.orders_            = {}
-        self.columns_           = {}
-        self.columns_var        = {}
-        self.table_             = {}
-
-
-        self.config             = Config.MaapiVars()
-        self.Maapi_dbName       =self.config.maapiDbName
-        self.Maapi_dbUser       =self.config.maapiDbUser
-        self.Maapi_dbHost       =self.config.maapiDbHost
-        self.Maapi_dbPasswd     =self.config.maapiDbpass
-
-        try:
-            self.conn = psycopg2.connect(f"dbname='{self.Maapi_dbName}' user='{self.Maapi_dbUser}' host='{self.Maapi_dbHost}' password='{self.Maapi_dbPasswd}'")
-        except (Exception, psycopg2.DatabaseError) as error:
-            self.logPrintOnly("ERROR",f'Connection error {error}')
+        self.objectname = "Database"
+        self.filters_ = {}
+        self.orders_ = {}
+        self.columns_ = {}
+        self.columns_var = {}
+        self.table_ = {}
+        self.config = Config.MaapiVars()
+        self.Maapi_dbName = self.config.maapiDbName
+        self.Maapi_dbUser = self.config.maapiDbUser
+        self.Maapi_dbHost = self.config.maapiDbHost
+        self.Maapi_dbPasswd = self.config.maapiDbpass
+        self.db_string = (
+            f"dbname='{self.Maapi_dbName}' "
+            f"user='{self.Maapi_dbUser}' "
+            f"host='{self.Maapi_dbHost}' "
+            f"password='{self.Maapi_dbPasswd}'"
+            )
 
     def logPrintOnly(self, level, msg):
+        """Print logs to console"""
         try:
-            time= "{0:0>2}:{1:0>2}:{2:0>2} - {3:0>6}".format(dt.now().hour,dt.now().minute,dt.now().second,dt.now().microsecond)
-
-            msg_ = str(msg).replace("'","")
-            msg__ = str(msg_).replace('\"', '')
-            print(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
+            time = (
+                f"{dt.now().hour:0>2}:"
+                f"{dt.now().minute:0>2}:"
+                f"{dt.now().second:0>2} - "
+                f"{dt.now().microsecond:0>6}"
+                )
+            print(
+                f"MaaPi  |  "
+                f"{self.name:<17}  |  "
+                f"{level:^6}  |  "
+                f"{time:<16}  |  "
+                f"{msg}"
+                )
         except:
             pass
 
-    def insertRaw(self, where, what):
+    def commitQuery(self, query):
+        """insert row data to dabase"""
         try:
-            string_ = f"INSERT INTO {where} VALUES ({','.join(what)}) "
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-            x.close()
-        except Exception() as e:
-            self.logPrintOnly("ERROR",f'Insert RAW error: {error}')
+            with psycopg2.connect(self.db_string) as conn:
+                cur = conn.cursor()
+                cur.execute(f"{query}")
+                conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
 
-    def createTable(self, name, list):
+    def fetchoneQuery(self, query):
+        """insert row data to dabase"""
         try:
-            string_ = f"CREATE TABLE {NAME}  ({','.join(what)}) "
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-            x.close()
-        except Exception() as e:
-            self.logPrintOnly("ERROR",f'CREATE TABLE ERROR {error}')
+            with psycopg2.connect(self.db_string) as conn:
+                cur = conn.cursor()
+                cur.execute(f"{query}")
+                return cur.fetchone()
+        except (Exception, psycopg2.DatabaseError) as error:
+            self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
+            return []
+
+    def fetchallQuery(self, query):
+        """insert row data to dabase"""
+        try:
+            with psycopg2.connect(self.db_string) as conn:
+                cur = conn.cursor()
+                cur.execute(f"{query}")
+                return cur.fetchall()
+        except (Exception, psycopg2.DatabaseError) as error:
+            self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
+            return []
+
+    def insertRaw(self, where, what):
+        """Prepare query string"""
+        try:
+            query = f"INSERT INTO {where} VALUES ({','.join(what)}) "
+            self.commitQuery(query)
+        except Exception as error:
+            self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
+
+    def createTable(self, name, what):
+        try:
+            query = f"CREATE TABLE {name}  ({','.join(list)}) "
+            self.commitQuery(query)
+        except Exception() as error:
+            self.logPrintOnly("ERROR", f'CREATE TABLE ERROR {error}')
 
     def clearTable(self, name, where):
         try:
-            string_ = f"truncate table {name} where {where}"
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-            x.close()
-        except Exception() as e:
-            self.logPrintOnly("ERROR",f'CLEAR TABLE ERROR {error}')
+            query = f"truncate table {name} where {where}"
+            self.commitQuery(query)
+        except Exception() as error:
+            self.logPrintOnly("ERROR", f'CLEAR TABLE ERROR {error}')
 
     def reindexTable(self, name):
         try:
-            string_ = f"reindex table {name} "
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-            x.close()
-        except Exception() as e:
-            self.logPrintOnly("ERROR",f'REINDEX TABLE ERROR {error}')
+            query = f"reindex table {name} "
+            self.commitQuery(query)
+        except Exception() as error:
+            self.logPrintOnly("ERROR", f'REINDEX TABLE ERROR {error}')
 
     def updateRaw(self, where, what, when):
         try:
-            string_ = f"UPDATE {where} SET {what} WHERE {when}"
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-            x.close()
-        except Exception() as e:
-            self.logPrintOnly("ERROR",f'UPDATE RAW ERRROR {error}')
+            query = f"UPDATE {where} SET {what} WHERE {when}"
+            self.commitQuery(query)
+        except Exception() as error:
+            self.logPrintOnly("ERROR", f'UPDATE RAW ERRROR {error}')
 
-    def cleanSocketServerList(self,board_id):
+    def cleanSocketServerList(self, board_id):
         try:
-            string_ = f"DELETE FROM maapi_running_socket_servers WHERE ss_board_id={board_id}"
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-
-            string_ = f"DELETE FROM maapi_running_py_scripts WHERE py_board_id={board_id}"
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-            x.close()
-        except Exception() as e:
-            self.logPrintOnly("ERROR",f'CLEAN SOCKET SERVER LIST {error}')
+            query = f"DELETE FROM maapi_running_socket_servers WHERE ss_board_id={board_id}"
+            self.commitQuery(query)
+            query_ = f"DELETE FROM maapi_running_py_scripts WHERE py_board_id={board_id}"
+            self.commitQuery(query_)
+        except Exception() as error:
+            self.logPrintOnly("ERROR", f'CLEAN SOCKET SERVER LIST {error}')
 
     def deleteRow(self, table, condition):
         try:
-            string_ = f"DELETE FROM {table} WHERE {condition}"
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-            x.close()
-        except Exception() as e:
-            self.logPrintOnly("ERROR",f'DELETE RAW ERROR {error}')
+            query = f"DELETE FROM {table} WHERE {condition}"
+            self.commitQuery(query)
+        except Exception() as error:
+            self.logPrintOnly("ERROR", f'DELETE RAW ERROR {error}')
 
     def clean_logs(self):
         try:
-            string_ = "DELETE FROM maapi_logs WHERE log_timestamp < NOW() - INTERVAL '1 days'"
-            x = self.conn.cursor()
-            x.execute(f"{string_}")
-            self.conn.commit()
-            x.close()
-        except EnvironmentError() as e:
-            self.logPrintOnly("ERROR",f'CLEAN LOGS ERROR {error}')
+            query = "DELETE FROM maapi_logs WHERE log_timestamp < NOW() - INTERVAL '1 days'"
+            self.commitQuery(query)
+        except EnvironmentError() as error:
+            self.logPrintOnly("ERROR", f'CLEAN LOGS ERROR {error}')
 
-    def insert_readings(self,device_id,insert_value,sensor_type,status):
+    def insert_readings(self, device_id, insert_value, sensor_type, status):
         try:
-            x = self.conn.cursor()
-            x.execute("SELECT dev_value, dev_rom_id, dev_collect_values_to_db "
-                    "FROM devices "
-                    f"WHERE dev_id='{device_id}' "
-                    "AND dev_status = True")
-            devices_data = x.fetchone()
+            query = (
+                "SELECT dev_value, dev_rom_id, dev_collect_values_to_db "
+                "FROM devices "
+                f"WHERE dev_id='{device_id}' "
+                "AND dev_status = True"
+                )
+            devices_data = self.fetchoneQuery(query)
             try:
-                x.execute("UPDATE devices "
-                        f"SET dev_value_old={devices_data[0]} "
-                        f"WHERE dev_id='{device_id}' "
-                        "AND dev_status=True")
-                self.conn.commit()
-            except Exception as e:
-                self.logPrintOnly("ERROR",f'insert readings - update device {error}')
+                query = (
+                    "UPDATE devices "
+                    f"SET dev_value_old={devices_data[0]} "
+                    f"WHERE dev_id='{device_id}' "
+                    "AND dev_status=True"
+                    )
+                self.commitQuery(query)
+            except Exception as error:
+                self.logPrintOnly("ERROR", f'insert readings - update device {error}')
 
             if status is True:
-                x.execute("UPDATE devices "
-                            f"SET dev_value={(1 if insert_value==True else (0 if insert_value==False else insert_value))}, "
-                            f"dev_interval_queue = {False}, "
-                            "dev_last_update=NOW(), "
-                            "dev_read_error='ok' "
-                            f"WHERE dev_id='{device_id}' and dev_status=True")
-                self.conn.commit()
+                query = (
+                    "UPDATE devices "
+                    f"SET dev_value={(1 if insert_value == True else (0 if insert_value == False else insert_value))}, "
+                    f"dev_interval_queue = {False}, "
+                    "dev_last_update=NOW(), "
+                    "dev_read_error='ok' "
+                    f"WHERE dev_id='{device_id}' and dev_status=True"
+                    )
+                self.commitQuery(query)
                 if devices_data[2]:
-                    x.execute(f"INSERT INTO maapi_dev_rom_{devices_data[1].replace('-', '_')}_values "
-                                f"VALUES (default,{device_id}, default, "
-                                f"{(1 if insert_value==True else (0 if insert_value==False else insert_value))})")
-                    self.conn.commit()
+                    query = (
+                        f"INSERT INTO maapi_dev_rom_{devices_data[1].replace('-', '_')}_values "
+                        f"VALUES (default,{device_id}, default, "
+                        f"{(1 if insert_value==True else (0 if insert_value == False else insert_value))})"
+                        )
+                    self.commitQuery(query)
             else:
-                x.execute("UPDATE devices "
-                        "SET dev_interval_queue = {2}, dev_value={0}, dev_read_error='Error' "
-                        "WHERE dev_id='{1}' and dev_status=True".format(9999,device_id,False))
-                self.conn.commit()
-            x.close()
-        except Exception() as e:
-            self.logPrintOnly("ERROR",f'insert readings {error}')
+                query = (
+                    "UPDATE devices "
+                    f"SET dev_interval_queue = 9999, dev_value={device_id}, "
+                    "dev_read_error='Error' "
+                    f"WHERE dev_id='{False}' and dev_status=True"
+                    )
+                self.commitQuery(query)
+        except Exception() as error:
+            self.logPrintOnly("ERROR", f'insert readings {error}')
 
-    def select_last_nr_of_values(self,dev_id,range_nr):
-            try:
-                x = self.conn.cursor()
-                x.execute("SELECT dev_rom_id "
-                        "FROM devices "
-                        "WHERE dev_id={0}".format(dev_id))
-                dev_rom_id = x.fetchone()[0]
-                x.execute("SELECT dev_read_error "
-                        "FROM devices "
-                        "WHERE dev_id={0}".format(dev_id))
-                error = x.fetchone()[0]
-                values_history=[]
-
-                if error == "ok":
-                    x.execute("SELECT "
-                            "dev_value, dev_timestamp "
-                            "FROM maapi_dev_rom_{0}_values "
-                            "order by dev_timestamp desc limit  {1}".format(dev_rom_id.replace("-", "_"), range_nr))
-                    values_history_temp = x.fetchall()
-                    for i in range(int(range_nr)):
-                        values_history.append(values_history_temp[i][0])
-
-                return  values_history
-                x.close()
-            except:
-                self.logPrintOnly("ERROR",f'select last nr of values {error}')
+    def select_last_nr_of_values(self, dev_id, range_nr):
+        try:
+            query = (
+                "SELECT dev_rom_id "
+                "FROM devices "
+                f"WHERE dev_id={dev_id}"
+                )
+            query2 = (
+                "SELECT dev_read_error "
+                "FROM devices "
+                f"WHERE dev_id={dev_id}"
+                )
+            error = (self.fetchoneQuery(query2))[0]
+            values_history = []
+            if error == "ok":
+                dev_rom_id = (self.fetchoneQuery(query))[0]
+                query3 = (
+                    "SELECT dev_value, dev_timestamp "
+                    f"FROM maapi_dev_rom_{dev_rom_id.replace('-', '_')}_values "
+                    f"order by dev_timestamp desc limit {range_nr}"
+                    )
+                values_history_temp = self.fetchallQuery(query3)
+                for i in range(int(range_nr)):
+                    values_history.append(values_history_temp[i][0])
+            return values_history
+        except:
+            return []
+            self.logPrintOnly("ERROR", f'select last nr of values {error}')
 
     def columns(self, *args):
         self.columns_ = args
@@ -286,19 +312,14 @@ class MaaPiDBConnection():
     def exec_query_select(self, query, name):
         table_data_dict = {}
         try:
-            x = self.conn.cursor()
-            try:
-                x.execute(query)
-            except Exception as e:
-                pass
-            table_data = x.fetchall()
-
+            table_data = self.fetchallQuery(query)
             if self.columns_var == '*':
-                x.execute("SELECT column_name "
-                          "FROM information_schema.columns "
-                          "WHERE table_name='{0}' ".format(name))
-                table_names = x.fetchall()
-
+                query2 = (
+                    "SELECT column_name "
+                    "FROM information_schema.columns "
+                    f"WHERE table_name='{name}' "
+                    )
+                table_names = self.fetchallQuery(query2)
                 for row_s in range(len(table_data)):
                     sensor_rows = {}
                     i = 0
@@ -307,13 +328,15 @@ class MaaPiDBConnection():
                         i += 1
                     table_data_dict[table_data[row_s][0]] = sensor_rows
             else:
-                if self.columns_[1]== "*":
-                    self.columns_=list(self.columns_)
-                    x.execute("SELECT column_name "
-                            "FROM information_schema.columns "
-                            "WHERE table_name='{0}' ".format(name))
-                    table_names_tmp = x.fetchall()
-                    table_names = [(self.columns_[0],),]+table_names_tmp
+                if self.columns_[1] == "*":
+                    self.columns_ = list(self.columns_)
+                    query3 = (
+                        "SELECT column_name "
+                        "FROM information_schema.columns "
+                        f"WHERE table_name='{name}' "
+                        )
+                    table_names_tmp = self.fetchallQuery(query3)
+                    table_names = [(self.columns_[0],),] + table_names_tmp
                 else:
                     table_names = self.columns_
 
@@ -326,18 +349,9 @@ class MaaPiDBConnection():
                             i += 1
                     else:
                         for r_s in table_data[row_s]:
-                            sensor_rows[table_names[i]]= r_s
+                            sensor_rows[table_names[i]] = r_s
                             i += 1
                     table_data_dict[table_data[row_s][0]] = sensor_rows
-            self.conn.commit()
-            x.close()
             return table_data_dict
         except Exception as error:
-           select_last_nr_of_values
-
-
-
-
-
-
-
+            return []

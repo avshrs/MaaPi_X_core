@@ -5,31 +5,35 @@
 #                          MAAPI X
 #
 ##############################################################
+import time
+import copy
+import sys
+import os
+import signal
+import lib_maapi_main_checkDevCond as CheckDev
+import lib_maapi_main_queue as Queue
+import lib_maapi_main_logger as MaapiLogger
+import lib_maapi_main_socketClient as SocketClient
+import lib_maapi_main_socketServer as SocketServer
+import lib_maapi_main_helpers as Helpers
+import lib_maapi_main_dbconn as Db_connection
+import lib_maapi_main_readings as Readings
 
-import lib_maapi_main_checkDevCond               as CheckDev
-import lib_maapi_main_queue                      as Queue
-import lib_maapi_main_logger                     as MaapiLogger
-import lib_maapi_main_socketClient               as SocketClient
-import lib_maapi_main_socketServer               as SocketServer
-import lib_maapi_main_helpers                    as Helpers
-import lib_maapi_main_dbORM                      as Db_connection
-import lib_maapi_main_readings                   as Readings
-import time, copy, sys, os, signal
 from datetime import datetime as dt
 
 
 class SensProto():
     def __init__(self):
-        self.queue                      = Queue.Queue()
-        self.helpers                    = Helpers.Helpers()
-        self.socketClient               = SocketClient.socketClient()
-        self.maapilogger                = MaapiLogger.Logger()
-        self.maapilogger.name           = self.objectname
-        self.readings                   = Readings.Readings(self.objectname,self.host, self.port)
-        self.maapiDB                    = Db_connection.MaaPiDBConnection()
-        self.payload_Status_responce    = self.helpers.pyloadToPicke(0xff, " ", " ", " ", self.host,self.port)
-        self.socketServer               = SocketServer.SocketServer(self.objectname, self.queue, self.id_)
-        self.isRunning                  = True
+        self.queue = Queue.Queue()
+        self.helpers = Helpers.Helpers()
+        self.socketClient = SocketClient.socketClient()
+        self.maapilogger = MaapiLogger.Logger()
+        self.maapilogger.name = self.objectname
+        self.readings = Readings.Readings(self.objectname,self.host, self.port)
+        self.maapiDB = Db_connection.MaaPiDBConnection()
+        self.payload_Status_responce = self.helpers.pyloadToPicke(0xff, " ", " ", " ", self.host,self.port)
+        self.socketServer = SocketServer.SocketServer(self.objectname, self.queue, self.id_)
+        self.isRunning = True
         self.socketServer.runTcpServer(self.host, self.port)
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
