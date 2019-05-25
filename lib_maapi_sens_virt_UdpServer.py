@@ -12,15 +12,16 @@ import subprocess
 
 class UdpServer(SensProto):
     def __init__(self,host,port,id_):
-        self.id_                = id_
-        self.objectname         = "UdpServer"
-        self.host               = host
-        self.port            = int(port)
-        self.udpPort            = 60000
-        self.maapiCommandLine   = []
-        self.timer_1            = dt.now()
-        self.timer_2            = dt.now()
         super().__init__()
+        self.id_ = id_
+        self.objectname = "UdpServer"
+        self.host = host
+        self.port = int(port)
+        self.udpPort = 60000
+        self.maapiCommandLine = []
+        self.timer_1 = dt.now()
+        self.timer_2 = dt.now()
+        self.libInit()
         self.socketServer.runUdpServer(self.host, self.udpPort)
 
 

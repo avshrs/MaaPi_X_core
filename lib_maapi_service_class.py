@@ -12,7 +12,9 @@ from datetime import datetime as dt
 
 class serviceClass():
     def __init__(self):
-
+        self.running = True
+        self.objectname = ""
+        self.interpreterVer = ""
         self.queue = Queue.Queue()
         self.helpers = Helpers.Helpers()
         self.maapiDB = Db_connection.MaaPiDBConnection()
@@ -24,10 +26,37 @@ class serviceClass():
         self.socketClient = SocketClient.socketClient()
         self.maapilogger = MaapiLogger.Logger()
         self.maapilogger.name = self.objectname
+        self.selectorHost = self.config.selectorHost
+        self.selectorPort = self.config.selectorPort
+        self.watcherHost = self.config.watcherHost
+        self.watcherPort = self.config.watcherPort
+        self.selecorName = self.config.selectorName
+        self.payload_StopUDP = "777_0_0_0"
+        self.payload_StopTCP = self.helpers.pyloadToPicke(
+            777,
+            " ",
+            " ",
+            " ",
+            self.watcherHost,
+            self.watcherPort
+            )
+        self.payload_Status = self.helpers.pyloadToPicke(
+            00,
+            " ",
+            " ",
+            " ",
+            self.watcherHost,
+            self.watcherPort
+            )
+
+
         self.servicePids = {}
         self.libraryPID = {}
         self.libraryList = []
-        self.libraryLastResponce = 600 # seconds
+        self.libraryLastResponce = 10 # seconds
+
+
+
 
     def stopServiceViaTCP(self, service_host, service_port):
         self.maapilogger.log("STOP", f"ServiceClass | Killing service via TCP Message {service_host}:{service_port}")
@@ -48,7 +77,6 @@ class serviceClass():
             self.maapilogger.log("STOP", f"ServiceClass | Kill message sended {service_host}:{service_port}")
         except:
             self.maapilogger.log("STOP", f"ServiceClass | Selector Service - Socket Server not running")
-
 
     def stopServiceKillPID(self,pid_object):
         try:
@@ -75,7 +103,9 @@ class serviceClass():
                     f"{self.selectorPid.pid }"
                     )
                 )
-            self.maapilogger.log("START", f"Selector Service added to running service table in database.")
+            self.maapilogger.log(
+                "START",
+                f"Selector Service added to running service table in database.")
 
         except Exception as e:
             self.maapilogger.log("ERROR", f"startSelectorService() | {e}")
@@ -102,7 +132,6 @@ class serviceClass():
                 except Exception as e :
                     self.maapilogger.log("ERROR", f"Error: startlibraryDeamon() {e}")
 
-
     def stopLibraryDeamon(self, lib_id):
         try:
             self.maapilogger.log("STOP", f"Killing library deamon {lib_id}")
@@ -113,15 +142,33 @@ class serviceClass():
                         self.libraryPID[lib_id]["port"],
                         self.payload_StopTCP
                         )
-                    self.maapilogger.log("STOP", f"ServiceClass | Kill message sended {self.libraryPID[lib_id]['host']}:{self.libraryPID[lib_id]['port']}")
+                    self.maapilogger.log(
+                        "STOP",
+                        f"ServiceClass | Kill message sended {self.libraryPID[lib_id]['host']}:{self.libraryPID[lib_id]['port']}"
+                        )
                 except:
-                    self.maapilogger.log("STOP", f"ServiceClass | Selector Service - Socket Server not running")
+                    self.maapilogger.log(
+                        "STOP",
+                        f"ServiceClass | Selector Service - Socket Server not running"
+                        )
 
                 self.libraryPID[lib_id]["pid"].kill()
                 try:
                     del self.libraryPID[lib_id]
+                    self.maapiDB.deleteRow(
+                        "maapi_running_py_scripts",
+                        f"py_pid={self.libraryPID['pid'].pid}"
+                        )
+                    self.maapiDB.deleteRow(
+                        "maapi_running_socket_servers",
+                        f"ss_pid={self.libraryPID['pid'].pid}"
+                        )
+
                 except Exception as e:
-                    self.maapilogger.log("ERROR", "Error: stoplibraryDeamon() pid not exist in libraryPID{exc}".format(exc = e))
+                    self.maapilogger.log(
+                        "ERROR",
+                        "Error: stoplibraryDeamon() pid not exist in libraryPID{exc}".format(exc = e)
+                        )
         except Exception as e:
             self.maapilogger.log("ERROR", f"library {lib_id} not exist in library libraryPID ")
 
@@ -160,8 +207,6 @@ class serviceClass():
             self.maapilogger.log("ERROR", "Exception: startLibraryDeamon() {exc}".format(exc = e))
 
 
-
-# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     def checkLibraryProcess(self):
         lib_temp = copy.copy(self.libraryPID)
         for lib in lib_temp:
@@ -187,17 +232,31 @@ class serviceClass():
             else:
                 self.stopLibraryDeamon(lib)
 
+    def checkLibraryForObject(self,library, queue, queue_nr):
+        try:
+            for lib in library:
+                if int(queue[queue_nr][5]) == int(library[lib]['port']):
+                    return lib
+                return False
+        except:
+            pass
+
     def checkLibraryResponce(self):
         try:
             lib_temp = copy.copy(self.libraryPID)
             if self.queue.getSocketStatusLen() > 0:
                 queue_ = (self.queue.getSocketStatus())[self.objectname][self.watcherHost][self.watcherPort]
                 for nr in queue_:
-                    for lib in lib_temp:
-                        if int(queue_[nr][5]) == int(lib_temp[lib]['port']):
-                            self.libraryPID[lib]["sendedQuery"] = 0
-                            self.libraryPID[lib]["lastResponce"] = dt.now()
-                            self.maapilogger.log("STATUS", f"Get Responce from {queue_[nr][4]} {queue_[nr][5]}")
-                            self.maapiDB.updateRaw("maapi_running_socket_servers ", " ss_last_responce = now() ", f" ss_host='{lib_temp[lib]['host']}' and ss_port='{lib_temp[lib]['port']}'")
-        except:
-            pass
+                    lib = self.checkLibraryForObject(lib_temp, queue_, nr)
+                    if lib:
+                        self.libraryPID[lib]["sendedQuery"] = 0
+                        self.libraryPID[lib]["lastResponce"] = dt.now()
+                        self.maapilogger.log("STATUS", f"Get Responce from {queue_[nr][4]} {queue_[nr][5]}")
+                        self.maapiDB.updateRaw(
+                            f"maapi_running_socket_servers ",
+                            f" ss_last_responce = now() ",
+                            f" ss_host='{lib_temp[lib]['host']}' and "
+                            f"ss_port='{lib_temp[lib]['port']}'"
+                            )
+        except EnvironmentError as error:
+            self.maapilogger.log("ERROR", f"checkLibraryResponce {error}")

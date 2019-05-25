@@ -12,14 +12,15 @@ from datetime import datetime as dt
 import subprocess
 
 class LinuxCmd(SensProto):
-    def __init__(self,host,port,id_):
-        self.id_                = id_
-        self.objectname         = "LinuxCmd"
-        self.host               = host
-        self.port               = int(port)
-        self.maapiCommandLine   = []
-        self.timer_1            = dt.now()
+    def __init__(self, host, port, id_):
         super().__init__()
+        self.id_ = id_
+        self.objectname = "LinuxCmd"
+        self.host = host
+        self.port = int(port)
+        self.maapiCommandLine = []
+        self.timer_1 = dt.now()
+        self.libInit()
 
     def updateCommandLine(self):
         self.maapiCommandLine = self.maapiDB.table("maapi_commandline").columns('cmd_update_rom_id', 'cmd_command').get()

@@ -11,7 +11,6 @@ import time
 import os
 import sys
 import signal
-import lib_maapi_main_queue as Queue
 import psutil
 import lib_maapi_main_socketServer as SocketServer
 from datetime import datetime as dt
@@ -23,47 +22,17 @@ class MaapiWatcher(serviceClass):
     """Main class of MaaPi application"""
 
     def __init__(self):
-        self.objectname = "Watcher"
         super().__init__()
-        self.queue = Queue.Queue()
-        self.socketServer = SocketServer.SocketServer(
-            self.objectname,
-            self.queue,
-            self.board_id
-            )
-        self.selectorHost = self.config.selectorHost
-        self.selectorPort = self.config.selectorPort
-        self.watcherHost = self.config.watcherHost
-        self.watcherPort = self.config.watcherPort
-        self.selecorName = self.config.selectorName
-        self.payload_StopTCP = self.helpers.pyloadToPicke(
-            777,
-            " ",
-            " ",
-            " ",
-            self.watcherHost,
-            self.watcherPort
-            )
-        self.payload_Status = self.helpers.pyloadToPicke(
-            00,
-            " ",
-            " ",
-            " ",
-            self.watcherHost,
-            self.watcherPort
-            )
-        self.payload_StopUDP = "777_0_0_0"
+        self.objectname = "Watcher"
         self.timer_1 = dt.now()
         self.timer_2 = dt.now()
         self.timer_3 = dt.now()
         self.timer_4 = dt.now()
         self.interpreterVer = f"{sys.executable}"
         self.libraryList = []
-        self.running = True
         self.selectorPid = object()
         self.pid = os.getpid()
         self.maapiDB.cleanSocketServerList(self.board_id)
-        self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
         self.maapiDB.insertRaw(
             "maapi_running_py_scripts", (
                 "default",
@@ -74,6 +43,15 @@ class MaapiWatcher(serviceClass):
                 f"{self.pid}"
                 )
             )
+        self.socketServer = SocketServer.SocketServer(
+            self.objectname,
+            self.queue,
+            self.board_id
+            )
+        self.watcherHost = self.config.watcherHost
+        self.watcherPort = self.config.watcherPort
+        self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
+
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
 
@@ -81,9 +59,11 @@ class MaapiWatcher(serviceClass):
         self.running = False
         self.maapilogger.log(
             "STOP",
-            f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+            f'Caught signal {signum} | stoping MaaPi {self.objectname}'
+            )
         self.stopServiceViaTCP(self.selectorHost, self.selectorPort)
         self.maapiDB.cleanSocketServerList(self.board_id)
+
         for process in self.libraryPID:
             self.stopServiceViaTCP(
                 self.libraryPID[process]["host"],
@@ -96,13 +76,15 @@ class MaapiWatcher(serviceClass):
         self.maapilogger.log("INFO", "Running Set UP ")
         self.getLibraryList()
         self.startAllLibraryDeamon()
+
         self.startSelectorServices(
             self.selectorHost,
             self.selectorPort,
             "MaaPi_Selector"
             )
 
-    def checkPIDs(self):
+    def checkPIDsParameters(self):
+        """check pids cpu and mem usage"""
         # selector
         self.maapiDB.updateRaw(
             "maapi_running_py_scripts",
@@ -113,31 +95,38 @@ class MaapiWatcher(serviceClass):
             "maapi_running_py_scripts",
             f"py_cpu_usage={round(psutil.Process(self.selectorPid.pid).cpu_percent(interval=1),3)}",
             f"py_pid={self.selectorPid.pid}")
+
         # watcher
         self.maapiDB.updateRaw(
             "maapi_running_py_scripts",
             f"py_mem_usage={round(psutil.Process(self.pid).memory_info()[0]/1000000,3)}",
             f"py_pid={self.pid}"
             )
+
         self.maapiDB.updateRaw(
             "maapi_running_py_scripts",
             f"py_cpu_usage={round(psutil.Process(self.pid).cpu_percent(interval=1),3)}",
             f"py_pid={self.pid}"
             )
+
+        # chek rest of library
         for process in self.libraryPID:
             pider = self.libraryPID[process]["pid"].pid
             try:
                 pider = self.libraryPID[process]["pid"].pid
+
                 self.maapiDB.updateRaw(
                     "maapi_running_py_scripts",
                     f"py_mem_usage={round(psutil.Process(pider).memory_info()[0]/1000000,3)}",
                     f"py_pid={pider}"
                     )
+
                 self.maapiDB.updateRaw(
                     "maapi_running_py_scripts",
                     f"py_cpu_usage={round(psutil.Process(pider).cpu_percent(interval=1),3)}",
                     f"py_pid={pider}"
                     )
+
             except Exception as error:
                 self.maapilogger.log(
                     "ERROR",
@@ -160,7 +149,7 @@ class MaapiWatcher(serviceClass):
             if (dt.now() - self.timer_3).seconds >= 60:
                 self.timer_3 = dt.now()
 
-                thread = Thread(target = self.checkPIDs())
+                thread = Thread(target=self.checkPIDsParameters())
                 thread.start()
 
             if (dt.now() - self.timer_4).seconds >= 10000:

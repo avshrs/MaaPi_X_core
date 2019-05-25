@@ -12,14 +12,15 @@ from datetime import datetime as dt
 
 class DS18X20(SensProto):
     def __init__(self,host,port,id_):
-        self.id_                = id_
-        self.objectname         = "DS18X20"
-        self.host               = host
-        self.port               = int(port)
-        self.maapiCommandLine   = []
-        self.timer_1            = dt.now()
-        self.timer_2            = dt.now()
         super().__init__()
+        self.id_ = id_
+        self.objectname = "DS18X20"
+        self.host = host
+        self.port = int(port)
+        self.maapiCommandLine = []
+        self.timer_1 = dt.now()
+        self.timer_2 = dt.now()
+        self.libInit()
 
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):

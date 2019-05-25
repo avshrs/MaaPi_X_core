@@ -13,14 +13,15 @@ from datetime import datetime as dt
 
 
 class MaaPiMath(SensProto):
-    def __init__(self,host,port,id_):
+    def __init__(self, host, port, id_):
+        super().__init__()
         self.objectname = "MaaPiMath"
         self.id_ = id_
         self.host = host
         self.port = int(port)
         self.maapiMathTable = []
         self.timer_1 = dt.now()
-        super().__init__()
+        self.libInit()
 
     def updateMathTable(self):
         try:

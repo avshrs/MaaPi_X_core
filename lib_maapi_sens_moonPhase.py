@@ -14,12 +14,13 @@ from datetime import datetime as dt
 
 class MoonPhase(SensProto):
     def __init__(self,host,port,id_):
-        self.id_                = id_
-        self.objectname         = "MoonPhase"
-        self.host               = host
-        self.port               = int(port)
-        self.maapiCommandLine   = []
         super().__init__()
+        self.id_ = id_
+        self.objectname = "MoonPhase"
+        self.host = host
+        self.port = int(port)
+        self.maapiCommandLine = []
+        self.libInit()
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         value, error = 0, 0

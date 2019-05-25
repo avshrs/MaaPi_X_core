@@ -24,19 +24,31 @@ from datetime import datetime as dt
 
 class SensProto():
     def __init__(self):
+        self.objectname = "none"
+        self.host = ""
+        self.port = 0
+        self.id_ = ""
+        self.readings = object
+        self.socketServer = object
+        self.isRunning = True
         self.queue = Queue.Queue()
         self.helpers = Helpers.Helpers()
         self.socketClient = SocketClient.socketClient()
         self.maapilogger = MaapiLogger.Logger()
-        self.maapilogger.name = self.objectname
-        self.readings = Readings.Readings(self.objectname,self.host, self.port)
         self.maapiDB = Db_connection.MaaPiDBConnection()
-        self.payload_Status_responce = self.helpers.pyloadToPicke(0xff, " ", " ", " ", self.host,self.port)
-        self.socketServer = SocketServer.SocketServer(self.objectname, self.queue, self.id_)
-        self.isRunning = True
-        self.socketServer.runTcpServer(self.host, self.port)
+
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
+
+    def readValues(self):
+        pass
+
+    def libInit(self):
+        self.readings = Readings.Readings(self.objectname, self.host, self.port)
+        self.maapilogger.name = self.objectname
+        self.payload_Status_responce = self.helpers.pyloadToPicke(0xff, " ", " ", " ", self.host, self.port)
+        self.socketServer = SocketServer.SocketServer(self.objectname, self.queue, self.id_)
+        self.socketServer.runTcpServer(self.host, self.port)
 
     def service_shutdown(self, signum, frame):
         self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')

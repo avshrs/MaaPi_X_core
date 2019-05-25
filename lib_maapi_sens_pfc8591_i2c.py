@@ -13,23 +13,23 @@ from datetime import datetime as dt
 
 class PFC8591(SensProto):
     def __init__(self,host,port,id_):
-        self.id_                = id_
-        self.objectname         = "PFC8591"
-        self.host               = host
-        self.port               = int(port)
-        self.timer_1            = dt.now()
-        self.timer_2            = dt.now()
-        self.pfcTable           = []
-        self.busOptionsTable    = []
-        self.bus                = I2C_MaaPi(1)
         super().__init__()
-
+        self.id_ = id_
+        self.objectname = "PFC8591"
+        self.host = host
+        self.port = int(port)
+        self.timer_1 = dt.now()
+        self.timer_2 = dt.now()
+        self.pfcTable = []
+        self.busOptionsTable = []
+        self.bus = I2C_MaaPi(1)
+        self.libInit()
 
     def getTables(self):
         try:
             self.pfcTable = self.maapiDB.table("maapi_pfc8591").get()
             self.busOptionsTable = self.maapiDB.table("maaapi_bus_options").get()
-            self.maapilogger.log("DEBUG","Update pfcTable and busOptionsTable from database")
+            self.maapilogger.log("DEBUG", "Update pfcTable and busOptionsTable from database")
         except:
             pass
 
