@@ -48,6 +48,7 @@ class MaapiWatcher(serviceClass):
             self.queue,
             self.board_id
             )
+        self.maapilogger.name = self.objectname
         self.watcherHost = self.config.watcherHost
         self.watcherPort = self.config.watcherPort
         self.socketServer.runTcpServer(self.watcherHost, self.watcherPort)
