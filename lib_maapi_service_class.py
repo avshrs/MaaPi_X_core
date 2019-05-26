@@ -53,7 +53,7 @@ class serviceClass():
         self.servicePids = {}
         self.libraryPID = {}
         self.libraryList = []
-        self.libraryLastResponce = 10 # seconds
+        self.libraryLastResponce = 600 # seconds
 
 
 
