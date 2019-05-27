@@ -98,7 +98,7 @@ class CheckDevCond:
                     cond_result = 0
             else:
                 cond_result = -1
-            self.maapilogger.log("INFO",f"Checking dev {dev_id} with value {value} - cond_result = {cond_result}  |cond_max={cond_max} | cond_min={cond_min}")
+            self.maapilogger.log("DEBUG",f"Checking dev {dev_id} with value {value} - cond_result = {cond_result}  |cond_max={cond_max} | cond_min={cond_min}")
         else:
             cond_result = -1
 
