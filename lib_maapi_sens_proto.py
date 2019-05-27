@@ -61,7 +61,7 @@ class SensProto():
             for nr in queue_:
                 if queue_[nr][0] == 0:
                     try:
-                        self.maapilogger.log("STATUS", f"Sending responce to Wacher {queue_[nr][4]} {queue_[nr][5]}")
+                        self.maapilogger.log("DEBUG", f"Sending responce to Wacher {queue_[nr][4]} {queue_[nr][5]}")
                         self.socketClient.sendStr(queue_[nr][4], queue_[nr][5], self.payload_Status_responce)
                     except Exception as e:
                          self.maapilogger.log("ERROR", f"Watcher Socket Server Not exist")

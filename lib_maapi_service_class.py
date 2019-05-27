@@ -49,7 +49,6 @@ class serviceClass():
             self.watcherPort
             )
 
-
         self.servicePids = {}
         self.libraryPID = {}
         self.libraryList = []
@@ -235,23 +234,35 @@ class serviceClass():
     def checkLibraryForObject(self,library, queue, queue_nr):
         try:
             for lib in library:
+                self.maapilogger.log(
+                    "DEBUG",
+                    f"Checking Library for   {int(queue[queue_nr][5])} ="
+                    f"=  {int(library[lib]['port'])}"
+                    )
                 if int(queue[queue_nr][5]) == int(library[lib]['port']):
                     return lib
-                return False
-        except:
-            pass
+
+            return False
+        except EnvironmentError as error:
+            self.maapilogger.log("ERROR", f"checkLibraryForObject {error}")
 
     def checkLibraryResponce(self):
+        """Check library reponce in queue """
         try:
             lib_temp = copy.copy(self.libraryPID)
-            if self.queue.getSocketStatusLen() > 0:
+            while self.queue.getSocketStatusLen():
                 queue_ = (self.queue.getSocketStatus())[self.objectname][self.watcherHost][self.watcherPort]
+                self.maapilogger.log("DEBUG", f"Checking queue {queue_}")
                 for nr in queue_:
                     lib = self.checkLibraryForObject(lib_temp, queue_, nr)
+
                     if lib:
                         self.libraryPID[lib]["sendedQuery"] = 0
                         self.libraryPID[lib]["lastResponce"] = dt.now()
-                        self.maapilogger.log("STATUS", f"Get Responce from {queue_[nr][4]} {queue_[nr][5]}")
+                        self.maapilogger.log(
+                            "STATUS",
+                            f"Get Responce from {queue_[nr][4]} {queue_[nr][5]}"
+                            )
                         self.maapiDB.updateRaw(
                             f"maapi_running_socket_servers ",
                             f" ss_last_responce = now() ",
