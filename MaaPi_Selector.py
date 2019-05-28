@@ -100,7 +100,7 @@ class MaapiSelector():
                         self.runningServices[serv]["ss_port"],
                         payload)
                     self.maapilogger.log(
-                        "DEBUG",
+                        "READ",
                         f"Devices sended to checkout readings {dev} | "
                         f"{self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | "
                         f"{self.deviceList[dev]['dev_rom_id']} to "
@@ -116,14 +116,33 @@ class MaapiSelector():
 
     def checkDbForOldreadings(self):
         for dev in self.deviceList:
-            tosec = self.helpers.to_sec(self.deviceList[dev]["dev_interval"], self.deviceList[dev]["dev_interval_unit_id"])
             try:
-                if ((dt.now() - self.deviceList[dev]["dev_last_update"]).seconds >= (tosec - (tosec * self.timeToRead))) and ((dt.now() - self.localQueue[dev]).seconds >= tosec):
-                    self.localQueue[dev] = dt.now()
-                    self.sendToRunningService(dev)
+                tosec = self.helpers.to_sec(
+                    self.deviceList[dev]["dev_interval"],
+                    self.deviceList[dev]["dev_interval_unit_id"]
+                    )
+                sensLastRead = (dt.now() - self.deviceList[dev]["dev_last_update"]).total_seconds()
+                sensInterval = (tosec - (tosec * self.timeToRead))
+                try:
+                    localQueueCond = (dt.now() - self.localQueue[dev]).total_seconds()
+
+                    if sensLastRead >= sensInterval and localQueueCond >= tosec:
+                        self.localQueue[dev] = dt.now()
+                        self.sendToRunningService(dev)
+
+                except Exception as e:
+                    self.maapilogger.log(
+                        "DEBUG",
+                        f"Exception checkDbForOldreadings inner error: {e}"
+                        )
+                    if sensLastRead >= sensInterval:
+                        self.localQueue[dev] = dt.now()
+                        self.sendToRunningService(dev)
             except Exception as e:
-                self.maapilogger.log("DEBUG", f"Exception checkDbForOldreadings error: {e}")
-                self.localQueue[dev] = dt.now() - timedelta(hours=1)
+                self.maapilogger.log(
+                    "DEBUG",
+                    f"Exception checkDbForOldreadings outer error: {e}"
+                    )
 
     def getData(self):
         self.deviceList = self.maapiDB.table("devices").columns(
@@ -170,7 +189,7 @@ class MaapiSelector():
             if (dt.now() - self.timer_2).seconds >= 10:
                 self.getData()
                 self.timer_2 = dt.now()
-            time.sleep(0.01)
+            time.sleep(0.1)
             self.checkDbForOldreadings()
             self.responceToWatcher()
 

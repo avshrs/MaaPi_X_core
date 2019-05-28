@@ -46,12 +46,21 @@ class SensProto():
     def libInit(self):
         self.readings = Readings.Readings(self.objectname, self.host, self.port)
         self.maapilogger.name = self.objectname
-        self.payload_Status_responce = self.helpers.pyloadToPicke(0xff, " ", " ", " ", self.host, self.port)
-        self.socketServer = SocketServer.SocketServer(self.objectname, self.queue, self.id_)
+        self.payload_Status_responce = self.helpers.pyloadToPicke(
+            0xff, " ", " ", " ", self.host, self.port)
+        self.socketServer = SocketServer.SocketServer(
+            self.objectname,
+            self.queue,
+            self.id_
+            )
         self.socketServer.runTcpServer(self.host, self.port)
 
     def service_shutdown(self, signum, frame):
-        self.maapilogger.log("STOP",f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        self.maapilogger.log(
+            "STOP",
+            f'Caught signal {signum} | stoping MaaPi'
+            f' {self.objectname}'
+            )
         self.isRunning = False
         raise SystemExit
 
@@ -61,10 +70,21 @@ class SensProto():
             for nr in queue_:
                 if queue_[nr][0] == 0:
                     try:
-                        self.maapilogger.log("DEBUG", f"Sending responce to Wacher {queue_[nr][4]} {queue_[nr][5]}")
-                        self.socketClient.sendStr(queue_[nr][4], queue_[nr][5], self.payload_Status_responce)
-                    except Exception as e:
-                         self.maapilogger.log("ERROR", f"Watcher Socket Server Not exist")
+                        self.maapilogger.log(
+                            "DEBUG",
+                            f"Sending responce to Wacher"
+                            f" {queue_[nr][4]} {queue_[nr][5]}"
+                            )
+                        self.socketClient.sendStr(
+                            queue_[nr][4],
+                            queue_[nr][5],
+                            self.payload_Status_responce
+                            )
+                    except:
+                         self.maapilogger.log(
+                             "ERROR",
+                             f"Watcher Socket Server Not exist"
+                             )
                 # elif queue_[nr][0] == 777:
                     # self.maapilogger.log("ERROR", f"Get self kill instruction via queue")
                     # self.service_shutdown()

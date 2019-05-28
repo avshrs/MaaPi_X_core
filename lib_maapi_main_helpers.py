@@ -38,7 +38,10 @@ class Helpers:
                 #9999.0 reading ok
                 #9999.1 device not exist
                 #9999.2 error while reading
-                self.maapilogger.log("DEBUG","Error while reading ")
+                self.maapilogger.log(
+                    "DEBUG",
+                    "Error while reading "
+                    )
                 self.maapiDB.insert_readings(dev_id,float(f"9999.{error_code}"," ",False))
             else:
                 value, boolean = self.checkDev.checkDevCond( devices_db, devices_db_rel, dev_id, readed_value)
@@ -52,9 +55,12 @@ class Helpers:
 
     def to_sec(self, value, unit):
         _seconds = 0
-        if unit == 2: _seconds = value * 60
-        elif unit == 3: _seconds = value * 3600
-        else: _seconds = value
+        if unit == 2:
+            _seconds = value * 60
+        elif unit == 3:
+            _seconds = value * 3600
+        else:
+            _seconds = value
         return _seconds
 
     def updateBoardLocation(self, location,board_location):
