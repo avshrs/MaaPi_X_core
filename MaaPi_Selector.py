@@ -21,7 +21,6 @@ import os
 import signal
 import subprocess
 
-
 class MaapiSelector():
     def __init__(self):
         # objects
@@ -102,7 +101,7 @@ class MaapiSelector():
                     self.maapilogger.log(
                         "READ",
                         f"Devices sended to checkout readings {dev} | "
-                        f"{self.deviceList[dev]['dev_user_name'].encode('utf-8').strip()} | "
+                        f"{self.deviceList[dev]['dev_user_name']} | "
                         f"{self.deviceList[dev]['dev_rom_id']} to "
                         f"{self.runningServices[serv]['ss_port']}"
                         )
@@ -156,6 +155,7 @@ class MaapiSelector():
             "dev_interval",
             "dev_value",
             "dev_unit_id",
+            "dev_gpio_pin",
             "dev_interval_unit_id",
             "dev_interval_queue",
             "dev_machine_location_id",
@@ -189,7 +189,7 @@ class MaapiSelector():
             if (dt.now() - self.timer_2).seconds >= 10:
                 self.getData()
                 self.timer_2 = dt.now()
-            time.sleep(0.1)
+            time.sleep(0.01)
             self.checkDbForOldreadings()
             self.responceToWatcher()
 

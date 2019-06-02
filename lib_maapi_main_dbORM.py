@@ -8,8 +8,10 @@
 import logging
 import os
 import psycopg2
+import time
 import MaaPi_Config as Config
 from datetime import datetime as dt
+
 
 
 pwd = os.getcwd()
@@ -33,13 +35,14 @@ class MaaPiDBConnection():
         self.Maapi_dbUser = self.config.maapiDbUser
         self.Maapi_dbHost = self.config.maapiDbHost
         self.Maapi_dbPasswd = self.config.maapiDbpass
+
         self.db_string = (
             f"dbname='{self.Maapi_dbName}' "
             f"user='{self.Maapi_dbUser}' "
             f"host='{self.Maapi_dbHost}' "
             f"password='{self.Maapi_dbPasswd}'"
             )
-
+        self.conn = psycopg2.connect(self.db_string)
     def logPrintOnly(self, level, msg):
         """Print logs to console"""
         try:
@@ -59,37 +62,47 @@ class MaaPiDBConnection():
         except:
             pass
 
+    def connectTodb(self):
+        try:
+            self.conn = psycopg2.connect(self.db_string)
+        except (Exception, psycopg2.DatabaseError) as error :
+            print(f"connection error {error}")
+            time.sleep(1)
+            self.connectTodb()
+
     def commitQuery(self, query):
         """insert row data to dabase"""
         try:
-            with psycopg2.connect(self.db_string) as conn:
-                cur = conn.cursor()
+            with self.conn.cursor() as cur:
                 cur.execute(f"{query}")
-                conn.commit()
+            self.conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
+            self.connectTodb()
 
     def fetchoneQuery(self, query):
         """insert row data to dabase"""
         try:
-            with psycopg2.connect(self.db_string) as conn:
-                cur = conn.cursor()
+            with self.conn.cursor() as cur:
                 cur.execute(f"{query}")
                 return cur.fetchone()
         except (Exception, psycopg2.DatabaseError) as error:
             self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
+            self.connectTodb()
             return []
+
 
     def fetchallQuery(self, query):
         """insert row data to dabase"""
         try:
-            with psycopg2.connect(self.db_string) as conn:
-                cur = conn.cursor()
+            with self.conn.cursor() as cur:
                 cur.execute(f"{query}")
                 return cur.fetchall()
         except (Exception, psycopg2.DatabaseError) as error:
             self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
+            self.connectTodb()
             return []
+
 
     def insertRaw(self, where, what):
         """Prepare query string"""
@@ -354,4 +367,5 @@ class MaaPiDBConnection():
                     table_data_dict[table_data[row_s][0]] = sensor_rows
             return table_data_dict
         except Exception as error:
+            print ("orm error")
             return []

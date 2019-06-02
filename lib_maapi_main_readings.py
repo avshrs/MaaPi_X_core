@@ -37,22 +37,32 @@ class Readings:
                     devices_db          = queue_[nr][2]
                     devices_db_rel      = queue_[nr][3]
                     if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
-                        self.maapilogger.log("DEBUG",f"Device {dev_id} will be readed")
+
                         try:
                             startd = dt.now()
                             value, error = method(nr, dev_id, devices_db, devices_db_rel)
+
                             stopd = dt.now()
-                            val = round(float(value),3)
-                            self.maapilogger.log("READ",f"Readed  id: {nr:<10} |  DevID: {dev_id:<5} |  Name: {devices_db[dev_id]['dev_user_name']:<25} |  Value: {val:<15} | inTime: {(stopd-startd)}")
-                            self.insertReadingsToDB(nr ,float(value), dev_id, devices_db, devices_db_rel, error)
-                        except Exception as e:
+                            if isinstance(value, float):
+                                val = round(float(value),3)
+                            else:
+                                val = value
+                            self.maapilogger.log(
+                                "READ",
+                                f"Readed  id: {nr:<10} |  "
+                                f"DevID: {dev_id:<5} |  "
+                                f"Name: {devices_db[dev_id]['dev_user_name']:<25} |  "
+                                f"Value: {val:<15} | inTime: {(stopd-startd)}")
+                            self.insertReadingsToDB(nr, float(value), dev_id, devices_db, devices_db_rel, error)
+
+                        except EnvironmentError as e:
                             value = 0
                             error = 2
                             self.maapilogger.log("ERROR",f"Error while reading values from {dev_id} - {devices_db[dev_id]['dev_user_name']}: {e}")
                             self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
 
 
-        except Exception as e :
+        except EnvironmentError as e :
             self.maapilogger.log("ERROR",f"checkQueueForReadings | {dev} | {e}")
 
     def insertReadingsToDB(self, nr, readed_value, dev_id, devices_db, devices_db_rel,  error_code):
@@ -68,7 +78,7 @@ class Readings:
                 self.maapilogger.log("DEBUG","Insert readings to DataBase")
                 self.maapiDB.insert_readings(dev_id,value," ",boolean)
 
-        except Exception as e:
+        except EnvironmentError as e:
             self.maapilogger.log("ERROR",f"Error inserting data from CMD: {e}")
             try:
                 self.maapiDB.insert_readings(dev_id,0," ",False)

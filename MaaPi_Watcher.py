@@ -140,6 +140,7 @@ class MaapiWatcher(serviceClass):
             if (dt.now() - self.timer_1).seconds >= 1:
                 if self.running:
                     self.checkLibraryProcess()
+                    self.checkLibrarylist()
 
                 self.timer_1 = dt.now()
 
