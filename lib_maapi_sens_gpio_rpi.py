@@ -105,19 +105,19 @@ class GPIO_PI(SensProto):
                 self.maapilogger.log("INFO", f"gpio condition checker {value}")
                 gpio_finale = self.invert_state(dev_id, value)
                 self.maapilogger.log("INFO", f"inverted? {gpio_finale}")
-                GPIO.setup(device_last_value[dev_id]["dev_gpio_pin"], GPIO.OUT)
+                GPIO.setup(devices_db[dev_id]["dev_gpio_pin"], GPIO.OUT)
                 if gpio_finale != 2:
                     self.maapilogger.log("INFO", f"gpio_finale != 2 True")
-                    if GPIO.input(device_last_value[dev_id]["dev_gpio_pin"]):
+                    if GPIO.input(devices_db[dev_id]["dev_gpio_pin"]):
                         if gpio_finale == 0:
                             self.maapilogger.log("INFO", f"gpio_finale == 0 True")
-                            GPIO.output(device_last_value[dev_id]["dev_gpio_pin"], gpio_finale)
+                            GPIO.output(devices_db[dev_id]["dev_gpio_pin"], gpio_finale)
                             self.maapilogger.log("READ",f"set gpio to {gpio_finale}")
                         return gpio_finale, 0
 
                     else:
                         if gpio_finale == 1:
-                            GPIO.output(device_last_value[dev_id]["dev_gpio_pin"], gpio_finale)
+                            GPIO.output(devices_db[dev_id]["dev_gpio_pin"], gpio_finale)
                             self.maapilogger.log("READ",f"set gpio to {gpio_finale}")
                         return gpio_finale, 0
                 else:
