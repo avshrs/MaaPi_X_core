@@ -99,6 +99,7 @@ class GPIO_PI(SensProto):
         target = self.mp_table[dev_id]["switch_update_rom_id"]
         source_dev = self.mp_table[dev_id]["switch_data_from_sens_id"]
         try:
+
             if source_dev and target:
                 self.maapilogger.log("INFO", f"source_dev and target: {source_dev} and  {target}")
                 value = self.gpio_condytion_checker(dev_id)
@@ -131,6 +132,8 @@ class GPIO_PI(SensProto):
 
     def service_startup(self):
         self.updateTable()
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
 
     def loop(self):
         while self.isRunning:
