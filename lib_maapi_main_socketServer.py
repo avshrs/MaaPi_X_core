@@ -9,7 +9,7 @@
 import socket, sys, os, signal, time
 import lib_maapi_main_helpers        as Helpers
 import lib_maapi_main_logger         as MaapiLogger
-import lib_maapi_main_dbORM          as Db_connection
+import lib_maapi_main_dbconn as Db_connection
 import MaaPi_Config                   as Config
 
 from datetime import datetime        as dt

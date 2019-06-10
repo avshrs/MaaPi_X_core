@@ -9,7 +9,7 @@
 ##############################################################
 import logging
 from datetime import datetime as dt
-import lib_maapi_main_dbORM as Db_connection
+import lib_maapi_main_dbconn as Db_connection
 import MaaPi_Config as Config
 import os
 

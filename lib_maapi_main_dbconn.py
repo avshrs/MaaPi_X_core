@@ -12,7 +12,6 @@ import psycopg2
 import MaaPi_Config as Config
 from datetime import datetime as dt
 
-
 pwd = os.getcwd()
 logging.basicConfig(
     filename=f'{pwd}/log/Maapi_logger.log',

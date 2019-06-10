@@ -7,7 +7,7 @@
 ##############################################################
 
 import lib_maapi_main_checkDevCond               as CheckDev
-import lib_maapi_main_dbORM                      as Db_connection
+import lib_maapi_main_dbconn as Db_connection
 import lib_maapi_main_logger                     as MaapiLogger
 import lib_maapi_main_helpers                    as Helpers
 from datetime import datetime as dt
