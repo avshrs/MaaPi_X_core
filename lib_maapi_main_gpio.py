@@ -5,7 +5,7 @@ class GPIOHelpers:
         self.maapiDB = Db_connection.MaaPiDBConnection()
 
 
-    def invertLogicState(self, sensID, value, true):
+    def invertLogicState(self, sensID, value):
         if value == 1 or value == True:
             return 0
         elif value == 0 or value == False:
@@ -47,7 +47,7 @@ class GPIOHelpers:
 
     def checkConditionState(self, dev, counter, table):
         value = 0
-        if table[dev]["switch_dev_rangeacc"] == counter:
+        if table[dev]["switch_range_acc"] == counter:
             # all readings match condition set to 1
             value = 1
         elif counter == 0:
@@ -64,9 +64,9 @@ class GPIOHelpers:
         value = 0
         for min_max in ("min", "max"):
             if table[sensID][f"switch_reference_sensor_{min_max}_e"]:
-                result[min_max] = self.getDeviceAndReferDeviceHistory(sensID, table[sensID]["switch_dev_rangeacc"], table, min_max)
+                result[min_max] = self.getDeviceAndReferDeviceHistory(sensID, table[sensID]["switch_range_acc"], table, min_max)
             elif table[sensID][f"switch_value_{min_max}_e"]:
-                result[min_max] = self.getDeviceHistory(sensID, table[sensID]["switch_dev_rangeacc"], table, min_max)
+                result[min_max] = self.getDeviceHistory(sensID, table[sensID]["switch_range_acc"], table, min_max)
         if result["min"] == 1 or result["max"] == 1:
             value = 1
         elif result["min"] == 2 or result["max"] == 2:

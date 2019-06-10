@@ -37,7 +37,7 @@ class GPIO_PI(SensProto):
 
             if source_dev and target:
                 value = self.gpioHelper.gpio_condytion_checker(dev_id, self.mp_table)
-                gpio_finale = self.gpioHelper.invert_state(dev_id, value)
+                gpio_finale = self.gpioHelper.invertLogicState(dev_id, value)
                 GPIO.setup(devices_db[dev_id]["dev_gpio_pin"], GPIO.OUT)
                 if gpio_finale != 2:
                     if GPIO.input(devices_db[dev_id]["dev_gpio_pin"]):
