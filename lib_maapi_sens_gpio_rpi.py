@@ -49,7 +49,7 @@ class GPIO_PI(SensProto):
                             GPIO.output(devices_db[dev_id]["dev_gpio_pin"], gpio_finale)
                         return gpio_finale, 0
                 else:
-                    return (self.maapiDB.select_last_nr_of_values(dev_id, 1)), 0
+                    return GPIO.input(devices_db[dev_id]["dev_gpio_pin"]), 0
             else:
                 return 0, 1
         except EnvironmentError as e:
