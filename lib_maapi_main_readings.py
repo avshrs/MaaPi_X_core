@@ -6,36 +6,36 @@
 #
 ##############################################################
 
-import lib_maapi_main_checkDevCond               as CheckDev
+import lib_maapi_main_checkDevCond as CheckDev
 import lib_maapi_main_dbconn as Db_connection
-import lib_maapi_main_logger                     as MaapiLogger
-import lib_maapi_main_helpers                    as Helpers
+import lib_maapi_main_logger as MaapiLogger
+import lib_maapi_main_helpers as Helpers
 from datetime import datetime as dt
 
 
 class Readings:
     def __init__(self, owner, host, port):
-        self.owner      =        owner
-        self.checkDev           = CheckDev.CheckDevCond()
-        self.host               = host
-        self.port               = port
-        self.maapiDB            = Db_connection.MaaPiDBConnection()
-        self.maapilogger        = MaapiLogger.Logger()
-        self.maapilogger.name   = f"Read - {self.owner}"
-        self.helpers            = Helpers.Helpers()
+        self.owner = owner
+        self.checkDev = CheckDev.CheckDevCond()
+        self.host = host
+        self.port = port
+        self.maapiDB = Db_connection.MaaPiDBConnection()
+        self.maapilogger = MaapiLogger.Logger()
+        self.maapilogger.name = f"Read - {self.owner}"
+        self.helpers = Helpers.Helpers()
 
 
     def checkQueueForReadings(self, method, queue):
         dev = 0
         try:
             if queue.getSocketRadingsLen() > 0:
-                queue_  = (queue.getSocketRadings())[self.owner][self.host][self.port]
+                queue_ = (queue.getSocketRadings())[self.owner][self.host][self.port]
                 value, error = 0, 0
                 for nr in queue_:
-                    dev_id              = queue_[nr][1]
-                    dev                 = queue_[nr][1]
-                    devices_db          = queue_[nr][2]
-                    devices_db_rel      = queue_[nr][3]
+                    dev_id = queue_[nr][1]
+                    dev = queue_[nr][1]
+                    devices_db = queue_[nr][2]
+                    devices_db_rel = queue_[nr][3]
                     if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
 
                         try:
@@ -49,7 +49,7 @@ class Readings:
                                 val = value
                             self.maapilogger.log(
                                 "READ",
-                                f"Readed  id: {nr:<10} |  "
+                                f"Readed  id: {dev_id:<10} |  "
                                 f"DevID: {dev_id:<5} |  "
                                 f"Name: {devices_db[dev_id]['dev_user_name']:<25} |  "
                                 f"Value: {val:<15} | inTime: {(stopd-startd)}")

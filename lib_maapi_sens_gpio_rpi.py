@@ -93,7 +93,21 @@ class GPIO_PI(SensProto):
     #         value = 2
     #     return value
 
-    def readValues(self, que, dev_id, devices_db, devices_db_rel):
+MaaPi  |  Read - PFC8591     |   READ   |  10:38:02 - 582601  |  Readed  id: 3          |  DevID: 2204  |  Name: L1 Napięcie               |  Value: 235.707         | inTime: 0:00:00.007405
+Traceback (most recent call last):
+  File "lib_maapi_sens_gpio_rpi.py", line 141, in <module>
+    GPIO_PI_.loop()
+  File "lib_maapi_sens_gpio_rpi.py", line 132, in loop
+    self.checkQueueForReadings()
+  File "/home/pi/MaaPi_X_core/lib_maapi_sens_proto.py", line 93, in checkQueueForReadings
+    self.readings.checkQueueForReadings(self.readValues, self.queue)
+  File "/home/pi/MaaPi_X_core/lib_maapi_main_readings.py", line 52, in checkQueueForReadings
+    f"Readed  id: {nr:<10} |  "
+TypeError: unsupported format string passed to list.__format__
+
+
+
+    def readValues(self, nr, dev_id, devices_db, devices_db_rel):
         value, error = 0, 0
         gpio_finale = 0
         target = self.mp_table[dev_id]["switch_update_rom_id"]
