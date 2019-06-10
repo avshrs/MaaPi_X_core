@@ -59,14 +59,14 @@ class GPIOHelpers:
         return value
 
 
-    def gpio_condytion_checker(self, sensID):
+    def gpio_condytion_checker(self, sensID, table):
         result = {"min": 0, "max": 0}
         value = 0
         for min_max in ("min", "max"):
             if table[sensID][f"switch_reference_sensor_{min_max}_e"]:
-                result[min_max] = self.getReferenceHistory(sensID, table[sensID]["switch_dev_rangeacc"], min_max)
+                result[min_max] = self.getDeviceAndReferDeviceHistory(sensID, table[sensID]["switch_dev_rangeacc"], table, min_max)
             elif table[sensID][f"switch_value_{min_max}_e"]:
-                result[min_max] = self.getSourceHistory(sensID, table[sensID]["switch_dev_rangeacc"], min_max)
+                result[min_max] = self.getDeviceHistory(sensID, table[sensID]["switch_dev_rangeacc"], table, min_max)
         if result["min"] == 1 or result["max"] == 1:
             value = 1
         elif result["min"] == 2 or result["max"] == 2:
