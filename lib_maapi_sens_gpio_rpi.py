@@ -34,24 +34,27 @@ class GPIO_PI(SensProto):
         target = self.mp_table[dev_id]["switch_update_rom_id"]
         source_dev = self.mp_table[dev_id]["switch_data_from_sens_id"]
         try:
-
             if source_dev and target:
                 value = self.gpioHelper.gpio_condytion_checker(dev_id, self.mp_table)
-                gpio_finale = self.gpioHelper.invertLogicState(dev_id, value)
+                gpio_finale = self.gpioHelper.invertLogicState(dev_id, self.mp_table, value)
                 GPIO.setup(devices_db[dev_id]["dev_gpio_pin"], GPIO.OUT)
                 if gpio_finale != 2:
                     if GPIO.input(devices_db[dev_id]["dev_gpio_pin"]):
                         if gpio_finale == 0:
+                            self.maapilogger.log("DEBUG", f"set to 0")
                             GPIO.output(devices_db[dev_id]["dev_gpio_pin"], gpio_finale)
                         return gpio_finale, 0
                     else:
                         if gpio_finale == 1:
+                            self.maapilogger.log("DEBUG", f"set to 1")
                             GPIO.output(devices_db[dev_id]["dev_gpio_pin"], gpio_finale)
                         return gpio_finale, 0
                 else:
+                    self.maapilogger.log("DEBUG", f"set to 2")
                     return GPIO.input(devices_db[dev_id]["dev_gpio_pin"]), 0
             else:
                 return 0, 1
+                self.maapilogger.log("DEBUG", f"error set to 0")
         except EnvironmentError as e:
              self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
              return 0, 1
