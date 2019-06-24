@@ -69,7 +69,8 @@ class Logger():
                 msg__ = str(msg_).replace('\"', '')
                 if self.printable:
                     print(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
-                logging.info(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
+               # logging.info(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
+                print(f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  {time:<16}  |  {msg}")
                 self.maapiDB.insertRaw("maapi_logs", ("default", f"'{level}'", f"'{self.name}'","now()",f"'{msg__}'", f"'{self.maapiLocation}'"))
                 #self.maapiDB.clean_logs()
         except:

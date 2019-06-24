@@ -257,8 +257,9 @@ class serviceClass():
                 self.startLibraryDeamon(lib)
         lib_temp = copy.copy(self.libraryPID)
         for lib in lib_temp:
-            if lib not in self.libraryList:
-                self.stopLibraryDeamon(lib)
+            if self.libraryList:
+                if lib not in self.libraryList:
+                    self.stopLibraryDeamon(lib)
 
 
     def checkLibraryProcess(self):

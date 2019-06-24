@@ -11,6 +11,7 @@ import time
 import psycopg2
 import MaaPi_Config as Config
 from datetime import datetime as dt
+import queue
 
 pwd = os.getcwd()
 logging.basicConfig(
@@ -26,6 +27,9 @@ class MaaPiDBConnection():
         self.filters_ = {}
         self.orders_ = {}
         self.columns_ = {}
+        self.queuecommitQuery = queue.Queue()
+        self.queuefetchoneQuery = {}
+        self.queuefetchallQuery = {}
         self.columns_var = {}
         self.table_ = {}
         self.config = Config.MaapiVars()
@@ -41,7 +45,10 @@ class MaaPiDBConnection():
             )
         self.cur = object
         self.conn = object
-        self.dbInnit()
+        self.dbInnit(False)
+        self.isRunning = True
+
+
     def logPrintOnly(self, level, msg):
         """Print logs to console"""
         try:
@@ -56,23 +63,34 @@ class MaaPiDBConnection():
         except:
             pass
 
-    def dbInnit(self):
-        """insert row data to dabase"""
+    def dbInnit(self, state):
+        if state:
+            time.sleep(0.1)
+            try:
+                self.conn.close()
+            except:
+                self.logPrintOnly("ERROR", f'DB not connected')
         try:
             self.conn = psycopg2.connect(self.db_string)
         except (Exception, psycopg2.DatabaseError) as error:
             self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
-            time.sleep(1)
+        else:
+            self.isRunning = True
+
 
     def commitQuery(self, query):
         """insert row data to dabase"""
+        self.queuecommitQuery.put(query)
         try:
             with self.conn.cursor() as cur:
-                cur.execute(f"{query}")
-                self.conn.commit()
+                while not self.queuecommitQuery.empty():
+                    cur.execute(f"{(self.queuecommitQuery.queue)[0]}")
+                    self.conn.commit()
+                    self.queuecommitQuery.get()
+
         except (Exception, psycopg2.DatabaseError) as error:
             self.logPrintOnly("ERROR", f'commitQuery error: {error}')
-            self.dbInnit()
+            self.dbInnit(True)
 
 
     def fetchoneQuery(self, query):
@@ -80,22 +98,36 @@ class MaaPiDBConnection():
         try:
             with self.conn.cursor() as cur:
                 cur.execute(f"{query}")
-                return cur.fetchone()
+                temp = cur.fetchone()
+                self.queuefetchoneQuery[query] = temp
+                return temp
         except (Exception, psycopg2.DatabaseError) as error:
+            temp = []
             self.logPrintOnly("ERROR", f'fetchoneQuery error: {error}')
-            self.dbInnit()
-            return []
+            self.dbInnit(True)
+            try:
+                temp = self.queuefetchallQuery[query]
+            except:
+                pass
+            return temp
 
     def fetchallQuery(self, query):
         """insert row data to dabase"""
         try:
             with self.conn.cursor() as cur:
                 cur.execute(f"{query}")
-                return cur.fetchall()
+                temp = cur.fetchall()
+                self.queuefetchoneQuery[query] = temp
+                return temp
         except (Exception, psycopg2.DatabaseError) as error:
+            temp = []
             self.logPrintOnly("ERROR", f'fetchallQuery error: {error}')
-            self.dbInnit()
-            return []
+            self.dbInnit(True)
+            try:
+                temp = self.queuefetchoneQuery[query]
+            except:
+                pass
+            return temp
 
     def insertRaw(self, where, what):
         """Prepare query string"""
@@ -175,32 +207,36 @@ class MaaPiDBConnection():
                 self.commitQuery(query)
             except Exception as error:
                 self.logPrintOnly("ERROR", f'insert readings - update device {error}')
-
-            if status is True:
-                query = (
-                    "UPDATE devices "
-                    f"SET dev_value={(1 if insert_value == True else (0 if insert_value == False else insert_value))}, "
-                    f"dev_interval_queue = {False}, "
-                    "dev_last_update=NOW(), "
-                    "dev_read_error='ok' "
-                    f"WHERE dev_id='{device_id}' and dev_status=True"
-                    )
-                self.commitQuery(query)
-                if devices_data[2]:
+            try:
+                if status is True:
+                    date = dt.now().strftime("%Y-%m-%d %H:%M:%S.%f")
                     query = (
-                        f"INSERT INTO maapi_dev_rom_{devices_data[1].replace('-', '_')}_values "
-                        f"VALUES (default,{device_id}, default, "
-                        f"{(1 if insert_value==True else (0 if insert_value == False else insert_value))})"
+                        "UPDATE devices "
+                        f"SET dev_value={(1 if insert_value == True else (0 if insert_value == False else insert_value))}, "
+                        f"dev_interval_queue = {False}, "
+                        f"dev_last_update= TIMESTAMP '{date}', "
+                        "dev_read_error='ok' "
+                        f"WHERE dev_id='{device_id}' and dev_status=True"
                         )
                     self.commitQuery(query)
-            else:
-                query = (
-                    "UPDATE devices "
-                    f"SET dev_interval_queue = 9999, dev_value={device_id}, "
-                    "dev_read_error='Error' "
-                    f"WHERE dev_id='{False}' and dev_status=True"
-                    )
-                self.commitQuery(query)
+                    if devices_data[2]:
+
+                        query = (
+                            f"INSERT INTO maapi_dev_rom_{devices_data[1].replace('-', '_')}_values "
+                            f"VALUES (default,{device_id}, TIMESTAMP '{date}', "
+                            f"{(1 if insert_value==True else (0 if insert_value == False else insert_value))})"
+                            )
+                        self.commitQuery(query)
+                else:
+                    query = (
+                        "UPDATE devices "
+                        f"SET dev_interval_queue = 9999, dev_value={device_id}, "
+                        "dev_read_error='Error' "
+                        f"WHERE dev_id='{False}' and dev_status=True"
+                        )
+                    self.commitQuery(query)
+            except:
+                pass
         except Exception() as error:
             self.logPrintOnly("ERROR", f'insert readings {error}')
 
@@ -360,4 +396,5 @@ class MaaPiDBConnection():
                     table_data_dict[table_data[row_s][0]] = sensor_rows
             return table_data_dict
         except Exception as error:
+
             return []

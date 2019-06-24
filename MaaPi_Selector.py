@@ -186,7 +186,7 @@ class MaapiSelector():
 
     def loop(self):
         while True:
-            if (dt.now() - self.timer_2).seconds >= 10:
+            if (dt.now() - self.timer_2).seconds >= 5:
                 self.getData()
                 self.timer_2 = dt.now()
             time.sleep(0.01)
