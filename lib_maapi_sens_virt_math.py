@@ -66,8 +66,6 @@ class MaaPiMath(SensProto):
         elif self.maapiMathTable[math_id][f'math_data_from_{nr}_date']:
             if self.maapiMathTable[math_id][f'math_data_from_{nr}_date'] > 0:
                 data = self.maapiDB.select_last_timeRange_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_date'])
-                print (data)
-
         else:
             data = devices_db_rel[float(self.maapiMathTable[math_id][f'math_data_from_{nr}_id'])]['dev_value']
         return data
@@ -96,7 +94,7 @@ class MaaPiMath(SensProto):
                     else: V4 = v4 = 'none'
 
                     value = eval(self.maapiMathTable[math_id]["math_math"])
-
+                    print (value)
                     self.maapilogger.log("DEBUG",f"Readed value {float(value)} nr:{nr}")
                 else:
                     self.maapilogger.log("DEBUG",f"Device Not exist in list {dev_id}")
