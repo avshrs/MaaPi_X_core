@@ -23,6 +23,7 @@ class MaaPiMath(SensProto):
         self.timer_1 = dt.now()
         self.libInit()
 
+
     def updateMathTable(self):
         try:
             self.maapiMathTable = self.maapiDB.table(
@@ -31,10 +32,23 @@ class MaaPiMath(SensProto):
                     'math_user_id',
                     'math_name',
                     'math_update_rom_id',
+
                     'math_data_from_1_id',
+                    'math_data_from_1_date',
+                    'math_data_from_1_count',
+
                     'math_data_from_2_id',
+                    'math_data_from_2_date',
+                    'math_data_from_2_count',
+
                     'math_data_from_3_id',
+                    'math_data_from_3_date',
+                    'math_data_from_3_count',
+
                     'math_data_from_4_id',
+                    'math_data_from_4_date',
+                    'math_data_from_4_count',
+
                     'math_math',
                     'math_descript',
                     'math_enabled',
@@ -42,6 +56,16 @@ class MaaPiMath(SensProto):
             self.maapilogger.log("DEBUG", "Update maapiMathTable from database")
         except:
             pass
+
+    def getDataHistory(self, dev_id, nr, math_id, devices_db_rel):
+
+        if self.maapiMathTable[math_id][f'math_data_from_{nr}_date'] > 0:
+            data = self.maapiDB.select_last_timeRange_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_date'])
+        elif self.maapiMathTable[math_id][f'math_data_from_{nr}_count'] > 0:
+            data = self.maapiDB.select_last_nr_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_count'])
+        else:
+            data = devices_db_rel[float(self.maapiMathTable[math_id][f'math_data_from_{nr}_id'])]['dev_value']
+        return data
 
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
         value = 0
@@ -51,20 +75,19 @@ class MaaPiMath(SensProto):
                 if int(self.maapiMathTable[math_id]["math_update_rom_id"]) == dev_id:
 
                     if self.maapiMathTable[math_id]['math_data_from_1_id']:
-
-                        V1 = v1 = devices_db_rel[int(self.maapiMathTable[math_id]['math_data_from_1_id'])]['dev_value']
+                        V1 = v1 = self.getDataHistory(self.maapiMathTable[math_id]['math_data_from_1_id'], 1, math_id, devices_db_rel)
                     else: V1 = v1 = 'none'
 
                     if self.maapiMathTable[math_id]['math_data_from_2_id']:
-                        V2 = v2 = devices_db_rel[int(self.maapiMathTable[math_id]['math_data_from_2_id'])]['dev_value']
+                        V2 = v2 = self.getDataHistory(self.maapiMathTable[math_id]['math_data_from_2_id'], 2, math_id, devices_db_rel)
                     else: V2 = v2 = 'none'
 
                     if self.maapiMathTable[math_id]['math_data_from_3_id']:
-                        V3 = v3 = devices_db_rel[int(self.maapiMathTable[math_id]['math_data_from_3_id'])]['dev_value']
+                        V3 = v3 = self.getDataHistory(self.maapiMathTable[math_id]['math_data_from_3_id'], 3, math_id, devices_db_rel)
                     else: V3 = v3 = 'none'
 
                     if self.maapiMathTable[math_id]['math_data_from_4_id']:
-                        V4 = v4 = devices_db_rel[int(self.maapiMathTable[math_id]['math_data_from_4_id'])]['dev_value']
+                        V4 = v4 = self.getDataHistory(self.maapiMathTable[math_id]['math_data_from_4_id'], 4, math_id, devices_db_rel)
                     else: V4 = v4 = 'none'
 
                     value = eval(self.maapiMathTable[math_id]["math_math"])

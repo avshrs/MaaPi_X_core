@@ -82,8 +82,8 @@ class MaaPiDBConnection():
         """insert row data to dabase"""
         self.queuecommitQuery.put(query)
         try:
-            with self.conn.cursor() as cur:
-                while not self.queuecommitQuery.empty():
+            while not self.queuecommitQuery.empty():
+                with self.conn.cursor() as cur:
                     cur.execute(f"{(self.queuecommitQuery.queue)[0]}")
                     self.conn.commit()
                     self.queuecommitQuery.get()
@@ -263,6 +263,35 @@ class MaaPiDBConnection():
                     )
                 values_history_temp = self.fetchallQuery(query3)
                 for i in range(int(range_nr)):
+                    values_history.append(values_history_temp[i][0])
+            return values_history
+        except:
+            return []
+            self.logPrintOnly("ERROR", f'select last nr of values {error}')
+
+    def select_last_timeRange_of_values(self, dev_id, seconds):
+        try:
+            query = (
+                "SELECT dev_rom_id "
+                "FROM devices "
+                f"WHERE dev_id={dev_id}"
+                )
+            query2 = (
+                "SELECT dev_read_error "
+                "FROM devices "
+                f"WHERE dev_id={dev_id}"
+                )
+            error = (self.fetchoneQuery(query2))[0]
+            values_history = []
+            if error == "ok":
+                dev_rom_id = (self.fetchoneQuery(query))[0]
+                query3 = (
+                    f"SELECT dev_value, dev_timestamp "
+                    f"FROM maapi_dev_rom_{dev_rom_id.replace('-', '_')}_values "
+                    f"where dev_timestamp >= now() - interval '{seconds} seconds order by dev_timestamp "
+                    )
+                values_history_temp = self.fetchallQuery(query3)
+                for i in range(len(values_history_temp)):
                     values_history.append(values_history_temp[i][0])
             return values_history
         except:
