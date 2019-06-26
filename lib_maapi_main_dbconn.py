@@ -291,7 +291,7 @@ class MaaPiDBConnection():
                 query3 = (
                     f"SELECT dev_value, dev_timestamp "
                     f"FROM maapi_dev_rom_{dev_rom_id.replace('-', '_')}_values "
-                    f"where dev_timestamp >= now() - interval '{seconds} seconds order by dev_timestamp "
+                    f"where dev_timestamp >= now() - interval '{seconds} seconds' order by dev_timestamp "
                     )
                 values_history_temp = self.fetchallQuery(query3)
                 for i in range(len(values_history_temp)):
