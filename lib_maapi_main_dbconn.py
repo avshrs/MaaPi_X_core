@@ -265,8 +265,7 @@ class MaaPiDBConnection():
                 values_history_temp = self.fetchallQuery(query3)
                 for i in range(int(range_nr)):
                     values_x.append(values_history_temp[i][0])
-                    values_y.append(values_history_temp[i][1])
-            return (values_x, values_y)
+            return values_x
         except:
             return []
             self.logPrintOnly("ERROR", f'select last nr of values {error}')
@@ -285,6 +284,8 @@ class MaaPiDBConnection():
                 )
             error = (self.fetchoneQuery(query2))[0]
             values_history = []
+            values_x = []
+            values_y = []
             if error == "ok":
                 dev_rom_id = (self.fetchoneQuery(query))[0]
                 query3 = (
@@ -294,8 +295,9 @@ class MaaPiDBConnection():
                     )
                 values_history_temp = self.fetchallQuery(query3)
                 for i in range(len(values_history_temp)):
-                    values_history.append(values_history_temp[i][0])
-            return values_history
+                    values_x.append(values_history_temp[i][0])
+                    values_y.append(values_history_temp[i][1])
+            return (values_x, values_y)
         except:
             return []
             self.logPrintOnly("ERROR", f'select last nr of values {error}')
