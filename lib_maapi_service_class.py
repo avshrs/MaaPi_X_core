@@ -70,17 +70,38 @@ class serviceClass():
             service_host,
             service_port
             )
+        running_services = self.maapiDB.table(
+                "maapi_running_socket_servers;"
+                ).filters_eq(
+                    ss_board_id=self.board_id
+                ).get()
         try:
-            self.socketClient.sendStr(
-                service_host,
-                service_port,
-                payload_StopTCP
-                )
-            self.maapilogger.log(
-                "STOP",
-                f"ServiceClass | Kill message sended "
-                f"{service_host}:{service_port}"
-                )
+            for rs in running_services:
+                if running_services[rs]["ss_port"] == service_port:
+                    if running_services[rs]["ss_type"] == "TCP":
+                        self.socketClient.sendStr(
+                            service_host,
+                            service_port,
+                            payload_StopTCP
+                            )
+
+                        self.maapilogger.log(
+                            "STOP",
+                            f"ServiceClass | Kill message sended "
+                            f"{service_host}:{service_port}"
+                            )
+                    if running_services[rs]["ss_type"] == "TCP":
+                        self.socketClient.sendViaUDP(
+                            service_host,
+                            service_port,
+                            self.payload_StopUDP
+                            )
+
+                        self.maapilogger.log(
+                            "STOP",
+                            f"ServiceClass | Kill message sended "
+                            f"{service_host}:{service_port}"
+                            )
         except:
             self.maapilogger.log(
                 "STOP",

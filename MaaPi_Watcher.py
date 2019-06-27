@@ -68,8 +68,9 @@ class MaapiWatcher(serviceClass):
         for process in self.libraryPID:
             self.stopServiceViaTCP(
                 self.libraryPID[process]["host"],
-                self.libraryPID[process]["port"]
+                self.libraryPID[process]["port"],
                 )
+
         self.stopServiceViaTCP(self.watcherHost, self.watcherPort)
         raise SystemExit
 
