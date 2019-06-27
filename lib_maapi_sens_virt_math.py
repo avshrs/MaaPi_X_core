@@ -73,7 +73,6 @@ class MaaPiMath(SensProto):
                     print (data)
             else:
                 data = devices_db_rel[float(self.maapiMathTable[math_id][f'math_data_from_{nr}_id'])]['dev_value']
-                print (data)
         except Exception as e :
             self.maapilogger.log("ERROR", f"getDataHistory -- error {e}")
         return data
@@ -81,6 +80,7 @@ class MaaPiMath(SensProto):
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
         value = 0
         error = 0
+        print (dev_id)
         try:
             for math_id in self.maapiMathTable:
                 if int(self.maapiMathTable[math_id]["math_update_rom_id"]) == dev_id:
