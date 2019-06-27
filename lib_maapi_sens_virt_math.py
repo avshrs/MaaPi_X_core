@@ -94,14 +94,12 @@ class MaaPiMath(SensProto):
                     else: V4 = v4 = 'none'
 
                     value = eval(self.maapiMathTable[math_id]["math_math"])
-                    print (value)
                     self.maapilogger.log("DEBUG",f"Readed value {float(value)} nr:{nr}")
                 else:
                     self.maapilogger.log("DEBUG",f"Device Not exist in list {dev_id}")
         except EnvironmentError as e:
             self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
             return value, 1
-
         else:
             return value, error
 
