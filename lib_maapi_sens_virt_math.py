@@ -59,7 +59,7 @@ class MaaPiMath(SensProto):
 
     def getDataHistory(self, dev_id, nr, math_id, devices_db_rel):
         try:
-            del deta
+            del data
         except:
             pass
         try:
