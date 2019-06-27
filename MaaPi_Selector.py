@@ -120,6 +120,10 @@ class MaapiSelector():
                     )
                 sensLastRead = (dt.now() - self.deviceList[dev]["dev_last_update"]).total_seconds()
                 sensInterval = (tosec - (tosec * self.timeToRead))
+                print("tosec", tosec)
+                print("sensLastRead", sensLastRead)
+                print("sensInterval", sensInterval)
+
                 try:
                     localQueueCond = (dt.now() - self.localQueue[dev]).total_seconds()
 
