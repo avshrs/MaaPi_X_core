@@ -66,11 +66,11 @@ class MaaPiMath(SensProto):
             if self.maapiMathTable[math_id][f'math_data_from_{nr}_count']:
                 if self.maapiMathTable[math_id][f'math_data_from_{nr}_count'] > 0:
                     data = self.maapiDB.select_last_nr_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_count'])
-                    print (data)
+
             elif self.maapiMathTable[math_id][f'math_data_from_{nr}_date']:
                 if self.maapiMathTable[math_id][f'math_data_from_{nr}_date'] > 0:
                     data = self.maapiDB.select_last_timeRange_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_date'])
-                    print (data)
+
             else:
                 data = devices_db_rel[float(self.maapiMathTable[math_id][f'math_data_from_{nr}_id'])]['dev_value']
         except Exception as e :
@@ -80,7 +80,7 @@ class MaaPiMath(SensProto):
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
         value = 0
         error = 0
-        print (dev_id)
+
         try:
             for math_id in self.maapiMathTable:
                 if int(self.maapiMathTable[math_id]["math_update_rom_id"]) == dev_id:
