@@ -123,10 +123,11 @@ class MaapiSelector():
 
                 try:
                     localQueueCond = (dt.now() - self.localQueue[dev]).total_seconds()
-                    print("tosec", tosec)
-                    print("sensLastRead", sensLastRead)
-                    print("sensInterval", sensInterval)
-                    print("localQueueCond", localQueueCond)
+                    if tosec > 3000:
+                        print("tosec", tosec)
+                        print("sensLastRead", sensLastRead)
+                        print("sensInterval", sensInterval)
+                        print("localQueueCond", localQueueCond)
                     time.sleep(0.01)
                     if sensLastRead >= sensInterval and localQueueCond >= tosec:
                         self.localQueue[dev] = dt.now()
