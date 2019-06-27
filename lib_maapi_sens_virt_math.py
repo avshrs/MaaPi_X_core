@@ -58,7 +58,10 @@ class MaaPiMath(SensProto):
             pass
 
     def getDataHistory(self, dev_id, nr, math_id, devices_db_rel):
-
+        try:
+            del deta
+        except:
+            pass
         if self.maapiMathTable[math_id][f'math_data_from_{nr}_count']:
             if self.maapiMathTable[math_id][f'math_data_from_{nr}_count'] > 0:
                 data = self.maapiDB.select_last_nr_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_count'])
