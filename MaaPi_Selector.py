@@ -59,13 +59,11 @@ class MaapiSelector():
         self.sendingQueryToSocket = 0
         signal.signal(signal.SIGTERM, self.service_shutdown)
         signal.signal(signal.SIGINT, self.service_shutdown)
-
+        self.isRunning = True
 
     def service_shutdown(self, signum=None, frame=None):
-        try:
-            self.maapilogger.log("INFO", f'Caught signal {signum} | stoping MaaPi {self.objectname}')
-        finally:
-            raise SystemExit
+        self.maapilogger.log("INFO", f'Caught signal {signum} | stoping MaaPi {self.objectname}')
+        raise SystemExit
 
     def responceToWatcher(self):
         if self.queue.getSocketStatusLen() > 0:
@@ -185,7 +183,7 @@ class MaapiSelector():
             ).filters_eq(ss_board_id=self.board_id).get()
 
     def loop(self):
-        while True:
+        while self.isRunning:
             if (dt.now() - self.timer_2).seconds >= 5:
                 self.getData()
                 self.timer_2 = dt.now()

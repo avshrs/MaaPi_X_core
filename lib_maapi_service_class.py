@@ -54,8 +54,8 @@ class serviceClass():
         self.libraryList = []
         self.libraryLastResponce = 600 # seconds
 
-    def stopServiceViaTCP(self, service_host, service_port):
-        """stopServiceViaTCP"""
+    def stopServices(self, service_host, service_port):
+        """stopServices"""
         self.maapilogger.log(
             "STOP",
             f"ServiceClass | Killing service via TCP Message "
@@ -70,10 +70,7 @@ class serviceClass():
             service_host,
             service_port
             )
-        running_services = self.maapiDB.table(
-                "maapi_running_socket_servers;"
-                ).filters_eq(
-                    ss_board_id=self.board_id
+        running_services = self.maapiDB.table("maapi_running_socket_servers"
                 ).get()
         try:
             for rs in running_services:
@@ -90,7 +87,7 @@ class serviceClass():
                             f"ServiceClass | Kill message sended "
                             f"{service_host}:{service_port}"
                             )
-                    if running_services[rs]["ss_type"] == "TCP":
+                    if running_services[rs]["ss_type"] == "UDP":
                         self.socketClient.sendViaUDP(
                             service_host,
                             service_port,
@@ -175,11 +172,11 @@ class serviceClass():
             self.maapilogger.log("STOP", f"Killing library deamon {lib_id}")
             if self.libraryPID[lib_id]:
                 try:
-                    self.socketClient.sendStr(
+                    self.stopServices(
                         self.libraryPID[lib_id]["host"],
                         self.libraryPID[lib_id]["port"],
-                        self.payload_StopTCP
                         )
+
                     self.maapilogger.log(
                         "STOP",
                         f"ServiceClass | Kill message sended "

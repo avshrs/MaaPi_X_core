@@ -108,7 +108,7 @@ class MaaPiMath(SensProto):
 
 
     def loop(self):
-        while True:
+        while self.isRunning:
             if (dt.now() - self.timer_1).seconds >= 10:
                 self.timer_1 = dt.now()
                 self.updateMathTable()
