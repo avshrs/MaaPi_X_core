@@ -66,14 +66,16 @@ class MaaPiMath(SensProto):
             if self.maapiMathTable[math_id][f'math_data_from_{nr}_count']:
                 if self.maapiMathTable[math_id][f'math_data_from_{nr}_count'] > 0:
                     data = self.maapiDB.select_last_nr_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_count'])
-
+                    print (data)
             elif self.maapiMathTable[math_id][f'math_data_from_{nr}_date']:
                 if self.maapiMathTable[math_id][f'math_data_from_{nr}_date'] > 0:
                     data = self.maapiDB.select_last_timeRange_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_date'])
+                    print (data)
             else:
                 data = devices_db_rel[float(self.maapiMathTable[math_id][f'math_data_from_{nr}_id'])]['dev_value']
-        except:
-            pass
+                print (data)
+        except Exception as e :
+            self.maapilogger.log("ERROR", f"getDataHistory -- error {e}")
         return data
 
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
