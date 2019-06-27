@@ -62,15 +62,18 @@ class MaaPiMath(SensProto):
             del deta
         except:
             pass
-        if self.maapiMathTable[math_id][f'math_data_from_{nr}_count']:
-            if self.maapiMathTable[math_id][f'math_data_from_{nr}_count'] > 0:
-                data = self.maapiDB.select_last_nr_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_count'])
+        try:
+            if self.maapiMathTable[math_id][f'math_data_from_{nr}_count']:
+                if self.maapiMathTable[math_id][f'math_data_from_{nr}_count'] > 0:
+                    data = self.maapiDB.select_last_nr_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_count'])
 
-        elif self.maapiMathTable[math_id][f'math_data_from_{nr}_date']:
-            if self.maapiMathTable[math_id][f'math_data_from_{nr}_date'] > 0:
-                data = self.maapiDB.select_last_timeRange_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_date'])
-        else:
-            data = devices_db_rel[float(self.maapiMathTable[math_id][f'math_data_from_{nr}_id'])]['dev_value']
+            elif self.maapiMathTable[math_id][f'math_data_from_{nr}_date']:
+                if self.maapiMathTable[math_id][f'math_data_from_{nr}_date'] > 0:
+                    data = self.maapiDB.select_last_timeRange_of_values(dev_id, self.maapiMathTable[math_id][f'math_data_from_{nr}_date'])
+            else:
+                data = devices_db_rel[float(self.maapiMathTable[math_id][f'math_data_from_{nr}_id'])]['dev_value']
+        except:
+            pass
         return data
 
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
@@ -100,7 +103,7 @@ class MaaPiMath(SensProto):
                     self.maapilogger.log("DEBUG",f"Readed value {float(value)} nr:{nr}")
                 else:
                     self.maapilogger.log("DEBUG",f"Device Not exist in list {dev_id}")
-        except EnvironmentError as e:
+        except Exception as e:
             self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
             return value, 1
         else:
