@@ -117,7 +117,7 @@ class MaaPiMath(SensProto):
                     except Exception as e:
                         self.maapilogger.log("ERROR",f"Error at eval math:{self.maapiMathTable[math_id]['math_math']} error {e}")
                 else:
-                    self.maapilogger.log("INFO",f"Device Not exist in list {dev_id}")
+                    self.maapilogger.log("INFO",f"Device {dev_id} not exist in maapiMathTable")
         except Exception as e:
             self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
             return value, 1
