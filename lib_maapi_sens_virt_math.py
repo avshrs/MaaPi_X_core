@@ -86,7 +86,7 @@ class MaaPiMath(SensProto):
         V4 = v4 = 0.00001
         try:
             for math_id in self.maapiMathTable:
-                if int(self.maapiMathTable[math_id]["math_update_rom_id"]) == dev_id:
+                if self.maapiMathTable[math_id]["math_update_rom_id"] == dev_id:
 
                     if self.maapiMathTable[math_id]['math_data_from_1_id']:
                         V1 = v1 = self.getDataHistory(
