@@ -62,7 +62,7 @@ class GPIOHelpers:
         else:
             # some readings match condition set to 2
             value = 2
-        self.maapilogger.log("READ", f"checkConditionState value is {value}")
+        self.maapilogger.log("DEBUG", f"checkConditionState value is {value}")
         return value
 
 
@@ -80,5 +80,5 @@ class GPIOHelpers:
             value = 1
         elif result["min"] == 2 or result["max"] == 2:
             value = 2
-        self.maapilogger.log("READ", f"gpio_condytion_checker value is {value}")
+        self.maapilogger.log("DEBUG", f"gpio_condytion_checker value is {value}")
         return value
