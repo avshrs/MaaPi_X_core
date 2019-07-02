@@ -56,12 +56,12 @@ class SensProto():
         self.socketServer.runTcpServer(self.host, self.port)
 
     def service_shutdown(self, signum, frame):
+        self.isRunning = False
         self.maapilogger.log(
             "STOP",
             f'Caught signal {signum} | stoping MaaPi'
             f' {self.objectname}'
             )
-        self.isRunning = False
         raise SystemExit
 
     def responceToWatcher(self):
