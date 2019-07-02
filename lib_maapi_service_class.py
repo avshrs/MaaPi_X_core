@@ -84,7 +84,7 @@ class serviceClass():
 
                         self.maapilogger.log(
                             "STOP",
-                            f"ServiceClass | Kill message sended "
+                            f"ServiceClass | Kill message sended via TCP "
                             f"{service_host}:{service_port}"
                             )
                     if running_services[rs]["ss_type"] == "UDP":
@@ -96,7 +96,7 @@ class serviceClass():
 
                         self.maapilogger.log(
                             "STOP",
-                            f"ServiceClass | Kill message sended "
+                            f"ServiceClass | Kill message sended via UDP "
                             f"{service_host}:{service_port}"
                             )
         except:
