@@ -196,10 +196,7 @@ class serviceClass():
                         "maapi_running_py_scripts",
                         f"py_pid={self.libraryPID['pid'].pid}"
                         )
-                    self.maapiDB.deleteRow(
-                        "maapi_running_socket_servers",
-                        f"ss_pid={self.libraryPID['pid'].pid}"
-                        )
+
 
                 except Exception as e:
                     self.maapilogger.log(

@@ -114,6 +114,10 @@ class SocketServer():
         self.sockTCP.close()
         try:
             self.maapilogger.log("STOP","socket TCP -  join thread")
+            self.maapiDB.deleteRow(
+                        "maapi_running_socket_servers",
+                        f"ss_pid={self.pid}"
+                        )
             self.threads["TCP"].join()
         except:
             pass
@@ -121,6 +125,10 @@ class SocketServer():
     def joiningUDP(self):
         try:
             self.maapilogger.log("STOP","socket UTP -  join thread")
+            self.maapiDB.deleteRow(
+            "maapi_running_socket_servers",
+            f"ss_pid={self.pid}"
+            )
             self.threads["UDP"].join()
         except:
             pass
