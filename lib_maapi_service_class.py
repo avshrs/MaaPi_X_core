@@ -74,7 +74,7 @@ class serviceClass():
                             f"ServiceClass | Kill message sended via TCP "
                             f"{service_host}:{service_port}"
                             )
-                    if running_services[rs]["ss_type"] == "UDP":
+                    elif running_services[rs]["ss_type"] == "UDP":
                         self.socketClient.sendViaUDP(
                             service_host,
                             service_port,
@@ -84,6 +84,12 @@ class serviceClass():
                         self.maapilogger.log(
                             "STOP",
                             f"ServiceClass | Kill message sended via UDP "
+                            f"{service_host}:{service_port}"
+                            )
+                    else:
+                        self.maapilogger.log(
+                            "STOP",
+                            f"ServiceClass | Unknown service protocol "
                             f"{service_host}:{service_port}"
                             )
         except:
