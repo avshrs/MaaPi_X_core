@@ -230,9 +230,9 @@ class MaaPiDBConnection():
                 else:
                     query = (
                         "UPDATE devices "
-                        f"SET dev_interval_queue = 9999, dev_value={device_id}, "
+                        f"SET dev_value={insert_value}, "
                         "dev_read_error='Error' "
-                        f"WHERE dev_id='{False}' and dev_status=True"
+                        f"WHERE dev_id='{device_id}' "
                         )
                     self.commitQuery(query)
             except:

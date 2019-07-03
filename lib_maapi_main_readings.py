@@ -68,10 +68,13 @@ class Readings:
     def insertReadingsToDB(self, nr, readed_value, dev_id, devices_db, devices_db_rel,  error_code):
         try:
             if error_code > 0:
-                #9999.0 reading ok
-                #9999.1 device not exist
-                #9999.2 error while reading
-                self.maapilogger.log("ERROR",f"Error in reading method - error code: {error_code}")
+                codes={
+                    0: "reading ok",
+                    1: "device not exist",
+                    2: "error while reading"
+                    }
+
+                self.maapilogger.log("ERROR",f"Error in reading method - error code: {codes[error_code]}")
                 self.maapiDB.insert_readings(dev_id,float(f"9999.{error_code}")," ",False)
             else:
                 value, boolean = self.checkDev.checkDevCond( devices_db, devices_db_rel, dev_id, readed_value)
