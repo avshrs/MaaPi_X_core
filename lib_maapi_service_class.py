@@ -56,22 +56,9 @@ class serviceClass():
 
     def stopServices(self, service_host, service_port):
         """stopServices"""
-        self.maapilogger.log(
-            "STOP",
-            f"ServiceClass | Killing service via TCP Message "
-            f"{service_host}:{service_port}"
-            )
-
-        payload_StopTCP = self.helpers.pyloadToPicke(
-            777,
-            " ",
-            " ",
-            " ",
-            service_host,
-            service_port
-            )
-        running_services = self.maapiDB.table("maapi_running_socket_servers"
-                ).get()
+        running_services = self.maapiDB.table(
+            "maapi_running_socket_servers"
+            ).get()
         try:
             for rs in running_services:
                 if running_services[rs]["ss_port"] == service_port:
@@ -79,7 +66,7 @@ class serviceClass():
                         self.socketClient.sendStr(
                             service_host,
                             service_port,
-                            payload_StopTCP
+                            self.payload_StopTCP
                             )
 
                         self.maapilogger.log(
