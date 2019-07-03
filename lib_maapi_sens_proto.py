@@ -71,7 +71,7 @@ class SensProto():
         if self.queue.getSocketStatusLen() > 0:
             queue_ = (self.queue.getSocketStatus())[self.objectname][self.host][self.port]
             for nr in queue_:
-                if queue_[nr][0] == 0:
+                if int(queue_[nr][0]) == 0:
                     try:
                         self.maapilogger.log(
                             "DEBUG",

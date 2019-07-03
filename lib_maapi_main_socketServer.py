@@ -124,16 +124,16 @@ class SocketServer():
                             float(value), str(name), fromHost, fromPort
                             )
                     elif int(payload_id) == 0:
-                        queue.addSocketRadings(
-                            self.objectname, host, port,
-                            str(payload_id), int(dev_id),
-                            float(value), str(name), fromHost, fromPort
+                        queue.addSocketStatus(
+                            self.objectname, str(host), int(port),
+                            int(payload_id), " ",
+                            " ", " ", str(fromHost), int(fromPort)
                             )
                     elif int(payload_id) == 777:
-                        queue.addSocketRadings(
+                        queue.addSocketStatus(
                             self.objectname, host, port,
-                            str(payload_id), int(dev_id),
-                            float(value), str(name), fromHost, fromPort
+                            int(payload_id), int(dev_id),
+                            float(value), str(name), str(fromHost), int(fromPort)
                             )
                         self.maapilogger.log("STOP", f"Get Slef Kill instruction via SocketUDP")
                         self.selfkill = True

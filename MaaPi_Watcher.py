@@ -150,7 +150,6 @@ class MaapiWatcher(serviceClass):
 
             if (dt.now() - self.timer_3).seconds >= 60:
                 self.timer_3 = dt.now()
-
                 thread = Thread(target=self.checkPIDsParameters())
                 thread.start()
 

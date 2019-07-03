@@ -60,6 +60,7 @@ class Queue():
         port[onPort]     = ids
         host[fomHost]    = port
         ow[owner]        = host
+
         self.socketStatus.put(ow)
         self.maapilogger.log("DEBUG", "Insert new data to queue")
         self.seqSRnr2 += 1
