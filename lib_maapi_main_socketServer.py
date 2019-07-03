@@ -110,14 +110,14 @@ class SocketServer():
                 data, address = self.sockUDP.recvfrom(4096)
                 if data:
                     payload_id, dev_id, value, name = data.decode("utf-8").split("_")
-                    if payload_id == 99:
+                    if int(payload_id) == 99:
                         self.queue.addSocketRadings(
                             self.objectname, host, port,
                             str(payload_id), int(dev_id),
                             float(value), str(name)
                             )
 
-                    elif payload_id == 777:
+                    elif int(payload_id) == 777:
                         self.queue.addSocketRadings(
                             self.objectname, host, port,
                             str(payload_id), int(dev_id),
