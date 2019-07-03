@@ -40,7 +40,7 @@ class serviceClass():
             self.watcherHost,
             self.watcherPort
             )
-        self.payload_Status = self.helpers.pyloadToPicke(
+        self.payloadTcpStatus = self.helpers.pyloadToPicke(
             00,
             " ",
             " ",
@@ -48,6 +48,7 @@ class serviceClass():
             self.watcherHost,
             self.watcherPort
             )
+        self.payloadUdpStatus = bytes(f"0_0_0_0_{self.watcherHost}_{self.watcherPort}", "utf-8")
 
         self.servicePids = {}
         self.libraryPID = {}
@@ -289,10 +290,6 @@ class serviceClass():
                         f"{lib_temp[lib]['name']} {lib_temp[lib]['host']},"
                         f" {lib_temp[lib]['port']}"
                         )
-                    payload = self.helpers.pyloadToPicke(
-                        00, " ", " ", " ",
-                        self.watcherHost, self.watcherPort
-                        )
                     try:
                         self.maapilogger.log(
                             "DEBUG",
@@ -303,12 +300,19 @@ class serviceClass():
 
                         self.libraryPID[lib]["sendedQuery"] += 1
                         self.libraryPID[lib]["lastResponce"] = dt.now()
-                        self.socketClient.sendStr(
-                            lib_temp[lib]["host"],
-                            lib_temp[lib]["port"],
-                            payload
-                            )
-                    except Exception as e :
+                        if self.libraryPID[lib]["ss_type"] == "TCP":
+                            self.socketClient.sendStr(
+                                lib_temp[lib]["host"],
+                                lib_temp[lib]["port"],
+                                self.payloadTcpStatus
+                                )
+                        elif self.libraryPID[lib]["ss_type"] == "UDP":
+                            self.socketClient.sendViaUDP(
+                                lib_temp[lib]["host"],
+                                lib_temp[lib]["port"],
+                                self.payloadUdpStatus
+                                )
+                    except Exception as e:
                         self.maapilogger.log(
                             "STATUS",
                             f"Service not responce - RESTARTING  "
