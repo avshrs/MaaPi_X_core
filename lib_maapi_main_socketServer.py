@@ -151,8 +151,8 @@ class SocketServer():
                 )
             self.threads["TCP"].join()
             self.sockTCP.close()
-        except:
-            self.maapilogger.log("ERROR", "ERROR  -  join TCP thread")
+        except Exception as error:
+            self.maapilogger.log("ERROR", f"ERROR  -  join TCP thread | error: {error}")
 
     def joiningUDP(self):
         try:
@@ -163,5 +163,5 @@ class SocketServer():
                 )
             self.threads["UDP"].join()
             self.sockUDP.close()
-        except:
-            self.maapilogger.log("ERROR", "ERROR  -  join UDP thread")
+        except Exception as error:
+            self.maapilogger.log("ERROR", f"ERROR  -  join UDP thread | error: {error}")
