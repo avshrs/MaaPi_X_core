@@ -13,10 +13,11 @@ from datetime import datetime as dt
 
 
 class MaaPiMath(SensProto):
-    def __init__(self, host, port, id_):
+    def __init__(self, host, port, id_, ss_proto):
         super().__init__()
         self.objectname = "MaaPiMath"
         self.id_ = id_
+        self.ssProto = ss_proto
         self.host = host
         self.port = int(port)
         self.maapiMathTable = []
@@ -137,6 +138,6 @@ class MaaPiMath(SensProto):
 
 
 if __name__ == "__main__":
-    MaaPiMath_ = MaaPiMath(sys.argv[1], sys.argv[2], sys.argv[3])
+    MaaPiMath_ = MaaPiMath(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     MaaPiMath_.service_startup()
     MaaPiMath_.loop()

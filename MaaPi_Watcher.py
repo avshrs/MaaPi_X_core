@@ -63,8 +63,6 @@ class MaapiWatcher(serviceClass):
             f'Caught signal {signum} | stoping MaaPi {self.objectname}'
             )
 
-
-
         for process in self.libraryPID:
             self.stopServices(
                 self.libraryPID[process]["host"],

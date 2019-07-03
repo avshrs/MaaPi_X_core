@@ -11,9 +11,10 @@ import time, copy, sys, os, signal
 from datetime import datetime as dt
 
 class DS18X20(SensProto):
-    def __init__(self,host,port,id_):
+    def __init__(self,host,port,id_, ss_proto):
         super().__init__()
         self.id_ = id_
+        self.ssProto = ss_proto
         self.objectname = "DS18X20"
         self.host = host
         self.port = int(port)
@@ -63,6 +64,6 @@ class DS18X20(SensProto):
 
 
 if __name__ == "__main__":
-    DS18X20_ =  DS18X20(sys.argv[1],sys.argv[2],sys.argv[3] )
+    DS18X20_ =  DS18X20(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
     DS18X20_.service_startup()
     DS18X20_.loop()

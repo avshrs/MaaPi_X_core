@@ -11,24 +11,25 @@ from datetime import datetime as dt
 import subprocess
 
 class UdpServer(SensProto):
-    def __init__(self, host, port, id_):
+    def __init__(self, host, port, id_, ss_proto):
         super().__init__()
         self.id_ = id_
+        self.ssProto = ss_proto
         self.objectname = "UdpServer"
         self.host = host
         self.port = int(port)
-        self.udpPort = 60000
+
         self.maapiCommandLine = []
         self.timer_1 = dt.now()
         self.timer_2 = dt.now()
         self.libInit()
-        self.socketServer.runUdpServer(self.host, self.udpPort)
+
 
 
     def checkQueueForReadings(self):
         try:
             queueTmp = self.queue.getSocketRadings()
-            queue_ = queueTmp[self.objectname][self.host][self.udpPort]
+            queue_ = queueTmp[self.objectname][self.host][self.port]
 
             for nr in queue_:
                 payload_id = queue_[nr][0]
@@ -62,5 +63,5 @@ class UdpServer(SensProto):
             self.responceToWatcher()
 
 if __name__ == "__main__":
-    UdpServer = UdpServer(sys.argv[1],sys.argv[2],sys.argv[3])
+    UdpServer = UdpServer(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     UdpServer.loop()

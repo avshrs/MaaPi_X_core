@@ -12,9 +12,10 @@ from statistics import median, stdev, mean
 from datetime import datetime as dt
 
 class PFC8591(SensProto):
-    def __init__(self,host,port,id_):
+    def __init__(self, host, port, id_, ss_proto):
         super().__init__()
         self.id_ = id_
+        self.ssProto = ss_proto
         self.objectname = "PFC8591"
         self.host = host
         self.port = int(port)
@@ -101,7 +102,7 @@ class PFC8591(SensProto):
 
 
 if __name__ == "__main__":
-    PFC8591_ =  PFC8591(sys.argv[1],sys.argv[2],sys.argv[3])
+    PFC8591_ = PFC8591(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     PFC8591_.service_startup()
     PFC8591_.loop()
 

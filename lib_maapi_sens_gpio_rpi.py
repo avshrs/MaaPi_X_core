@@ -13,9 +13,10 @@ from datetime import datetime as dt
 import lib_maapi_main_gpio as gipoHelper
 
 class GPIO_PI(SensProto):
-    def __init__(self,host, port,id_):
+    def __init__(self,host, port,id_, ss_proto):
         super().__init__()
         self.id_ = id_
+        self.ssProto = ss_proto
         self.gpioHelper = gipoHelper.GPIOHelpers()
         self.objectname = "GPIO_PI"
         self.host = host
@@ -75,6 +76,6 @@ class GPIO_PI(SensProto):
                 self.updateTable()
 
 if __name__ == "__main__":
-    GPIO_PI_ =  GPIO_PI(sys.argv[1],sys.argv[2],sys.argv[3])
+    GPIO_PI_ =  GPIO_PI(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
     GPIO_PI_.service_startup()
     GPIO_PI_.loop()

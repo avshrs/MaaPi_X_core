@@ -26,6 +26,7 @@ class SensProto():
     def __init__(self):
         self.objectname = "none"
         self.host = ""
+        self.ssProto = ""
         self.port = 0
         self.id_ = ""
         self.readings = object
@@ -44,16 +45,18 @@ class SensProto():
         pass
 
     def libInit(self):
+
         self.readings = Readings.Readings(self.objectname, self.host, self.port)
         self.maapilogger.name = self.objectname
         self.payload_Status_responce = self.helpers.pyloadToPicke(
             0xff, " ", " ", " ", self.host, self.port)
+
         self.socketServer = SocketServer.SocketServer(
             self.objectname,
             self.queue,
-            self.id_
+            self.id_,
             )
-        self.socketServer.runTcpServer(self.host, self.port)
+        self.socketServer.startSockServer(self.host, self.port, self.ssProto)
 
     def service_shutdown(self, signum, frame):
         self.isRunning = False

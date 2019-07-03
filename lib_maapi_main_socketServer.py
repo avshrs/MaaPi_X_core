@@ -19,6 +19,7 @@ from threading import Lock, Thread
 class SocketServer():
     def __init__(self, objectname, queue, object_id):
         self.objectname = objectname
+
         self.config = Config.MaapiVars()
         self.helpers = Helpers.Helpers()
         self.maapilogger = MaapiLogger.Logger()
@@ -36,6 +37,12 @@ class SocketServer():
             self.config.maapiLocation,
             self.maapiDB.table("maapi_machine_locations").filters_eq(ml_enabled = True).get()
             )
+    def startSockServer(self, host, port, ss_proto):
+        if ss_proto == "TCP":
+            self.runTcpServer(host, port)
+        if ss_proto == "UDP":
+            self.runUdpServer(host, port)
+
 
     def startServerTCP(self, host, port, queue):
         try:
@@ -94,7 +101,7 @@ class SocketServer():
         except Exception as e:
             self.maapilogger.log("ERROR", f"Exception in startServerTCP {self.objectname}: {e}")
 
-    def startServerUDP(self, host, port):
+    def startServerUDP(self, host, port, queue):
         try:
             self.maapiDB.insertRaw(
                 "maapi_running_socket_servers",
@@ -111,14 +118,14 @@ class SocketServer():
                 if data:
                     payload_id, dev_id, value, name = data.decode("utf-8").split("_")
                     if int(payload_id) == 99:
-                        self.queue.addSocketRadings(
+                        queue.addSocketRadings(
                             self.objectname, host, port,
                             str(payload_id), int(dev_id),
                             float(value), str(name)
                             )
 
                     elif int(payload_id) == 777:
-                        self.queue.addSocketRadings(
+                        queue.addSocketRadings(
                             self.objectname, host, port,
                             str(payload_id), int(dev_id),
                             float(value), str(name)
@@ -139,7 +146,7 @@ class SocketServer():
 
     def runUdpServer(self, host, port):
         self.maapilogger.log("START", "{0} Run UDP Server".format(self.objectname ))
-        self.threads["UDP"] = Thread(target=self.startServerUDP, args=(host, port))
+        self.threads["UDP"] = Thread(target=self.startServerUDP, args=(host, port, self.queue))
         self.threads["UDP"].start()
 
     def joiningTCP(self):

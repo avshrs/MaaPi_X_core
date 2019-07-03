@@ -31,7 +31,7 @@ class serviceClass():
         self.watcherHost = self.config.watcherHost
         self.watcherPort = self.config.watcherPort
         self.selecorName = self.config.selectorName
-        self.payload_StopUDP = "777_0_0_0"
+        self.payload_StopUDP = bytes("777_0_0_0", "utf-8")
         self.payload_StopTCP = self.helpers.pyloadToPicke(
             777,
             " ",
@@ -58,23 +58,14 @@ class serviceClass():
         """stopServices"""
         running_services = self.maapiDB.table(
             "maapi_running_socket_servers"
-            ).get()
+                ).filters_eq(
+                    ss_board_id=self.board_id
+                ).get()
+
         try:
             for rs in running_services:
                 if running_services[rs]["ss_port"] == service_port:
-                    if running_services[rs]["ss_type"] == "TCP":
-                        self.socketClient.sendStr(
-                            service_host,
-                            service_port,
-                            self.payload_StopTCP
-                            )
-
-                        self.maapilogger.log(
-                            "STOP",
-                            f"ServiceClass | Kill message sended via TCP "
-                            f"{service_host}:{service_port}"
-                            )
-                    elif running_services[rs]["ss_type"] == "UDP":
+                    if running_services[rs]["ss_type"] == "UDP":
                         self.socketClient.sendViaUDP(
                             service_host,
                             service_port,
@@ -86,6 +77,19 @@ class serviceClass():
                             f"ServiceClass | Kill message sended via UDP "
                             f"{service_host}:{service_port}"
                             )
+                    elif running_services[rs]["ss_type"] == "TCP":
+                        self.socketClient.sendStr(
+                            service_host,
+                            service_port,
+                            self.payload_StopTCP
+                            )
+
+                        self.maapilogger.log(
+                            "STOP",
+                            f"ServiceClass | Kill message sended via TCP "
+                            f"{service_host}:{service_port}"
+                            )
+
                     else:
                         self.maapilogger.log(
                             "STOP",
@@ -154,11 +158,10 @@ class serviceClass():
 
     def startAllLibraryDeamon(self):
         for lib in self.libraryList:
-            if self.libraryList[lib]["device_location_id"] == self.board_id:
-                try:
-                    self.startLibraryDeamon(lib)
-                except Exception as e :
-                    self.maapilogger.log("ERROR", f"Error: startlibraryDeamon() {e}")
+            try:
+                self.startLibraryDeamon(lib)
+            except Exception as e :
+                self.maapilogger.log("ERROR", f"Error: startlibraryDeamon() {e}")
 
     def stopLibraryDeamon(self, lib_id):
         try:
@@ -215,18 +218,22 @@ class serviceClass():
                     "START",
                     f"Starting library deamon {self.libraryList[lib]['device_lib_name']}"
                     )
+
                 lists =[
                     self.interpreterVer,
                     f"{self.libraryList[lib]['device_lib_name']}.py",
                     f"{self.selectorHost}",
-                    f"{int(self.selectorPort)+int(self.libraryList[lib]['id'])}",
-                    f"{lib}"
+                    f"{self.libraryList[lib]['device_port']}",
+                    f"{lib}",
+                    f"{self.libraryList[lib]['device_protocol']}",
+
                     ]
 
                 file_ = f"{self.libraryList[lib]['device_lib_name']}.py"
                 pid = subprocess.Popen(lists)
                 name = self.libraryList[lib]['device_lib_name']
-                port = int(self.selectorPort)+int(self.libraryList[lib]['id'])
+                port = self.libraryList[lib]['device_port']
+                ss_type = self.libraryList[lib]['device_protocol']
 
                 self.libraryPID[lib] = {
                     "id": lib,
@@ -234,6 +241,7 @@ class serviceClass():
                     "pid": pid,
                     "host": self.selectorHost,
                     "port": port,
+                    "ss_type": ss_type,
                     "lastResponce": dt.now(),
                     "sendedQuery": 0
                     }
