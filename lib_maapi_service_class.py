@@ -31,7 +31,7 @@ class serviceClass():
         self.watcherHost = self.config.watcherHost
         self.watcherPort = self.config.watcherPort
         self.selecorName = self.config.selectorName
-        self.payload_StopUDP = bytes("777_0_0_0", "utf-8")
+        self.payload_StopUDP = bytes(f"777_0_0_0_{self.watcherHost}_{self.watcherPort}", "utf-8")
         self.payload_StopTCP = self.helpers.pyloadToPicke(
             777,
             " ",
