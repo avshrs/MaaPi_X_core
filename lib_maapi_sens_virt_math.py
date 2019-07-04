@@ -81,10 +81,7 @@ class MaaPiMath(SensProto):
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
         value = 0
         error = 0
-        V1 = v1 = 0.00001
-        V2 = v2 = 0.00001
-        V3 = v3 = 0.00001
-        V4 = v4 = 0.00001
+
         try:
             for math_id in self.maapiMathTable:
                 if self.maapiMathTable[math_id]["math_update_rom_id"] == dev_id:
@@ -95,24 +92,32 @@ class MaaPiMath(SensProto):
                             1,
                             math_id, devices_db_rel
                             )
+                    else:
+                        V1 = v1 = "none"
                     if self.maapiMathTable[math_id]['math_data_from_2_id']:
                         V2 = v2 = self.getDataHistory(
                             self.maapiMathTable[math_id]['math_data_from_2_id'],
                             2,
                             math_id, devices_db_rel
                             )
+                    else:
+                        V2 = v2 = "none"
                     if self.maapiMathTable[math_id]['math_data_from_3_id']:
                         V3 = v3 = self.getDataHistory(
                             self.maapiMathTable[math_id]['math_data_from_3_id'],
                             3,
                             math_id, devices_db_rel
                             )
+                    else:
+                        V3 = v3 = "none"
                     if self.maapiMathTable[math_id]['math_data_from_4_id']:
                         V4 = v4 = self.getDataHistory(
                             self.maapiMathTable[math_id]['math_data_from_4_id'],
                             4,
                             math_id, devices_db_rel
                             )
+                    else:
+                        V4 = v4 = "none"
                     try:
                         value = eval(self.maapiMathTable[math_id]["math_math"])
                     except Exception as e:
