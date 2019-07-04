@@ -82,8 +82,11 @@ class MaaPiMath(SensProto):
         value = 0
         error = 0
         try:
+            print ("try")
             for math_id in self.maapiMathTable:
+
                 if self.maapiMathTable[math_id]["math_update_rom_id"] == dev_id:
+                    print ("if")
                     if self.maapiMathTable[math_id]['math_data_from_1_id']:
                         V1 = v1 = self.getDataHistory(
                             self.maapiMathTable[math_id]['math_data_from_1_id'],
@@ -116,9 +119,11 @@ class MaaPiMath(SensProto):
                             )
                     else:
                         V4 = v4 = "none"
+                    print ("before eval")
                     try:
+                        print ("value1", value)
                         value = float(eval(self.maapiMathTable[math_id]["math_math"]))
-                        print ("value", value)
+                        print ("value2", value)
                     except Exception as e:
                         self.maapilogger.log("ERROR",f"Error at eval math:{self.maapiMathTable[math_id]['math_math']} error {e}")
             return value, error
