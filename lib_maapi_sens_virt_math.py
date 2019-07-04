@@ -82,9 +82,10 @@ class MaaPiMath(SensProto):
         value = 0
         error = 0
         try:
-            print ("try")
-            for math_id in self.maapiMathTable:
+            print ("dev_id",dev_id,type(dev_id))
 
+            for math_id in self.maapiMathTable:
+                print("mtid",self.maapiMathTable[math_id]["math_update_rom_id"],type(self.maapiMathTable[math_id]["math_update_rom_id"]))
                 if self.maapiMathTable[math_id]["math_update_rom_id"] == dev_id:
                     print ("if")
                     if self.maapiMathTable[math_id]['math_data_from_1_id']:
