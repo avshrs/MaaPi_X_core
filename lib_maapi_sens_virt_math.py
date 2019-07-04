@@ -81,7 +81,6 @@ class MaaPiMath(SensProto):
     def readValues(self, nr, dev_id, devices_db, devices_db_rel):
         value = 0
         error = 0
-
         try:
             for math_id in self.maapiMathTable:
                 if self.maapiMathTable[math_id]["math_update_rom_id"] == dev_id:
@@ -121,11 +120,12 @@ class MaaPiMath(SensProto):
                         value = float(eval(self.maapiMathTable[math_id]["math_math"]))
                     except Exception as e:
                         self.maapilogger.log("ERROR",f"Error at eval math:{self.maapiMathTable[math_id]['math_math']} error {e}")
+            return value, error
         except Exception as e:
             self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
             return value, 1
-        else:
-            return value, error
+
+
 
     def service_startup(self):
         self.updateMathTable()
