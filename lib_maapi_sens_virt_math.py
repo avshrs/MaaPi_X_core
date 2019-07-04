@@ -118,6 +118,7 @@ class MaaPiMath(SensProto):
                         V4 = v4 = "none"
                     try:
                         value = float(eval(self.maapiMathTable[math_id]["math_math"]))
+                        print ("value", value)
                     except Exception as e:
                         self.maapilogger.log("ERROR",f"Error at eval math:{self.maapiMathTable[math_id]['math_math']} error {e}")
             return value, error
