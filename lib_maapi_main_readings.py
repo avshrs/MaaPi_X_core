@@ -37,7 +37,6 @@ class Readings:
                     devices_db = queue_[nr][2]
                     devices_db_rel = queue_[nr][3]
                     if queue_[nr][0] == self.helpers.instructions["readFromDev_id"]:
-
                         try:
                             startd = dt.now()
                             value, error = method(nr, dev_id, devices_db, devices_db_rel)
@@ -47,19 +46,41 @@ class Readings:
                                 val = round(float(value),3)
                             else:
                                 val = value
+
                             self.maapilogger.log(
                                 "READ",
                                 f"Readed  id: {dev_id:<10} |  "
                                 f"DevID: {dev_id:<5} |  "
                                 f"Name: {devices_db[dev_id]['dev_user_name']:<25} |  "
                                 f"Value: {val:<15} | inTime: {(stopd-startd)}")
-                            self.insertReadingsToDB(nr, float(value), dev_id, devices_db, devices_db_rel, error)
+
+                            self.insertReadingsToDB(
+                                nr,
+                                float(value),
+                                dev_id,
+                                devices_db,
+                                devices_db_rel,
+                                error
+                                )
 
                         except EnvironmentError as e:
                             value = 0
                             error = 2
-                            self.maapilogger.log("ERROR",f"Error while reading values from {dev_id} - {devices_db[dev_id]['dev_user_name']}: {e}")
-                            self.insertReadingsToDB(nr ,value, dev_id, devices_db, devices_db_rel, error)
+
+                            self.maapilogger.log(
+                                "ERROR",
+                                f"Error while reading values from "
+                                f"{dev_id} - {devices_db[dev_id]['dev_user_name']}"
+                                f": {e}")
+
+                            self.insertReadingsToDB(
+                                nr,
+                                value,
+                                dev_id,
+                                devices_db,
+                                devices_db_rel,
+                                error
+                                )
 
 
         except EnvironmentError as e :

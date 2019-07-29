@@ -54,11 +54,11 @@ class GPIO_PI(SensProto):
                     self.maapilogger.log("DEBUG", f"set to 2")
                     return GPIO.input(devices_db[dev_id]["dev_gpio_pin"]), 0
             else:
-                return 0, 1
                 self.maapilogger.log("DEBUG", f"error set to 0")
+                return 0, 1
         except EnvironmentError as e:
-             self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
-             return 0, 1
+            self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
+            return 0, 1
 
 
     def service_startup(self):
@@ -76,6 +76,6 @@ class GPIO_PI(SensProto):
                 self.updateTable()
 
 if __name__ == "__main__":
-    GPIO_PI_ =  GPIO_PI(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
+    GPIO_PI_ = GPIO_PI(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
     GPIO_PI_.service_startup()
     GPIO_PI_.loop()
