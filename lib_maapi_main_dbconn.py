@@ -90,6 +90,7 @@ class MaaPiDBConnection():
 
         except (Exception, psycopg2.DatabaseError) as error:
             self.logPrintOnly("ERROR", f'commitQuery error: {error}')
+            self.insertRaw("maapi_logs", ("default", f"'ERROR'", f"'DBconnect'","now()",f"'{error}'", f"'{self.maapiLocation}'"))
             self.dbInnit(True)
 
 
