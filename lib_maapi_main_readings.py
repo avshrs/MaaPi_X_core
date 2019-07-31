@@ -107,4 +107,4 @@ class Readings:
             try:
                 self.maapiDB.insert_readings(dev_id,0," ",False)
             except:
-                pass
+                print ("error inserting to db")
