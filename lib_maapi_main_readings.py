@@ -99,7 +99,7 @@ class Readings:
                 self.maapiDB.insert_readings(dev_id,float(f"9999.{error_code}")," ",False)
             else:
                 value, boolean = self.checkDev.checkDevCond( devices_db, devices_db_rel, dev_id, readed_value)
-                self.maapilogger.log("READ","Insert readings to DataBase")
+                self.maapilogger.log("READ",f"Insert readings to DataBase {dev_id}")
                 self.maapiDB.insert_readings(dev_id,value," ",boolean)
 
         except EnvironmentError as e:
