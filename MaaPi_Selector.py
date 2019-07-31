@@ -97,7 +97,7 @@ class MaapiSelector():
                         self.runningServices[serv]["ss_port"],
                         payload)
                     self.maapilogger.log(
-                        "DEBUG",
+                        "READ",
                         f"Devices sended to checkout readings {dev} | "
                         f"{self.deviceList[dev]['dev_user_name']} | "
                         f"{self.deviceList[dev]['dev_rom_id']} to "
