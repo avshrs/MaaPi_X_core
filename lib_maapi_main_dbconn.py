@@ -12,7 +12,6 @@ import psycopg2
 import MaaPi_Config as Config
 from datetime import datetime as dt
 import queue
-import lib_maapi_main_logger as MaapiLogger
 
 pwd = os.getcwd()
 logging.basicConfig(
@@ -24,9 +23,7 @@ logging.basicConfig(
 
 class MaaPiDBConnection():
     def __init__(self):
-        self.maapilogger = MaapiLogger.Logger()
         self.objectname = "Database"
-        self.maapilogger.name = "DBconnect"
         self.filters_ = {}
         self.orders_ = {}
         self.columns_ = {}
