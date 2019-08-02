@@ -37,7 +37,7 @@ class DS18X20(SensProto):
                 self.maapilogger.log("DEBUG", f"CRC - {w1_crc}")
                 if w1_crc == 'YES':
                     value = float(float((w1_file.readline()).rsplit('t=', 1)[1]) / float(1000))
-                    self.maapilogger.log("READ", f"Read_data_from_1w - Value is {value} for {rom_id} {dev_id}")
+                    self.maapilogger.log("DEBUG", f"Read_data_from_1w - Value is {value} for {rom_id} {dev_id}")
                     w1_file.close()
                 else:
                     w1_file.close()
