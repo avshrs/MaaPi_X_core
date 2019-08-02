@@ -48,7 +48,6 @@ class MaaPiDBConnection():
         self.dbInnit(False)
         self.isRunning = True
 
-
     def logPrintOnly(self, level, msg):
         """Print logs to console"""
         try:
@@ -57,11 +56,11 @@ class MaaPiDBConnection():
                 f"{dt.now().second:0>2} - {dt.now().microsecond:0>6}"
                 )
             print(
-                f"MaaPi  |  {self.name:<17}  |  {level:^6}  |  "
+                f"MaaPi  |  {self.objectname:<17}  |  {level:^6}  |  "
                 f"{time:<16}  |  {msg}"
                 )
-        except:
-            pass
+        except Exception as e:
+            print ("Error: ", e)
 
     def dbInnit(self, state):
         if state:
@@ -76,7 +75,6 @@ class MaaPiDBConnection():
             self.logPrintOnly("ERROR", f'Insert RAW error: {error}')
         else:
             self.isRunning = True
-
 
     def commitQuery(self, query):
         """insert row data to dabase"""
