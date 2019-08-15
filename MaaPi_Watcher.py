@@ -75,7 +75,9 @@ class MaapiWatcher(serviceClass):
 
     def setUp(self):
         self.maapilogger.log("INFO", "Running Set UP ")
-        self.getLibraryList()
+        # self.UpdateDeviceTableIndex()
+        self.maapilogger.log("INFO", "Running Set UP ")
+
         self.startAllLibraryDeamon()
 
         self.startSelectorServices(

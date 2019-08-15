@@ -14,6 +14,7 @@ class serviceClass():
     def __init__(self):
         self.running = True
         self.objectname = ""
+        self.devicesList = []
         self.interpreterVer = ""
         self.queue = Queue.Queue()
         self.helpers = Helpers.Helpers()
@@ -30,7 +31,7 @@ class serviceClass():
         self.selectorPort = self.config.selectorPort
         self.watcherHost = self.config.watcherHost
         self.watcherPort = self.config.watcherPort
-        self.selecorName = self.config.selectorName
+    #    self.selecorName = self.config.selectorName
         self.payload_StopUDP = bytes(f"777_0_0_0_{self.watcherHost}_{self.watcherPort}", "utf-8")
         self.payload_StopTCP = self.helpers.pyloadToPicke(
             777,
@@ -154,6 +155,17 @@ class serviceClass():
             for ids in self.libraryList:
                 self.queue.prepareQueueDevList(ids)
             self.maapilogger.log("DEBUG", "Devices library list updated")
+        except:
+            pass
+
+    def UpdateDeviceTableIndex(self):
+        try:
+            self.devicesList = self.maapiDB.table(
+                "devices"
+                ).columns("dev_id", "dev_rom_id").get()
+            for ids in self.devicesList:
+                self.maapiDB.reindexTable(self.devicesList[ids]["dev_rom_id"])
+                self.maapilogger.log("DEBUG", f"Devices device index {ids}")
         except:
             pass
 

@@ -37,6 +37,7 @@ class MaaPiDBConnection():
         self.Maapi_dbUser = self.config.maapiDbUser
         self.Maapi_dbHost = self.config.maapiDbHost
         self.Maapi_dbPasswd = self.config.maapiDbpass
+        self.maapiLocation = self.config.maapiLocation
         self.db_string = (
             f"dbname='{self.Maapi_dbName}' "
             f"user='{self.Maapi_dbUser}' "
@@ -89,8 +90,7 @@ class MaaPiDBConnection():
         except (Exception, psycopg2.DatabaseError) as error:
             self.logPrintOnly("ERROR", f'commitQuery error: {error}')
             self.dbInnit(True)
-            self.insertRaw("maapi_logs", ("default", f"'ERROR'", f"'DBconnect'","now()",f"'{error}'", f"'{self.maapiLocation}'"))
-
+            self.insertRaw("maapi_logs", ("default", f"'ERROR'", f"'DBconnect'", "now()", f"'{error}'", f"'{self.maapiLocation}'"))
 
     def fetchoneQuery(self, query):
         """insert row data to dabase"""
@@ -153,7 +153,7 @@ class MaaPiDBConnection():
 
     def reindexTable(self, name):
         try:
-            query = f"reindex table {name} "
+            query = f"reindex table maapi_dev_rom_{name.replace('-', '_')}_values"
             self.commitQuery(query)
         except Exception() as error:
             self.logPrintOnly("ERROR", f'REINDEX TABLE ERROR {error}')

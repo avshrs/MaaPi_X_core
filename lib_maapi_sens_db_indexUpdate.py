@@ -25,14 +25,15 @@ class MoonPhase(SensProto):
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         value, error = 0, 0
-        # try:
-        self.maapiDB.reindexTable(devices_db)
+        try:
+            for ids in devices_db:
+                self.maapiDB.reindexTable(devices_db[ids]["dev_rom_id"])
 
-        # except Exception as e:
-        #     return 0, 1
-        #     self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
-        # else:
-        return 1, 0
+        except Exception as e:
+             return 0, 1
+             self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
+        else:
+            return 1, 0
 
     def loop(self):
         while True:
