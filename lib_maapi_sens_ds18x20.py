@@ -50,6 +50,8 @@ class DS18X20(SensProto):
             self.maapilogger.log("ERROR", f"throw : {e}")
             return value, 1
         else:
+            if value == 85:
+                return value, 1
             return value, error
 
     def service_startup(self):
