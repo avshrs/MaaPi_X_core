@@ -5,7 +5,7 @@
 #                          MAAPI X
 #
 ##############################################################
-import Libs.integra 
+from Libs.integra import Integra
 
 from lib_maapi_sens_proto import SensProto
 import time, copy, sys, os, signal
@@ -23,7 +23,7 @@ class DS18X20(SensProto):
         self.timer_1 = dt.now()
         self.timer_2 = dt.now()
         self.libInit()
-        self.integ = integra.Integra(user_code=1234, host='192.168.1.240', port=25197)
+        self.integ = Integra(user_code=1234, host='192.168.1.240', port=25197)
         self.inputs = []
         self.outputs = []
 
