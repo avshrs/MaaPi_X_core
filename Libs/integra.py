@@ -12,8 +12,8 @@ from binascii import hexlify
 from socket import socket, AF_INET, SOCK_STREAM
 
 
-from constants import HEADER, FOOTER, HARDWARE_MODEL, LANGUAGES
-from framing import (
+from Lib.constants import HEADER, FOOTER, HARDWARE_MODEL, LANGUAGES
+from Lib.framing import (
     checksum, prepare_frame, parse_event, parse_name, set_bits_positions,
     bytes_with_bits_set, format_user_code
 )
