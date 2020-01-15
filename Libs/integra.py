@@ -5,7 +5,7 @@ integra -- a module implementing Satel integration protocol for
 Satel Integra and ETHM-1 modules
 '''
 import time
-import logging
+
 from datetime import datetime
 from struct import unpack
 from binascii import hexlify
@@ -17,18 +17,6 @@ from Libs.framing import (
     checksum, prepare_frame, parse_event, parse_name, set_bits_positions,
     bytes_with_bits_set, format_user_code
 )
-
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
-
-
-def log_frame(msg, frame):
-    log.debug(
-        msg + '"{0}", length: {1}',
-        hexlify(frame),
-        len(frame)
-    )
-
 
 class Integra(object):
 
@@ -57,7 +45,6 @@ class Integra(object):
 
     def run_command(self, cmd):
         command = prepare_frame(cmd)
-        log_frame('Sending command: ', command)
 
         for attempt in range(self.max_attempts):
             sock = socket(AF_INET, SOCK_STREAM)
@@ -67,7 +54,6 @@ class Integra(object):
                 raise Exception("Error sending frame.")
 
             resp = bytearray(sock.recv(100))
-            log_frame('Response received: ', resp)
             sock.close()
 
             # integra will respond "Busy!" if it gets next message too early
@@ -84,11 +70,9 @@ class Integra(object):
             raise Exception("Wrong footer - got {}".format(hexlify(resp[-2:])))
 
         output = resp[2:-2].replace(b'\xFE\xF0', b'\xFE')
-        log.debug('Output: %s', repr(output))
 
         # EF - result
         if output[0] == 0xEF:
-            log.debug('Error output: %s', repr(output))
             # FF - command will be processed, 00 - OK
             if not output[1] in (0xFF, 0x00):
                 raise Exception(
