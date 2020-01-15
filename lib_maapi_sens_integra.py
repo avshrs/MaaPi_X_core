@@ -71,8 +71,8 @@ class DS18X20(SensProto):
                     self.out_table[i] = dt.now()
             self.outputs = []
             
-        except:
-            pass
+        except Exception as e:
+            print(e)
     def loop(self):
         while self.isRunning:
             time.sleep(0.01)
