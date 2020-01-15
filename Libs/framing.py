@@ -19,7 +19,7 @@ from ctypes import (
 from binascii import hexlify, unhexlify
 
 
-from constants import (
+from Libs.constants import (
     HEADER, FOOTER, EVENT_MONITORING, EVENT_CLASSES, EVENT_DESCRIPTIONS,
     OBJECT_KINDS
 )
