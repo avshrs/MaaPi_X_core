@@ -34,7 +34,9 @@ class DS18X20(SensProto):
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         error = 0
         value = 0
+        print("dupa")
         try:
+        
             pin = devices_db[dev_id]["dev_gpio_pin"]
             rom_id = devices_db[dev_id]["dev_rom_id"]
             print(f"|{rom_id}|,|{rom_id[-2]}|,{pin}")
