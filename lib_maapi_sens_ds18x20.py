@@ -48,7 +48,7 @@ class DS18X20(SensProto):
 
         except EnvironmentError as e:
             self.maapilogger.log("ERROR", f"throw : {e}")
-            return value, 1
+            return 9999, 1
         else:
             if value == 85:
                 return value, 1
