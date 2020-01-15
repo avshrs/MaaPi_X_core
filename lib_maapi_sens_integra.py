@@ -39,10 +39,10 @@ class DS18X20(SensProto):
             rom_id = devices_db[dev_id]["dev_rom_id"]
             if rom_id[-2] == "in":
                 if pin in self.in_table and (dt.now() - self.in_table[i]).seconds <= self.interval:
-                    value = self.inputs[pin]
+                    value = 1
             else:
                 if pin in self.out_table and (dt.now() - self.out_table[i]).seconds <= self.interval:
-                    value = self.outputs[pin]
+                    value = 1
         
         except EnvironmentError as e:
             self.maapilogger.log("ERROR", f"throw : {e}")
@@ -51,7 +51,7 @@ class DS18X20(SensProto):
     def service_startup(self):
         pass
 
-    def getreadings(self);
+    def getreadings(self):
         try:
             self.inputs = self.integ.get_violated_zones()
             for i in self.inputs:
