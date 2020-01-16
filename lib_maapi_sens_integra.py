@@ -33,6 +33,7 @@ class INTEGRA(SensProto):
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         error = 0
         value = 0
+        self.maapilogger.log("ERROR", "before try")
         try:
             pin = devices_db[dev_id]["dev_gpio_pin"]
             rom_id = devices_db[dev_id]["dev_rom_id"]
@@ -72,7 +73,7 @@ class INTEGRA(SensProto):
             self.outputs = []
             
         except Exception as e:
-            print(e)
+            self.maapilogger.log("ERROR", f"throw : {e}")
     def loop(self):
         while self.isRunning:
             time.sleep(0.1)
