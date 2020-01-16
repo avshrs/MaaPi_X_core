@@ -37,7 +37,7 @@ class INTEGRA(SensProto):
             pin = devices_db[dev_id]["dev_gpio_pin"]
             rom_id = devices_db[dev_id]["dev_rom_id"]
 
-            if rom_id[-2] == "in":
+            if rom_id[-2:] == "in":
                 if pin in self.in_table and (dt.now() - self.in_table[i]).seconds <= self.interval:
                     value = 1
             else:
