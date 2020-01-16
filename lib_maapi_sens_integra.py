@@ -26,20 +26,17 @@ class INTEGRA(SensProto):
         self.integ = Integra(user_code=1234, host='192.168.1.240', port=25197)
         self.inputs = []
         self.outputs = []
-
         self.in_table = {}
         self.out_table = {}
-        self.interval = 12
+        self.interval = 10
 
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         error = 0
         value = 0
-        print("dupa")
         try:
-        
             pin = devices_db[dev_id]["dev_gpio_pin"]
             rom_id = devices_db[dev_id]["dev_rom_id"]
-            print(f"|{rom_id}|,|{rom_id[-2]}|,{pin}")
+
             if rom_id[-2] == "in":
                 if pin in self.in_table and (dt.now() - self.in_table[i]).seconds <= self.interval:
                     value = 1
@@ -76,7 +73,7 @@ class INTEGRA(SensProto):
             print(e)
     def loop(self):
         while self.isRunning:
-            time.sleep(0.01)
+            time.sleep(0.1)
             self.getreadings()
             self.checkQueueForReadings()
             self.responceToWatcher()
