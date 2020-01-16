@@ -46,13 +46,14 @@ class INTEGRA(SensProto):
             else:
                 if pin in self.out_table and (dt.now() - self.out_table[i]).seconds <= self.interval:
                     value = 1
-        
+
         except EnvironmentError as e:
             self.maapilogger.log("ERROR", f"throw : {e}")
             return 9999, 1
-
+        return value, error
+        
     def service_startup(self):
-        pass
+        pass value
 
     def getreadings(self):
         try:
