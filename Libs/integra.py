@@ -57,7 +57,7 @@ class Integra(object):
             sock.close()
 
             # integra will respond "Busy!" if it gets next message too early
-            if (resp[0:8] == b'\x10\x42\x75\x73\x79\x21\x0D\x0A'):
+            if (resp[0:2] == b'\x10\x42'):
                 time.sleep(self.delay * (attempt + 1))
             else:
                 break
