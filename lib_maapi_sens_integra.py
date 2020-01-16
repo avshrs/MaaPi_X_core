@@ -36,9 +36,11 @@ class INTEGRA(SensProto):
         try:
             pin = devices_db[dev_id]["dev_gpio_pin"]
             rom_id = devices_db[dev_id]["dev_rom_id"]
-
+            self.maapilogger.log("ERROR", "in try")
             if rom_id[-2:] == "in":
+                self.maapilogger.log("ERROR", "in if in")
                 if pin in self.in_table and (dt.now() - self.in_table[i]).seconds <= self.interval:
+                    self.maapilogger.log("ERROR", "set value =1")
                     value = 1
             else:
                 if pin in self.out_table and (dt.now() - self.out_table[i]).seconds <= self.interval:
