@@ -33,18 +33,14 @@ class INTEGRA(SensProto):
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         error = 0
         value = 0
-        self.maapilogger.log("ERROR", "before try")
         try:
             pin = devices_db[dev_id]["dev_gpio_pin"]
             rom_id = devices_db[dev_id]["dev_rom_id"]
-            self.maapilogger.log("ERROR", "in try")
             if rom_id[-2:] == "in":
-                self.maapilogger.log("ERROR", "in if in")
-                if pin in self.in_table and (dt.now() - self.in_table[i]).seconds <= self.interval:
-                    self.maapilogger.log("ERROR", "set value =1")
+                if pin in self.in_table and (dt.now() - self.in_table[pin]).seconds <= self.interval:
                     value = 1
             else:
-                if pin in self.out_table and (dt.now() - self.out_table[i]).seconds <= self.interval:
+                if pin in self.out_table and (dt.now() - self.out_table[pin]).seconds <= self.interval:
                     value = 1
             return value, error
         except EnvironmentError as e:
