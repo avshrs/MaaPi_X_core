@@ -11,7 +11,7 @@ from lib_maapi_sens_proto import SensProto
 import time, copy, sys, os, signal
 from datetime import datetime as dt
 
-class DS18X20(SensProto):
+class INTEGRA(SensProto):
     def __init__(self,host,port,id_, ss_proto):
         super().__init__()
         self.id_ = id_
@@ -82,6 +82,6 @@ class DS18X20(SensProto):
 
 
 if __name__ == "__main__":
-    DS18X20_ =  DS18X20(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
+    DS18X20_ =  INTEGRA(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
     DS18X20_.service_startup()
     DS18X20_.loop()
