@@ -51,9 +51,9 @@ class INTEGRA(SensProto):
             self.maapilogger.log("ERROR", f"throw : {e}")
             return 9999, 1
         return value, error
-        
+
     def service_startup(self):
-        pass value
+        pass 
 
     def getreadings(self):
         try:
