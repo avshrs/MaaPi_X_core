@@ -72,13 +72,13 @@ class SocketServer():
                 self.sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 self.sockTCP.bind((host, port))
 
-            self.sockTCP.listen(10000)
+            self.sockTCP.listen(2000000)
             self.maapilogger.log("START", self.sockTCP)
             while not self.selfkill:
                 client, address = self.sockTCP.accept()
                 with client:
                     while not self.selfkill:
-                        data = client.recv(200000)
+                        data = client.recv(2000000)
                         if not data:
                             break
                         payload_id, payload_, payload2_, payload3_, fromHost_, fromPort_ = self.helpers.payloadFromPicke(data)
@@ -114,7 +114,7 @@ class SocketServer():
             self.sockUDP.bind((host, port))
             self.maapilogger.log("INFO", self.sockUDP)
             while not self.selfkill:
-                data, address = self.sockUDP.recvfrom(4096)
+                data, address = self.sockUDP.recvfrom(200000)
                 if data:
                     payload_id, dev_id, value, name, fromHost, fromPort = data.decode("utf-8").split("_")
                     if int(payload_id) == 99:
