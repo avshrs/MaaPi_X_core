@@ -1,4 +1,5 @@
 {
-    "C_Cpp.intelliSenseEngineFallback": "Disabled",
-    "python.linting.pylintEnabled": true
+    "C_Cpp.intelliSenseEngineFallback": "Enabled",
+    "python.linting.pylintEnabled": true,
+    "python.pythonPath": "/bin/python"
 }
