@@ -1,5 +1,7 @@
 
 import copy
+import sys
+sys.path.append("libs/")
 import lib_maapi_main_helpers as Helpers
 import MaaPi_Config as Config
 import lib_maapi_main_dbconn as Db_connection
@@ -120,7 +122,7 @@ class serviceClass():
                 f"Starting Selector Service at host:{host}, port:{port}"
                 )
 
-            self.selectorPid = subprocess.Popen([self.interpreterVer, f"{name}.py"])
+            self.selectorPid = subprocess.Popen([self.interpreterVer, f"libs/{name}.py"])
 
             self.maapilogger.log(
                 "START",
@@ -131,7 +133,7 @@ class serviceClass():
                 "maapi_running_py_scripts",(
                     "default",
                     f"'{name}'",
-                    f"'{name}.py'",
+                    f"'libs/{name}.py'",
                     "now()",
                     f"{self.board_id}",
                     f"{self.selectorPid.pid }"
@@ -234,7 +236,7 @@ class serviceClass():
 
                 lists =[
                     self.interpreterVer,
-                    f"{self.libraryList[lib]['device_lib_name']}.py",
+                    f"libs/{self.libraryList[lib]['device_lib_name']}.py",
                     f"{self.selectorHost}",
                     f"{self.libraryList[lib]['device_port']}",
                     f"{lib}",

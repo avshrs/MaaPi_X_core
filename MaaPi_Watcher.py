@@ -10,6 +10,7 @@
 import time
 import os
 import sys
+sys.path.append("libs/")
 import signal
 import psutil
 import lib_maapi_main_socketServer as SocketServer
@@ -89,28 +90,19 @@ class MaapiWatcher(serviceClass):
     def checkPIDsParameters(self):
         """check pids cpu and mem usage"""
         # selector
-        self.maapiDB.updateRaw(
-            "maapi_running_py_scripts",
-            f"py_mem_usage={round(psutil.Process(self.selectorPid.pid).memory_info()[0]/1000000,3)}",
-            f"py_pid={self.selectorPid.pid}"
-            )
-        self.maapiDB.updateRaw(
-            "maapi_running_py_scripts",
-            f"py_cpu_usage={round(psutil.Process(self.selectorPid.pid).cpu_percent(interval=1),3)}",
-            f"py_pid={self.selectorPid.pid}")
-
-        # watcher
-        self.maapiDB.updateRaw(
-            "maapi_running_py_scripts",
-            f"py_mem_usage={round(psutil.Process(self.pid).memory_info()[0]/1000000,3)}",
-            f"py_pid={self.pid}"
-            )
-
-        self.maapiDB.updateRaw(
-            "maapi_running_py_scripts",
-            f"py_cpu_usage={round(psutil.Process(self.pid).cpu_percent(interval=1),3)}",
-            f"py_pid={self.pid}"
-            )
+        pidlist = (self.selectorPid.pid, self.pid)
+        for pid in pidlist:
+            mem = round(psutil.Process(pid).memory_info()[0]/1000000,3)
+            self.maapiDB.updateRaw(
+                "maapi_running_py_scripts",
+                f"py_mem_usage={mem}",
+                f"py_pid={pid}"
+                )
+            cpu = round(psutil.Process(pid).cpu_percent(interval=1),3)
+            self.maapiDB.updateRaw(
+                "maapi_running_py_scripts",
+                f"py_cpu_usage={cpu}",
+                f"py_pid={pid}")
 
         # chek rest of library
         for process in self.libraryPID:
