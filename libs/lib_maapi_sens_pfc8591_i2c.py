@@ -71,20 +71,18 @@ class PFC8591(SensProto):
                                 out.append(0)
                             else:
                                 out.append(dd)
-                    value = (out[3]*(ref_volt/255))
+                    value_ = (out[3]*(ref_volt/255))
 
                     if unit_id == 21:
-                        value = value / toAmper
+                        return (value_ / toAmper), 0
                     elif unit_id == 19:
-                        value = (value / toAmper) * to_wats
+                        return ((value_ / toAmper) * to_wats), 0
                     elif unit_id == 20:
-                        value = value * to_volts
+                        return (value_ * to_volts), 0
+                    
         except Exception as e:
             return value, 1
             self.maapilogger.log("ERROR", f"Exception read values {self.objectname}: {e}")
-        else:
-            return value, error
-        return value, error
 
     def service_startup(self):
         self.getTables()

@@ -6,12 +6,16 @@
 #
 ##############################################################
 
-from lib_maapi_sens_proto import SensProto
-import time, copy, sys, os, signal
+import time
+import  sys
+import  os
+from w1thermsensor import W1ThermSensor as W1
 from datetime import datetime as dt
+from lib_maapi_sens_proto import SensProto
+
 
 class DS18X20(SensProto):
-    def __init__(self,host,port,id_, ss_proto):
+    def __init__(self, host, port,id_, ss_proto):
         super().__init__()
         self.id_ = id_
         self.ssProto = ss_proto
@@ -27,32 +31,20 @@ class DS18X20(SensProto):
     def readValues(self, que, dev_id, devices_db, devices_db_rel):
         error = 0
         value = 0
-        try:
-            rom_id = devices_db[dev_id]["dev_rom_id"]
-            if os.path.isfile(f'/sys/bus/w1/devices/{rom_id}/w1_slave'):
-                w1_file = open(f'/sys/bus/w1/devices/{rom_id}/w1_slave','r')
-
-                w1_crc = w1_file.readline().rsplit(' ', 1)
-                w1_crc = w1_crc[1].replace('\n', '')
-                self.maapilogger.log("DEBUG", f"CRC - {w1_crc}")
-                if w1_crc == 'YES':
-                    value = float(float((w1_file.readline()).rsplit('t=', 1)[1]) / float(1000))
-                    self.maapilogger.log("DEBUG", f"Read_data_from_1w - Value is {value} for {rom_id} {dev_id}")
-                    w1_file.close()
-                else:
-                    w1_file.close()
-                    self.maapilogger.log("ERROR", "CRC False")
-                    error = 2
-            else:
-                self.maapilogger.log("ERROR", f"ERROR reading values from {rom_id}: {dev_id} sensor not exist")
-
-        except EnvironmentError as e:
-            self.maapilogger.log("ERROR", f"throw : {e}")
-            return 9999, 1
-        else:
-            if value == 85:
-                return value, 1
+        rom_id = devices_db[dev_id]["dev_rom_id"]
+        stype = {
+            28:0x28,
+            10:0x10,
+            22:0x22,
+            42:0x42
+        }
+        try: 
+            value = W1(stype[int(rom_id[:2])], rom_id[3:]).get_temperature()
             return value, error
+        except Exception as e:
+            self.maapilogger.log("ERROR", f"ERROR reading values {rom_id}, {dev_id} sensor not exist")
+            self.maapilogger.log("ERROR", f"Throw : {e}")
+            return 85, 1
 
     def service_startup(self):
         pass
