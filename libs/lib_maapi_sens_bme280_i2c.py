@@ -5,7 +5,7 @@
 #                          MAAPI X
 #
 ##############################################################
-from Adafruit_BME280 import *
+from Libs.Adafruit_BME280 import *
 from lib_maapi_sens_proto import SensProto
 
 import time, copy, sys, os, signal
