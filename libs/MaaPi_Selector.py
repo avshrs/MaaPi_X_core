@@ -106,8 +106,8 @@ class MaapiSelector():
                 except Exception as error:
                     self.maapilogger.log(
                         "ERROR",
-                        f"Exception checkDbForOldreadings - Send dev_id: "
-                        f"{dev} to lib: {self.deviceList[dev]['dev_type_id']} "
+                        f"Exception Send message to running service - Send dev_id: "
+                        f"{dev} to lib: {self.deviceList[dev]['dev_MAAtype_id'], }, {self.runningServices[serv]['ss_host']} "
                         f"library for dev not exist in database for this location/board{error}"
                         )
 
